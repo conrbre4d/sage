@@ -1,0 +1,167 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Personal loan application</title>
+<style>
+  :root { --bg:#f6f7f9; --card:#fff; --ink:#1b1f24; --muted:#5b6470; --line:#d9dde3; --accent:#c8102e; --ok:#1a7f37; }
+  @media (prefers-color-scheme: dark) { :root { --bg:#14171a; --card:#1d2125; --ink:#e8eaed; --muted:#9aa3ad; --line:#30363d; } }
+  * { box-sizing: border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:16px/1.5 system-ui, -apple-system, "Segoe UI", sans-serif; }
+  main { max-width: 760px; margin: 0 auto; padding: 24px 16px 64px; }
+  h1 { font-size: 1.6rem; margin: 0 0 4px; }
+  p.sub { color: var(--muted); margin: 0 0 24px; }
+  fieldset { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin:0 0 16px; }
+  legend { font-weight:600; padding:0 6px; }
+  .grid { display:grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); gap: 12px 16px; }
+  label { display:flex; flex-direction:column; font-size:.9rem; color:var(--muted); gap:4px; }
+  input, select, textarea { font:inherit; color:var(--ink); background:var(--bg); border:1px solid var(--line); border-radius:6px; padding:8px 10px; }
+  textarea { min-height: 90px; resize: vertical; }
+  .check { flex-direction:row; align-items:center; gap:8px; color:var(--ink); }
+  .note { font-size:.85rem; color:var(--muted); margin:8px 0 0; }
+  .row { display:flex; gap:12px; flex-wrap:wrap; align-items:center; }
+  button { font:inherit; font-weight:600; border:0; border-radius:8px; padding:10px 18px; cursor:pointer; background:var(--accent); color:#fff; }
+  button.secondary { background:transparent; color:var(--ink); border:1px solid var(--line); }
+  #result { background:var(--card); border:1px solid var(--line); border-radius:10px; padding:16px; margin-top:16px; display:none; }
+  #result h2 { margin:0 0 8px; font-size:1.1rem; }
+  .ok { color: var(--ok); }
+  pre { white-space: pre-wrap; font-size:.85rem; color:var(--muted); }
+</style>
+</head>
+<body>
+<main>
+  <h1>Personal loan application</h1>
+  <p class="sub">Synthetic demo. Don't enter real details. Your name, date of birth, address and account are encrypted before they're stored, and no AI ever sees them.</p>
+
+  <form id="loan">
+    <fieldset>
+      <legend>About you <span class="note">(encrypted)</span></legend>
+      <div class="grid">
+        <label>Full name<input name="name" required value="Mia Chen"></label>
+        <label>Date of birth<input name="date_of_birth" type="date" required value="1995-03-02"></label>
+        <label>Address<input name="address" required value="4 Banksia Court, Toowong QLD 4066"></label>
+        <label>BSB / account<input name="account_number" value="032-000 51 7788"></label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Work and income</legend>
+      <div class="grid">
+        <label>Employer <span class="note">(encrypted)</span><input name="employer" required value="Riverbend Health Pty Ltd"></label>
+        <label>Employment<input name="employment" value="full-time, 4 years"></label>
+        <label>Annual gross income ($)<input name="gross_income" type="number" min="1" required value="85000"></label>
+        <label>Pay frequency
+          <select name="pay_frequency"><option>weekly</option><option selected>fortnightly</option><option>monthly</option></select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>The loan</legend>
+      <div class="grid">
+        <label>Amount ($)<input name="requested" type="number" min="1" required value="12000"></label>
+        <label>Term (years, optional)<input name="term_years" type="number" min="1" max="10" placeholder="we'll ask"></label>
+        <label>Purpose
+          <select name="purpose">
+            <option>car</option><option>debt consolidation</option><option>home improvement</option>
+            <option>travel</option><option>wedding</option><option>education</option><option>other</option>
+          </select>
+        </label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Your finances</legend>
+      <div class="grid">
+        <label>Monthly living expenses ($)<input name="monthly_expenses" type="number" min="0" required value="2100"></label>
+        <label>Credit card limits ($)<input name="credit_card_limit" type="number" min="0" value="5000"></label>
+        <label>Household
+          <select name="household"><option selected>single</option><option>couple</option></select>
+        </label>
+        <label>Dependants<input name="dependants" type="number" min="0" max="10" value="0"></label>
+        <label class="check"><input name="has_hecs" type="checkbox"> I have a HECS-HELP debt</label>
+        <label class="check"><input name="existing_customer" type="checkbox" checked> I'm an existing customer</label>
+      </div>
+    </fieldset>
+
+    <fieldset>
+      <legend>Tell us about your loan</legend>
+      <label>In your own words
+        <textarea name="customer_message" required>Hi, I'm Mia Chen, I'm 31. I'd like to borrow $12,000 to buy a car.</textarea>
+      </label>
+      <label style="margin-top:12px">Demo only: your reply if our assistant asks a question
+        <input name="customer_reply" value="3 years please">
+      </label>
+    </fieldset>
+
+    <div class="row">
+      <button type="submit" data-process="false">Submit application</button>
+      <button type="submit" class="secondary" data-process="true">Submit and process now</button>
+    </div>
+  </form>
+
+  <div id="result" aria-live="polite"></div>
+</main>
+
+<script>
+const form = document.getElementById("loan");
+const result = document.getElementById("result");
+// Served by AgentLens at /bank/form? Then submissions go through AgentLens and open its dashboard.
+const WITH_AGENTLENS = location.pathname.startsWith("/bank/");
+if (WITH_AGENTLENS) {
+  document.querySelector('[data-process="false"]').textContent = "Submit application";
+  document.querySelector('[data-process="true"]').remove();
+}
+const NUM = ["gross_income", "requested", "term_years", "monthly_expenses", "credit_card_limit", "dependants"];
+
+form.addEventListener("submit", async (ev) => {
+  ev.preventDefault();
+  const process = ev.submitter?.dataset.process === "true";
+  const fd = new FormData(form);
+  const body = {};
+  for (const [k, v] of fd.entries()) {
+    if (k === "customer_reply" || v === "") continue;  // blank optional fields are left out
+    body[k] = NUM.includes(k) ? Number(v) : v;
+  }
+  body.has_hecs = fd.has("has_hecs");
+  body.existing_customer = fd.has("existing_customer");
+  const reply = (fd.get("customer_reply") || "").trim();
+  body.customer_replies = reply ? [reply] : [];
+  if (!body.account_number) delete body.account_number;
+
+  result.style.display = "block";
+  result.innerHTML = `<p>${process ? "Submitting and running the agents (this takes a few seconds)…" : "Submitting…"}</p>`;
+  try {
+    if (WITH_AGENTLENS) {
+      // AgentLens is running: it stores the application, runs the agents in the background
+      // while it watches, and the dashboard shows the case live.
+      const r = await fetch("../api/applications", {
+        method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+      const out = await r.json();
+      if (!r.ok) throw new Error(typeof out.detail === "string" ? out.detail : JSON.stringify(out.detail));
+      result.innerHTML = `<h2 class="ok">Application ${out.case_id} submitted</h2><p>Opening the AgentLens dashboard…</p>`;
+      window.location.href = `..${out.dashboard}`;
+      return;
+    }
+    const r = await fetch(`applications${process ? "?process=true" : ""}`, {
+      method: "POST", headers: {"Content-Type": "application/json"}, body: JSON.stringify(body)});
+    const out = await r.json();
+    if (!r.ok) throw new Error(typeof out.detail === "string" ? out.detail : JSON.stringify(out.detail));
+    const esc = (s) => String(s ?? "").replace(/[&<>"]/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c]));
+    result.innerHTML = process
+      ? `<h2 class="ok">${esc(out.case_id)}: ${esc(out.status)}</h2>
+         <p>${esc(out.customer_message)}</p>
+         <pre>decision: ${esc(out.decision)} · confidence: ${esc(out.confidence)} · ${esc(out.events)} events logged
+reasoning: ${esc(out.summary)}</pre>
+         <p class="note">Event log: <a href="event_log/${esc(out.case_id)}">event_log/${esc(out.case_id)}</a></p>`
+      : `<h2 class="ok">Application ${esc(out.case_id)} received</h2>
+         <p>Status: ${esc(out.status)}. Process it with <code>POST /process/${esc(out.case_id)}</code>
+         or <code>python main.py process ${esc(out.case_id)}</code>.</p>`;
+  } catch (e) {
+    result.innerHTML = `<h2>Something went wrong</h2><pre>${String(e.message).replace(/</g, "&lt;")}</pre>`;
+  }
+});
+</script>
+</body>
+</html>

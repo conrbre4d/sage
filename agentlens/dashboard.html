@@ -1,0 +1,517 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>AgentLens</title>
+<style>
+  :root {
+    --bg:#f3f4f6; --card:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --soft:#f9fafb;
+    --dark:#0f172a; --green:#16a34a; --green-bg:#ecfdf3; --green-line:#bbf7d0;
+    --orange:#c2410c; --orange-bg:#fff4e0; --orange-line:#f5b14c; --amber-ink:#92400e;
+    --blue:#1d4ed8; --blue-bg:#e8f0fe; --blue-line:#3b82f6;
+    --red:#b42318; --red-bg:#fef2f2; --red-line:#fecaca; --violet:#5b5bd6; --violet-bg:#eef2ff;
+  }
+  * { box-sizing:border-box; }
+  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
+  button { font:inherit; cursor:pointer; }
+  .mono { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
+  header { background:var(--card); border-bottom:1px solid var(--line); }
+  .bar { max-width:1180px; margin:0 auto; padding:16px 24px 0; }
+  .brand { display:flex; align-items:center; gap:12px; }
+  .logo { width:36px; height:36px; border-radius:9px; background:var(--dark); display:grid; place-items:center; }
+  .brand h1 { font-size:20px; margin:0; font-weight:700; letter-spacing:-.01em; }
+  .pill { font-size:12px; padding:3px 10px; border-radius:999px; font-weight:500; }
+  .pill.proto { background:#fdf2c4; color:#7a5b00; }
+  .who { margin-left:auto; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
+  .avatar { width:32px; height:32px; border-radius:50%; background:#e0e7ff; color:#3730a3; display:grid; place-items:center; font-weight:700; font-size:12px; }
+  .tabs { display:flex; gap:28px; margin-top:14px; }
+  .tab { background:none; border:0; padding:10px 2px 12px; color:var(--muted); font-weight:500; border-bottom:2px solid transparent; display:flex; gap:8px; align-items:center; }
+  .tab.on { color:var(--ink); border-bottom-color:var(--ink); }
+  .count { font-size:11px; min-width:20px; padding:1px 6px; border-radius:999px; background:#eef0f3; color:var(--ink); }
+  .tab.on .count { background:var(--dark); color:#fff; }
+  main { max-width:1180px; margin:0 auto; padding:22px 24px 60px; }
+
+  .runbar { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 16px; margin-bottom:18px; flex-wrap:wrap; }
+  .runbar select { font:inherit; padding:6px 8px; border-radius:8px; border:1px solid var(--line); background:#fff; }
+  .btn { border:1px solid var(--line); background:#fff; color:var(--ink); padding:8px 14px; border-radius:10px; font-weight:600; }
+  .btn.dark { background:var(--dark); color:#fff; border-color:var(--dark); }
+  .btn.danger { color:var(--red); border-color:var(--red-line); }
+  .btn:disabled { opacity:.45; cursor:not-allowed; }
+  .runmsg { color:var(--muted); font-size:13px; flex:1; min-width:200px; }
+  .runmsg b { color:var(--ink); }
+  .runmsg .err { color:var(--red); }
+  .track { height:6px; border-radius:99px; background:#e9ebef; overflow:hidden; }
+  .track > i { display:block; height:100%; background:var(--green); border-radius:99px; transition:width .4s; }
+  .runbar .track { width:180px; }
+  a.link { color:var(--violet); text-decoration:none; font-weight:500; font-size:13px; }
+
+  .stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px; }
+  .stat { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; min-height:122px; }
+  .stat.hot { border:2px solid var(--orange-line); }
+  .stat h3 { margin:0 0 6px; font-size:13px; font-weight:600; color:#374151; }
+  .stat.hot h3 { color:var(--amber-ink); }
+  .big { font-size:34px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
+  .stat.hot .big { color:var(--amber-ink); }
+  .big small { font-size:13px; color:var(--muted); font-weight:500; margin-left:6px; }
+  .stat .track { margin-top:14px; }
+  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
+  .sev { font-size:12px; padding:2px 10px; border-radius:999px; font-weight:500; white-space:nowrap; }
+  .sev.Critical { background:var(--red-bg); color:var(--red); }
+  .sev.High { background:var(--orange-bg); color:var(--orange); }
+  .sev.Medium { background:var(--blue-bg); color:var(--blue); }
+  .down { color:var(--red); font-size:13px; font-weight:600; margin-top:8px; }
+  .down div + div { margin-top:2px; }
+
+  .review { display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start; }
+  .review h2, .section h2 { font-size:15px; margin:0 0 12px; }
+  .qitem { width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 14px 14px 22px; margin-bottom:10px; position:relative; display:flex; align-items:center; gap:10px; }
+  .qitem::before { content:""; position:absolute; left:10px; top:12px; bottom:12px; width:4px; border-radius:4px; background:var(--blue-line); }
+  .qitem.High::before { background:var(--orange-line); }
+  .qitem.Critical::before { background:#ef4444; }
+  .qitem.on { border:2px solid var(--ink); padding:13px 13px 13px 21px; }
+  .qitem .t { font-weight:600; }
+  .qitem .s { font-size:12px; color:var(--muted); }
+  .qitem .sev { margin-left:auto; }
+  .empty { color:var(--muted); background:var(--card); border:1px dashed var(--line); border-radius:12px; padding:20px; text-align:center; }
+
+  .detail { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px 26px 22px; min-height:420px; }
+  .dhead { display:flex; align-items:flex-start; gap:12px; }
+  .meta { font-size:12px; color:var(--muted); }
+  .detail h2.title { font-size:22px; margin:6px 0 20px; letter-spacing:-.01em; }
+  .compare { display:grid; grid-template-columns:1fr 32px 1fr; align-items:center; gap:10px; margin-bottom:16px; }
+  .box { border:1px solid var(--line); background:var(--soft); border-radius:14px; padding:16px 18px; }
+  .box.bad { background:var(--red-bg); border-color:var(--red-line); }
+  .box .l { font-size:12.5px; color:#374151; }
+  .box.bad .l, .box.bad .v, .box.bad .x { color:var(--red); }
+  .box .v { font-size:30px; font-weight:700; margin:2px 0; letter-spacing:-.02em; overflow-wrap:anywhere; }
+  .box .x { font-size:12.5px; color:var(--muted); }
+  .arrow { color:#9ca3af; text-align:center; font-size:18px; }
+  .ai { background:var(--violet-bg); border-radius:12px; padding:14px 16px; display:flex; gap:12px; margin-bottom:18px; }
+  .ai .spark { color:var(--violet); font-size:16px; line-height:1.3; }
+  .ai p { margin:0 0 4px; }
+  .ai .act { color:#3730a3; font-weight:600; font-size:13px; }
+  .ai .by { color:var(--muted); font-size:11px; margin-left:6px; font-weight:400; }
+  .where { font-size:12.5px; color:var(--muted); margin-bottom:8px; }
+  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:20px; }
+  .step { font-size:12.5px; padding:5px 10px; border-radius:8px; border:1px solid var(--green-line); background:var(--green-bg); color:#15803d; font-weight:500; }
+  .step.bad { border-color:var(--red-line); background:var(--red-bg); color:var(--red); }
+  .step.skip { border-color:var(--line); background:var(--soft); color:#9ca3af; }
+  .step.end { background:var(--dark); color:#fff; border-color:var(--dark); }
+  .step.end.ok { background:var(--green); border-color:var(--green); }
+  .sep { color:#c0c4cc; font-size:12px; }
+  .actions { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:12px; border-top:1px solid var(--line); padding-top:18px; }
+  .actions .btn { padding:12px; border-radius:12px; }
+  details { margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
+  summary { cursor:pointer; color:#374151; font-weight:600; font-size:13px; }
+  .vs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
+  .vs div { background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13px; }
+  .vs b { display:block; font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
+  table.ev { width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; }
+  table.ev td { padding:6px 8px; border-top:1px solid var(--line); vertical-align:top; }
+  table.ev td.r { font-weight:600; }
+  .r.fail { color:var(--red); } .r.flag { color:var(--orange); } .r.pass { color:var(--green); }
+
+  .agents { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px; }
+  .agent { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
+  .agent.sel { border:2px solid var(--ink); padding:19px; }
+  .agent h3 { margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:8px; }
+  .lvl { font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; margin-left:auto; }
+  .lvl.FULL { background:var(--green-bg); color:#15803d; } .lvl.P2 { background:#ecfccb; color:#3f6212; }
+  .lvl.P1 { background:var(--red-bg); color:var(--red); } .lvl.L { background:#fef9c3; color:#854d0e; }
+  .lvl.SUSPENDED { background:var(--dark); color:#fff; }
+  .kv { display:grid; grid-template-columns:1fr auto; gap:4px 10px; font-size:13px; color:#374151; margin-top:10px; }
+  .kv span:nth-child(even) { font-weight:600; text-align:right; }
+  .agent .row { display:flex; gap:8px; margin-top:14px; }
+  .section { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px; }
+  .sug { border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-top:10px; }
+  .sug .top { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
+  .st { font-size:12px; padding:2px 9px; border-radius:999px; font-weight:600; background:#eef0f3; }
+  .st.proposed { background:var(--blue-bg); color:var(--blue); } .st.testing { background:#fef9c3; color:#854d0e; }
+  .st.applied { background:var(--orange-bg); color:var(--orange); } .st.resolved { background:var(--green-bg); color:#15803d; }
+  .st.rejected { background:#f3f4f6; color:var(--muted); }
+  .sug p { margin:6px 0 0; font-size:13px; color:#374151; }
+  .sug .fix { font-weight:600; color:var(--ink); }
+  .sug .res { font-size:12.5px; color:var(--muted); margin-top:6px; }
+  .hist { font-size:13px; }
+  .hist div { display:grid; grid-template-columns:150px 70px 1fr; gap:10px; padding:7px 0; border-top:1px solid var(--line); }
+  .neg { color:var(--red); font-weight:600; } .zero { color:var(--muted); }
+  .twocol { display:grid; grid-template-columns:1.2fr 1fr; gap:18px; }
+  .minis { margin-top:10px; display:grid; gap:6px; }
+  .mini { display:flex; align-items:center; gap:8px; font-size:13px; }
+  .mini .nm { color:#374151; }
+  .mini .sc { margin-left:auto; font-weight:700; }
+  .mini .lvl { margin-left:0; font-size:11px; padding:1px 8px; }
+  .apps { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:8px; }
+  .app { text-align:left; border:1px solid var(--line); background:#fff; border-radius:10px; padding:10px 12px; display:grid; grid-template-columns:1fr auto; gap:2px 8px; }
+  .app.on { border-color:var(--ink); }
+  .app .id { font-weight:600; font-size:13px; }
+  .app .sub { font-size:12px; color:var(--muted); grid-column:1 / -1; }
+  .stp { font-size:11.5px; padding:1px 8px; border-radius:999px; font-weight:600; align-self:start; white-space:nowrap; }
+  .stp.approved { background:var(--green-bg); color:#15803d; } .stp.declined { background:#f3f4f6; color:#374151; }
+  .stp.referred { background:var(--blue-bg); color:var(--blue); } .stp.held { background:var(--orange-bg); color:var(--orange); }
+  .stp.submitted { background:#f3f4f6; color:var(--muted); } .stp.verifying, .stp.deciding { background:var(--violet-bg); color:var(--violet); }
+  .stp.error { background:var(--red-bg); color:var(--red); }
+  .pulse { animation:pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { opacity:.45; } }
+  .okbox { background:var(--green-bg); border:1px solid var(--green-line); border-radius:12px; padding:14px 16px; color:#15803d; margin-bottom:18px; }
+  .okbox b { color:#14532d; }
+  @media (max-width: 900px) {
+    .stats, .agents { grid-template-columns:1fr; } .review, .twocol { grid-template-columns:1fr; }
+    .actions { grid-template-columns:1fr; } .compare { grid-template-columns:1fr; } .arrow { transform:rotate(90deg); }
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <div class="brand">
+      <div class="logo" aria-hidden="true">
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><circle cx="10.5" cy="10.5" r="1.6" fill="#fff" stroke="none"/></svg>
+      </div>
+      <h1>AgentLens</h1>
+      <span class="pill proto">Prototype · synthetic data</span>
+      <div class="who">Credit reviewer <div class="avatar">CR</div></div>
+    </div>
+    <nav class="tabs">
+      <button class="tab on" data-tab="review">Review <span class="count" id="reviewCount">0</span></button>
+      <button class="tab" data-tab="agents">Agents <span class="count" id="agentCount">3</span></button>
+    </nav>
+  </div>
+</header>
+
+<main>
+  <div class="runbar">
+    <button class="btn dark" id="runBtn">Run demo batch</button>
+    <select id="count" aria-label="Number of applications">
+      <option value="23">23 applications</option><option value="30" selected>30 applications</option>
+      <option value="45">45 applications</option><option value="60">60 applications</option>
+    </select>
+    <div class="track" id="runTrack" hidden><i id="runFill" style="width:0"></i></div>
+    <button class="btn" id="waitBtn" hidden data-needs-idle>Process waiting</button>
+    <div class="runmsg" id="runMsg">Submits synthetic loan applications; the bank's agents process them one by one while AgentLens watches.</div>
+    <a class="btn" href="/bank/form">+ New application</a>
+  </div>
+
+  <section id="tab-review">
+    <div class="stats">
+      <div class="stat">
+        <h3>Cleared automatically</h3>
+        <div class="big"><span id="sCleared">0</span><small id="sOf">of 0</small></div>
+        <div class="track"><i id="sClearedBar" style="width:0"></i></div>
+      </div>
+      <div class="stat hot">
+        <h3>Held for you</h3>
+        <div class="big" id="sHeld">0</div>
+        <div class="chips" id="sHeldChips"></div>
+      </div>
+      <div class="stat">
+        <h3>Agents restricted</h3>
+        <div class="big" id="sRestricted">0</div>
+        <div class="minis" id="sAgents"></div>
+      </div>
+    </div>
+
+    <div class="review">
+      <div>
+        <h2>Review queue</h2>
+        <div id="queue"></div>
+      </div>
+      <div class="detail" id="detail">
+        <div class="empty" style="border:0">Select a case from the queue, or submit a <a class="link" href="/bank/form">new application</a>.</div>
+      </div>
+    </div>
+
+    <div class="section" style="margin-top:24px">
+      <h2>All applications <span class="meta" id="appsMeta"></span></h2>
+      <div class="apps" id="apps"></div>
+    </div>
+  </section>
+
+  <section id="tab-agents" hidden>
+    <div class="agents" id="agentCards"></div>
+    <div class="twocol">
+      <div class="section">
+        <h2>Improvement suggestions</h2>
+        <div id="suggestions"></div>
+      </div>
+      <div class="section">
+        <h2>Licence history</h2>
+        <div class="hist" id="history"></div>
+      </div>
+    </div>
+    <div class="section">
+      <h2 id="mistakeTitle">Mistake log</h2>
+      <div id="mistakeLog"></div>
+    </div>
+  </section>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
+const money = (n) => n == null ? "" : (n >= 1000 ? `$${(n/1000).toFixed(n % 1000 ? 1 : 0)}k` : `$${n}`);
+const LEVEL = {SUSPENDED:"Suspended", L:"L-plates", P1:"Red P", P2:"Green P", FULL:"Full licence"};
+const AGENT = {intake_agent:"Intake agent", verification_agent:"Verification agent", decision_agent:"Decision agent"};
+let state = {tab:"review", selected:null, overview:null, detailStatus:null, selectedAgent:"verification_agent", explain:{}};
+
+async function api(path, opts={}) {
+  const r = await fetch(path, {headers:{"Content-Type":"application/json"}, ...opts});
+  const out = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(typeof out.detail === "string" ? out.detail : JSON.stringify(out.detail || out));
+  return out;
+}
+
+// ---- tabs
+document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
+  state.tab = b.dataset.tab;
+  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === b));
+  $("tab-review").hidden = state.tab !== "review";
+  $("tab-agents").hidden = state.tab !== "agents";
+  if (state.tab === "agents") loadAgent(state.selectedAgent);
+});
+
+// ---- run bar
+$("runBtn").onclick = async () => {
+  if (!confirm("This clears the demo data in the database and submits a fresh batch of synthetic applications. Continue?")) return;
+  state.selected = null; state.explain = {};
+  try { await api("/api/jobs/batch", {method:"POST", body:JSON.stringify({count:Number($("count").value)})}); }
+  catch (e) { alert(e.message); }
+  refresh();
+};
+
+function renderJob(job) {
+  const busy = job.running;
+  $("runBtn").disabled = busy;
+  document.querySelectorAll("[data-needs-idle]").forEach(b => b.disabled = busy);
+  $("runTrack").hidden = !(busy && job.total);
+  if (job.total) $("runFill").style.width = `${Math.round(100 * job.done / job.total)}%`;
+  if (job.error) $("runMsg").innerHTML = `<span class="err">${esc(job.error)}</span>`;
+  else if (job.message) $("runMsg").innerHTML = busy ? `<b>${esc(job.message)}</b>` : esc(job.message);
+}
+
+// ---- overview
+function renderOverview(o) {
+  const s = o.stats;
+  $("reviewCount").textContent = s.held;
+  $("sCleared").textContent = s.cleared;
+  $("sOf").textContent = `of ${s.total}`;
+  $("sClearedBar").style.width = s.total ? `${Math.round(100 * s.cleared / s.total)}%` : "0";
+  $("sHeld").textContent = s.held;
+  $("sHeldChips").innerHTML = ["Critical","High","Medium"].filter(k => s.held_by_severity[k])
+    .map(k => `<span class="sev ${k}">${s.held_by_severity[k]} ${k.toLowerCase()}</span>`).join("");
+  const restricted = o.agents.filter(a => a.level !== "FULL");
+  $("sRestricted").textContent = restricted.length;
+  $("sAgents").innerHTML = o.agents.map(a => `<div class="mini"><span class="nm">${esc(a.label)}</span>
+      <span class="lvl ${a.level}">${a.level === "FULL" ? "" : "↓ "}${esc(LEVEL[a.level])}</span><span class="sc">${a.trust_score}</span></div>`).join("");
+
+  const waiting = s.waiting;
+  $("waitBtn").hidden = !waiting;
+  $("waitBtn").textContent = `Process waiting (${waiting})`;
+  $("appsMeta").textContent = s.total ? `· ${s.total} total · ${s.processed} processed` : "";
+  const STATUS = {submitted:"Waiting", verifying:"Verifying…", deciding:"Deciding…", approved:"Approved",
+                  declined:"Declined", referred:"Referred", held:"Held", error:"Error"};
+  $("apps").innerHTML = o.applications.length ? o.applications.map(a => `
+    <button class="app ${a.case_id === state.selected ? "on" : ""}" data-case="${esc(a.case_id)}">
+      <span class="id mono">${esc(a.case_id)}</span>
+      <span class="stp ${esc(a.status)} ${["verifying","deciding"].includes(a.status) || a.live === "running" ? "pulse" : ""}">${esc(STATUS[a.status] || a.status)}</span>
+      <span class="sub">${money(a.amount)} ${esc(a.purpose)}${a.flagged ? " · ⚑ AgentLens flagged" : a.status !== "submitted" && !["verifying","deciding"].includes(a.status) ? " · ✓ no problems" : ""}</span>
+    </button>`).join("") : `<div class="empty">No applications yet.</div>`;
+  $("apps").querySelectorAll(".app").forEach(b => b.onclick = () => { selectCase(b.dataset.case); window.scrollTo({top:0, behavior:"smooth"}); });
+
+  const q = $("queue");
+  if (!o.queue.length) {
+    q.innerHTML = `<div class="empty">${s.total ? "Nothing held. Every case cleared." : "No applications yet. Click <b>Run demo batch</b>."}</div>`;
+  } else {
+    q.innerHTML = o.queue.map(c => `
+      <button class="qitem ${c.severity} ${c.case_id === state.selected ? "on" : ""}" data-case="${esc(c.case_id)}">
+        <div><div class="t">${esc(c.title)}</div><div class="s mono">${esc(c.case_id)} · ${money(c.amount)}</div></div>
+        <span class="sev ${c.severity}">${c.severity}</span>
+      </button>`).join("");
+    q.querySelectorAll(".qitem").forEach(b => b.onclick = () => selectCase(b.dataset.case));
+    if (!state.selected && !o.job.running) selectCase(o.queue[0].case_id);
+  }
+  if (state.selected) {
+    const st = o.statuses[state.selected];
+    if (st !== state.detailStatus) selectCase(state.selected, true);
+  }
+  renderAgents(o);
+}
+
+// ---- case detail
+async function selectCase(caseId, keep=false) {
+  state.selected = caseId;
+  document.querySelectorAll(".qitem, .app").forEach(b => b.classList.toggle("on", b.dataset.case === caseId));
+  if (!keep) history.replaceState(null, "", `?case=${encodeURIComponent(caseId)}`);
+  let d;
+  try { d = await api(`/api/case/${caseId}`); } catch (e) { $("detail").innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
+  state.detailStatus = d.status;
+  const m = d.primary;
+  const det = (m && m.details) || {};
+  const held = d.status === "held";
+  const working = ["submitted","verifying","deciding"].includes(d.status);
+  const endLabel = held ? "Held" : working ? "In progress" : (d.status.charAt(0).toUpperCase() + d.status.slice(1));
+  const flow = d.chips.map(c => `<span class="step ${c.state}" title="${esc(c.result || "not reached")}">${c.state === "bad" ? "✕" : c.state === "ok" ? "✓" : "·"} ${esc(c.label)}</span>`)
+    .join('<span class="sep">→</span>') + `<span class="sep">→</span><span class="step end ${held ? "" : "ok"}">${held ? "■" : "✓"} ${esc(endLabel)}</span>`;
+  $("detail").innerHTML = `
+    <div class="dhead">
+      <div class="meta mono">${esc(d.case_id)} · ${esc(d.token)}${m ? " · " + esc(m.agent_label) : ""}</div>
+      ${m ? `<span class="sev ${det.severity}" style="margin-left:auto">${esc(det.severity)}</span>` : ""}
+    </div>
+    <h2 class="title">${m ? esc(det.title) : ["submitted","verifying","deciding"].includes(d.status) ? "Agents are working on this case" : "No problems found"}</h2>
+    ${!m ? (["submitted","verifying","deciding"].includes(d.status)
+        ? `<div class="ai"><div class="spark pulse">✦</div><div><p><b>${d.status === "submitted" ? "Waiting for its turn" : d.status === "verifying" ? "Verification agent is checking the documents" : "Decision agent is deciding"}</b></p><p style="color:var(--muted)">AgentLens checks the event log after each agent, before the customer hears anything.</p></div></div>`
+        : `<div class="okbox"><b>✓ AgentLens checked every step and found nothing wrong.</b><br>${esc(money(d.amount))} ${esc(d.purpose)} loan · outcome <b>${esc(d.decision || d.status)}</b>. This case counts towards the agents' clean record.</div>`) : ""}
+    ${m ? `
+    <div class="compare">
+      <div class="box"><div class="l">${esc(det.left?.label)}</div><div class="v">${esc(det.left?.value)}</div><div class="x">${esc(det.left?.sub)}</div></div>
+      <div class="arrow">→</div>
+      <div class="box bad"><div class="l">${esc(det.right?.label)}</div><div class="v">${esc(det.right?.value)}</div><div class="x">${esc(det.right?.sub)}</div></div>
+    </div>
+    <div class="ai"><div class="spark">✦</div><div id="aiText"><p style="color:var(--muted)">Explaining…</p></div></div>` : ""}
+    <div class="where">${m ? "Where it went wrong" : "Steps"}</div>
+    <div class="flow">${flow}</div>
+    ${held ? `
+    <div class="actions">
+      <button class="btn dark" data-act="recalculate" data-needs-idle>Send back to recalculate</button>
+      <button class="btn" data-act="approve" data-needs-idle>Approve anyway</button>
+      <button class="btn danger" data-act="decline" data-needs-idle>Decline</button>
+    </div>` : ""}
+    ${d.mistakes.length ? `<details ${keep ? "" : ""}><summary>Agent's reasoning vs what should have happened (${d.mistakes.length})</summary>
+      ${d.mistakes.map(x => `<div style="margin-top:12px"><div class="meta">${esc(x.mistake_type)} · ${esc(AGENT[x.agent_name] || x.agent_name)} · rule ${esc(x.rule)}${x.resolved ? " · resolved" : ""}${d.events.some(e => e.event_id === x.event_id) ? "" : " · earlier run"}</div>
+        <div class="vs"><div><b>Agent said</b>${esc(x.agent_stated_reasoning)}</div><div><b>Should have</b>${esc(x.what_should_have_happened)}</div></div>
+        <p style="margin:8px 0 0;font-size:13px">${esc(x.mistake_reason)}</p></div>`).join("")}
+    </details>` : ""}
+    <details><summary>Event log (${d.events.length} steps)</summary>
+      <table class="ev">${d.events.map(e => `<tr><td class="mono">#${e.event_id}</td><td>${esc(AGENT[e.agent_name] || e.agent_name)}</td><td class="mono">${esc(e.step_name)}</td><td class="r ${esc(e.result)}">${esc(e.result)}</td><td>${esc(e.notes)}</td></tr>`).join("")}</table>
+    </details>`;
+  $("detail").querySelectorAll("[data-act]").forEach(b => b.onclick = () => review(d.case_id, b.dataset.act));
+  renderJob(state.overview?.job || {});
+  if (m) loadExplain(d.case_id);
+}
+
+async function loadExplain(caseId) {
+  if (!state.explain[caseId]) state.explain[caseId] = api(`/api/case/${caseId}/explain`).catch(() => null);
+  const x = await state.explain[caseId];
+  if (state.selected !== caseId || !$("aiText")) return;
+  $("aiText").innerHTML = x ? `<p>${esc(x.explanation)}<span class="by">${x.by === "ai" ? "AI explanation" : "rule-based"}</span></p>${x.action ? `<div class="act">→ ${esc(x.action)}</div>` : ""}` : "";
+}
+
+async function review(caseId, action) {
+  const label = {recalculate:"send back to recalculate", approve:"approve anyway", decline:"decline"}[action];
+  if (!confirm(`${caseId}: ${label}?`)) return;
+  try { await api(`/api/jobs/review/${caseId}`, {method:"POST", body:JSON.stringify({action, reviewer:"Credit reviewer"})}); state.explain[caseId] = null; }
+  catch (e) { alert(e.message); }
+  refresh();
+}
+
+// ---- agents tab
+function renderAgents(o) {
+  $("agentCount").textContent = o.agents.length;
+  $("agentCards").innerHTML = o.agents.map(a => `
+    <div class="agent ${a.agent_name === state.selectedAgent ? "sel" : ""}" data-agent="${esc(a.agent_name)}">
+      <h3>${esc(a.label)} <span class="lvl ${a.level}">${esc(LEVEL[a.level])}</span></h3>
+      <div class="big">${a.trust_score}<small>trust score</small></div>
+      <div class="kv">
+        <span>Mistake rate (last ${a.recent_cases.length} cases)</span><span>${Math.round(a.mistake_rate * 100)}%</span>
+        <span>A person checks</span><span>${Math.round(a.human_review_rate * 100)}% of cases</span>
+        <span>Cases at this level</span><span>${a.cases_at_level}${a.level !== "FULL" ? ` / ${a.cases_needed_to_promote}` : ""}</span>
+        <span>Open mistakes</span><span>${a.open_mistakes}</span>
+        ${a.fast_track ? `<span>Fast-tracked</span><span>yes</span>` : ""}
+      </div>
+      <div class="row">
+        ${a.level !== "FULL" ? `<button class="btn" data-promote="${esc(a.agent_name)}" data-needs-idle>Promote…</button>` : ""}
+        <button class="btn" data-show="${esc(a.agent_name)}">Mistakes</button>
+      </div>
+    </div>`).join("");
+  $("agentCards").querySelectorAll("[data-promote]").forEach(b => b.onclick = (ev) => { ev.stopPropagation(); promote(b.dataset.promote); });
+  $("agentCards").querySelectorAll(".agent").forEach(c => c.onclick = () => { state.selectedAgent = c.dataset.agent; loadAgent(c.dataset.agent); renderAgents(state.overview); });
+
+  $("suggestions").innerHTML = o.suggestions.length ? o.suggestions.map(s => {
+    const vr = s.verify_result;
+    return `<div class="sug">
+      <div class="top"><b>#${s.id}</b><span class="st ${s.status}">${esc(s.status)}</span>
+        <span class="meta">${esc(AGENT[s.agent_name] || s.agent_name)} · iteration ${s.iteration}${s.parent_id ? ` · from #${s.parent_id}` : ""}</span>
+        <span style="margin-left:auto;display:flex;gap:6px">
+          ${s.status === "proposed" ? `<button class="btn" data-apply="${s.id}" data-needs-idle>Apply…</button>` : ""}
+          ${s.status === "testing" ? `<button class="btn dark" data-verify="${s.id}" data-needs-idle>Verify (replay ${s.case_ids.length})</button>` : ""}
+        </span></div>
+      <p><b>Pattern:</b> ${esc(s.pattern_description)}</p>
+      <p><b>Root cause:</b> ${esc(s.root_cause)}</p>
+      <p><b>Fix:</b> <span class="fix">${esc(s.fix_description || s.suggested_fix)}</span>${s.applied_by ? ` <span class="meta">(applied by ${esc(s.applied_by)})</span>` : ""}</p>
+      <div class="res mono">cases: ${esc((s.case_ids || []).join(", "))}${vr ? ` · passed ${vr.passed.length}/${vr.replayed}${vr.failed.length ? ` · still failing: ${esc(vr.failed.join(", "))}` : ""}` : ""}</div>
+    </div>`; }).join("") : `<div class="empty">No patterns yet. A suggestion appears when an agent makes the same mistake on 3 different cases.</div>`;
+  $("suggestions").querySelectorAll("[data-apply]").forEach(b => b.onclick = () => applyFix(b.dataset.apply));
+  $("suggestions").querySelectorAll("[data-verify]").forEach(b => b.onclick = () => verifyFix(b.dataset.verify));
+
+  $("history").innerHTML = o.history.length ? o.history.map(h => `<div>
+      <span>${esc(AGENT[h.agent_name] || h.agent_name)}</span>
+      <span class="${h.score_change < 0 ? "neg" : "zero"}">${h.score_change > 0 ? "+" : ""}${h.score_change} → ${h.new_score}</span>
+      <span>${esc(h.reason)} <span class="meta">${esc(LEVEL[h.new_level] || h.new_level)}${h.case_id ? " · " + esc(h.case_id) : ""}</span></span>
+    </div>`).join("") : `<div class="empty">No changes yet.</div>`;
+  renderJob(o.job);
+}
+
+async function loadAgent(agent) {
+  $("mistakeTitle").textContent = `Mistake log · ${AGENT[agent] || agent}`;
+  try {
+    const d = await api(`/api/agent/${agent}`);
+    $("mistakeLog").innerHTML = d.mistakes.length ? d.mistakes.slice().reverse().map(x => `
+      <div style="padding:12px 0;border-top:1px solid var(--line)">
+        <div class="meta">${esc(x.mistake_type)} · ${esc(x.case_id)} · ${esc(x.pattern_key)}${x.resolved ? " · resolved" : ""}</div>
+        <p style="margin:4px 0 8px">${esc(x.mistake_reason)}</p>
+        <div class="vs"><div><b>Agent said</b>${esc(x.agent_stated_reasoning)}</div><div><b>Should have</b>${esc(x.what_should_have_happened)}</div></div>
+      </div>`).join("") : `<div class="empty">No mistakes recorded for this agent.</div>`;
+  } catch (e) { $("mistakeLog").innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+}
+
+async function promote(agent) {
+  const who = prompt(`Promote ${AGENT[agent]}: promotion always needs a named person. Your name:`);
+  if (!who) return;
+  try { await api(`/licence/${agent}/promote`, {method:"POST", body:JSON.stringify({approved_by:who})}); }
+  catch (e) { alert(e.message); }
+  refresh();
+}
+
+async function applyFix(id) {
+  const s = state.overview.suggestions.find(x => String(x.id) === String(id));
+  const who = prompt(`Apply fix #${id} to ${AGENT[s.agent_name]}.\nThe agent goes back to L-plates for re-testing.\nApproved by (your name):`);
+  if (!who) return;
+  const fix = prompt("Fix description:", s.suggested_fix);
+  if (fix === null) return;
+  try { await api(`/improve/${id}/apply`, {method:"POST", body:JSON.stringify({approved_by:who, fix_description:fix})}); }
+  catch (e) { alert(e.message); }
+  refresh();
+}
+
+async function verifyFix(id) {
+  try { await api(`/api/jobs/verify/${id}`, {method:"POST"}); } catch (e) { alert(e.message); }
+  refresh();
+}
+
+$("waitBtn").onclick = async () => {
+  try { await api("/api/jobs/process_waiting", {method:"POST"}); } catch (e) { alert(e.message); }
+  refresh();
+};
+const linked = new URLSearchParams(location.search).get("case");
+if (linked) selectCase(linked, true);
+
+// ---- polling
+async function refresh() {
+  try {
+    const o = await api("/api/overview");
+    state.overview = o;
+    renderOverview(o);
+    if (state.tab === "agents" && !o.job.running) {}
+  } catch (e) { $("runMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+}
+let lastRunning = false;
+setInterval(async () => {
+  await refresh();
+  const running = state.overview?.job?.running;
+  if (lastRunning && !running && state.tab === "agents") loadAgent(state.selectedAgent);
+  lastRunning = running;
+}, 2000);
+refresh();
+</script>
+</body>
+</html>

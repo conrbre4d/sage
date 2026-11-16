@@ -14,11 +14,13 @@ Red P → Green P → Full licence**.
 python -m venv .venv
 .venv\Scripts\activate            # macOS/Linux: source .venv/bin/activate
 pip install -r requirements.txt
-copy .env.example .env            # macOS/Linux: cp; then add your API key
+copy .env.example .env            # macOS/Linux: cp; then add your QUT API_KEY
 
 python -m shared.validate         # check sample data + config -> should say OK
 python -m pytest                  # all tests should pass
-python agents/main.py             # run the 9-agent mock pipeline on LOAN-0023 / LOAN-0024
+python agents/main.py check       # Supabase + encryption + AI key OK? (setup: agents/README.md)
+python agents/main.py             # submit + process the demo cases (LOAN-0023..0027)
+cd agentlens && uvicorn agentlens:app   # AgentLens dashboard at http://127.0.0.1:8000/
 ```
 
 Regenerate the sample data with `python scripts/build_sample.py`.
@@ -33,7 +35,9 @@ Regenerate the sample data with `python scripts/build_sample.py`.
 | `data/sample/` | Hand-written sample: `events.csv` (event log), `agents.csv` (starting licences), `customers.csv` (tracker names only) | — |
 | `scripts/build_sample.py` | Builds `data/sample/` | — |
 | `tests/` | Foundation tests | — |
-| `agents/` | **Mock loan pipeline**: the 9 "bank" agents, FastAPI + SQLite `event_log`. See [agents/README.md](agents/README.md) | Agent 1 |
+| `agents/` | **Mock loan pipeline**: loan form → Supabase (identity encrypted) → 3 "bank" agents that only reach data through ticket-checked tools (least privilege) → `event_log`. See [agents/README.md](agents/README.md) | Agent 1 |
+| `supabase/schema.sql` | Supabase tables + Row Level Security. Paste into the SQL editor once | Agent 1 |
+| `agentlens/` | **AgentLens**: mistake detection, trust scores + L-Plates licences, fix suggestions + replay, and the review dashboard. `cd agentlens && uvicorn agentlens:app`. See [agentlens/README.md](agentlens/README.md) | Audit team |
 | `agents/` *(to add)* | Customer chat, redaction, tracker | Agent 2 |
 | `audit/` *(to add)* | Process mining, rules engine, trust score + licence engine | Audit 1 |
 | `dashboard/` *(to add)* | Dashboard, licence board, licence cards, score chart | Audit 2 |

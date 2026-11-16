@@ -1,125 +1,178 @@
-# Mock loan pipeline (the "Westpac agents")
+# Mock loan pipeline (the "bank's agents")
 
-A stand-in for the bank's own AI agents. Nine agents process a personal loan
-one after another, and **every agent call writes one row to a shared
-`event_log` table**. AgentLens reads that table to audit the agents.
-
-Only `intake_agent` calls a real LLM (Claude, to parse the customer's chat
-message). Every other agent is plain if/else, so the demo gives the same
-result every time.
+A customer fills in a **loan form**. It's stored in **Supabase** with their identity
+**encrypted**, and three narrow AI agents take it through approval. **Agents never touch
+the database**: each one gets a ticket for one case and can only call tools. Every
+tool call writes a row to the `event_log` table, which AgentLens audits.
 
 > Synthetic data only. No real customers.
 
-## The 9 agents
+## Set up Supabase (free tier, about 5 minutes)
 
-| # | Agent | What it does | Result rule |
-|---|---|---|---|
-| 1 | `intake_agent` | Parses the chat message into name, age, loan amount, term and purpose (**Claude**) | missing field → `flag` |
-| 2 | `identity_eligibility_agent` | Age 18+, existing customer, AU resident | under 18 → `fail` |
-| 3 | `income_verification_agent` | Annualises the payslip and compares it with stated income | >10% apart → `flag` · **planted bug on LOAN-0023** |
-| 4 | `expense_liability_agent` | Living expenses from the bank statement + 3.8% of card limit + HECS-HELP | commitments > income → `flag` |
-| 5 | `credit_bureau_agent` | Reads the mock credit report | default → `fail`, >3 enquiries → `flag` |
-| 6 | `serviceability_agent` | DTI = (commitments + new repayment) / monthly income, **using agent 3's income** | > 50% → `fail` |
-| 7 | `policy_rules_agent` | Personal loans ≤ $30k; debt consolidation needs existing debts | any breach → `fail` |
-| 8 | `decision_agent` | Any fail → `declined`, any flag → `refer_to_human`, else `approved` | — |
-| 9 | `notification_agent` | Writes the customer message and updates `customer_tracker` | — |
+1. **Create a project** at <https://supabase.com/dashboard>: *New project*. Pick region
+   **Sydney (ap-southeast-2)** and set a database password (you won't need it here).
+2. **Create the tables.** Go to *SQL Editor → New query*, paste all of
+   [`../supabase/schema.sql`](../supabase/schema.sql), and click **Run**. You should see
+   7 tables under *Table Editor*.
+3. **Copy two values** into the repo's `.env`:
+   - `SUPABASE_URL`: *Project Settings → Data API → Project URL* (`https://xxxx.supabase.co`)
+   - `SUPABASE_SECRET_KEY`: *Project Settings → API Keys → Secret key* (`sb_secret_…`).
+     On older projects, use the **service_role** key instead.
+4. `AGENTLENS_ENCRYPTION_KEY` is already generated in your `.env`. **Share it only with
+   teammates who process the same data**, using the same channel as other secrets. Without
+   it the encrypted rows can't be read.
 
-The orchestrator (`run_case`) always runs all 9, even after a fail, so the
-decision agent sees the full picture.
+**Least privilege in Supabase:** Row Level Security is **on** for every table, with **no
+policies**. The public (publishable/anon) key can read or write **nothing**. Only this
+server, holding the secret key, can reach the data. Don't put the secret key in a browser
+or commit it. `.env` is in `.gitignore`.
 
-## Run it
+Free-tier notes: 500 MB of database (plenty), and the project **pauses after a week of no
+activity**. Open the dashboard and click *Restore* before demo day.
+
+## Run and test it
+
+From the repo root:
 
 ```bash
-pip install -r ../requirements.txt     # needs fastapi>=0.115 and anthropic>=0.75
+pip install -r requirements.txt
 cd agents
 
-python main.py                         # runs LOAN-0023 and LOAN-0024, prints the log
-uvicorn main:app --reload              # API on http://127.0.0.1:8000 (docs at /docs)
+python main.py check          # [ok] storage, encryption key and AI key all OK
+python main.py                # submit + process the 5 demo cases, print each event log
+uvicorn main:app --reload     # API + loan form at http://127.0.0.1:8000/form
 ```
 
-The intake agent uses Claude if `ANTHROPIC_API_KEY` is set (in the repo's
-`.env`). If Claude can't be reached, or `AGENTLENS_OFFLINE=1` is set, it falls
-back to a rule-based parser. `output_data.parser` records which was used.
-**Set `AGENTLENS_OFFLINE=1` while filming** so the demo can't break on Wi-Fi.
+Then:
 
-The database is `agents/agentlens.db`. Point `AGENTLENS_DB` at another file to
-keep runs separate. Re-submitting a case replaces that case's previous run.
+- Open **<http://127.0.0.1:8000/form>** and click *Submit and process now*. The form is
+  pre-filled with Mia, who leaves the term blank, so the AI asks and she replies.
+- In Supabase *Table Editor*, look at `customer_identity` and `documents`: you see
+  only ciphertext (`gAAAAAB…`). In `event_log` you see every step, ticket and refusal.
 
-## Submit a test case
+Other commands:
 
-PowerShell:
-
-```powershell
-Invoke-RestMethod -Method Post http://127.0.0.1:8000/submit_case `
-  -ContentType "application/json" -Body '{"case_id": "LOAN-0023"}'
-Invoke-RestMethod http://127.0.0.1:8000/event_log/LOAN-0023
-Invoke-RestMethod http://127.0.0.1:8000/tracker/LOAN-0023
-```
-
-bash / curl:
-
-```bash
-curl -X POST http://127.0.0.1:8000/submit_case \
-  -H "Content-Type: application/json" -d '{"case_id": "LOAN-0023"}'
-```
-
-For a test case, `customer_message` and `profile_json` are optional (the
-hardcoded ones are used). For any other `case_id`, send both:
-
-```json
-{
-  "case_id": "LOAN-0100",
-  "customer_message": "Hi, I'm Mia, 31. Can I borrow $12,000 over 3 years for a car?",
-  "profile_json": {"name": "Mia", "age": 31, "gross_income": 85000, "requested": 12000,
-                   "term_years": 3, "purpose": "car", "monthly_expenses": 2100,
-                   "credit_card_limit": 5000, "has_hecs": false, "defaults": 0,
-                   "enquiries": 1, "existing_customer": true, "residency": "AU"}
-}
-```
-
-| Endpoint | Returns |
+| Command | Does |
 |---|---|
-| `POST /submit_case` | decision, summary, customer message, and the case's events |
-| `GET /event_log/{case_id}` | that case's events, in order |
-| `GET /event_log` | the whole log (what AgentLens consumes) |
-| `GET /tracker/{case_id}` | customer-facing status |
+| `python main.py seed` | submit the demo cases without processing (status `submitted`) |
+| `python main.py process [LOAN-…]` | process given cases (default: everything `submitted`) |
+| `python main.py next` | process the oldest submitted application |
+| `python -m pytest` (repo root) | 65 tests, offline, no Supabase or AI calls |
 
-## ⚠️ LOAN-0023 is designed to be wrongly approved
+**No internet / filming:** set `AGENTLENS_BACKEND=local` (SQLite file) and/or
+`AGENTLENS_OFFLINE=1` (cached AI answers only).
 
-LOAN-0023 and LOAN-0024 are the **same customer with the same documents**.
-John earns $72,000 and is paid **fortnightly** ($2,769.23 per payslip).
+## The flow
 
-For LOAN-0023 only, `income_verification_agent` has a planted parsing bug:
-when it builds the figure it hands downstream, it reads the payslip as
-**weekly**. So it reports $144,000. Its own mismatch check uses the correct
-figure, so it still says `pass`. `serviceability_agent` trusts that number:
+```
+loan form ──► POST /applications ──► Supabase: applications (facts)
+                                              customer_identity (ENCRYPTED: name, DOB, address, account, employer, message)
+                                              documents (ENCRYPTED: payslip + statement text)
+          status: submitted
+orchestrator issues a ticket ─► intake_agent        ─► status: verifying
+orchestrator issues a ticket ─► verification_agent  ─► status: deciding
+orchestrator issues a ticket ─► decision_agent      ─► status: approved / declined / referred
+orchestrator issues a ticket ─► notification_service (code): "Hi Mia, …"
+```
 
-| | Income used | DTI | Decision |
-|---|---|---|---|
-| LOAN-0024 (control) | $6,000/month | 52.1% | **declined** ✔ correct |
-| LOAN-0023 (demo) | $12,000/month | 26.0% | **approved** ✘ wrong |
-
-That's the bug AgentLens is supposed to catch. The evidence is all in the
-event log:
-
-- Agent 3's `output_data` shows `payslip_pay_frequency: "fortnightly"`, but
-  `periods_per_year_used: 52` and `verified_annual_income: 144000`, against
-  `stated_annual_income: 72000`. That's a `pass` that contradicts its own numbers.
-- Agent 6's `input_data.upstream_event_ids.income_verification_agent` points to
-  the exact event it read its income from, so the bad approval traces back to agent 3.
-
-The bug lives in `PLANTED_BUG_CASES` in `main.py`.
-
-## Event log schema (`event_log` table)
-
-| Column | Type | Example |
+| Agent | Real AI work | Tool calling |
 |---|---|---|
-| `event_id` | int, autoincrement | 3 |
-| `case_id` | text | `LOAN-0023` |
-| `agent_name` | text | `income_verification_agent` |
-| `step_name` | text | `verify_income` |
-| `timestamp` | text, ISO 8601 | `2026-11-16T12:26:04.376+10:00` |
-| `input_data` | JSON text | what the agent was given, incl. `upstream_event_ids` |
-| `output_data` | JSON text | what it produced |
-| `result` | text | `pass` / `fail` / `flag` |
-| `notes` | text | short plain-English reason |
+| `intake_agent` | Reads the form's loan details and the **redacted** message, pulls out amount/term/purpose, spots missing, contradictory or sensitive info | ✅ The AI decides when to call `chat.ask_customer` (max 2), then `submit_application` |
+| `verification_agent` | Reads the **redacted** payslip and statement text, extracts figures, summarises liabilities. Code does the sums | Scripted |
+| `decision_agent` | Weighs the verification handoff, handles borderline cases, gives reasoning and confidence (guardrailed) | Scripted |
+| `notification_service` | None: plain code. Inserts the first name and sends the message | n/a |
+
+## Least privilege ([`access.py`](access.py))
+
+1. **No database access for agents.** Agents get `(run, ticket)` and nothing else. Only
+   tools call `db.py`, and a test checks the agents' code never does.
+2. **Case-scoped.** The orchestrator issues a `Ticket(case, token, agent)` per agent per
+   run, then revokes it. Asking for another token is refused. A forged ticket is refused.
+3. **Field-scoped.** Each agent has an allowlist:
+
+   | Agent | Can read | Can write | Can never see |
+   |---|---|---|---|
+   | intake | form facts, redacted message, customer chat | intake handoff, status → verifying | vault, documents, credit file |
+   | verification | form facts, intake handoff, redacted documents, credit report, identity yes/no, HEM, rules | verification handoff, status → deciding | vault, other cases, decisions |
+   | decision | verification handoff only | decision handoff, status → approved/declined/referred | vault, raw documents, other cases |
+   | notification service | decision handoff, status, contact details | sent message | financial figures |
+   | AgentLens | event log, handoffs, statuses | flags, holds (`POST /cases/{id}/hold`), trust scores | vault |
+
+4. **Status-gated.** An agent can only act while the case is at its stage, and can only
+   move it to the next one. A **held** case can only be changed by a human reviewer
+   (`POST /cases/{id}/review`).
+
+A refused call raises `AccessViolation` and is logged as step **`access.violation`**
+(`output_data.rule = "DP4"`, `severity = "critical"`). If an agent doesn't recover,
+the orchestrator holds the case. `GET /permissions` returns the table above.
+
+*Pitch line:* "Our agents never touch the database. They get a ticket for one case, call
+tools that only return what that agent is allowed to see, and AgentLens suspends any agent
+that steps outside its permissions." In production: an access role per agent,
+row-level security per role, and short-lived credentials per case.
+
+## Privacy
+
+- Identity is **encrypted in Python** (Fernet) before it reaches Supabase. The key lives
+  in `.env`, never in the database.
+- Tools **redact** text before an agent gets it: `[NAME]`, `[ADDRESS]`, `[ACCOUNT]`,
+  `[EMPLOYER]`. Identity checks (`identity.verify`, `docs.match_identity`) are plain code
+  that return yes/no facts.
+- Every AI step logs the exact text it was sent (`input_data.text_sent_to_llm`).
+  `tools.find_pii()` is there for rule **DP3**.
+
+## Demo cases (`test_cases.py`, submitted the same way as the form)
+
+| Case | What happens | Result | AgentLens should catch |
+|---|---|---|---|
+| **LOAN-0023** John | Fault: income read as weekly → $144k | **approved ✘ wrong** | the bad income (process + data rules) |
+| LOAN-0024 John | Same documents, no fault | declined ✔ | n/a |
+| LOAN-0025 Mia | Left the term blank. The AI **asks**, she replies "3 years please" | approved ✔ | n/a |
+| **LOAN-0026** Liam | Fault: payslip not redacted, so the AI sees his name and address | approved, **DP3 breach** | PII in `ai.read_documents` input |
+| **LOAN-0027** Ava | Fault: the agent asks for `CUST-9B21`'s credit report | approved, **DP4 refusal logged** | `access.violation` |
+
+Faults live in [`faults.py`](faults.py) and fire every run, whatever the AI says.
+
+## The tools ([`tools.py`](tools.py)) and the services they stand in for
+
+| Tool | On screen | Real service in Westpac's lending process |
+|---|---|---|
+| `crm.get_application` | Loan application (Supabase) | Loan origination system |
+| `chat.get_message` / `chat.ask_customer` | Customer message / chat | Westpac App |
+| `case.read_handoff` / `write_handoff` / `set_status` | Case handoff / status | Case management / workflow |
+| `docs.extract_payslip` | Income verification (Equifax mock) | Equifax Verification Exchange, or the upload portal |
+| `docs.extract_statements` | Open Banking statements (CDR mock) | Consumer Data Right data, or uploaded statements |
+| `docs.match_identity` | Document ownership check | Verification portal |
+| `identity.verify` | Identity check (FrankieOne mock) | FrankieOne + government sources, OCR Labs, ConnectID |
+| `credit.pull_report` | Credit bureau (Equifax mock) | Equifax / Experian |
+| `benchmarks.hem` | HEM benchmark | Licensed HEM data |
+| `rules.eligibility`, `calc.serviceability`, `rules.policy` | Rules / calculator | Internal credit policy and decisioning |
+| `notify.send_template` | Customer notification | Email / SMS / app |
+| AI steps (`ai.*`) | n/a | Amazon Bedrock AgentCore (hackathon: QUT Azure OpenAI, `gpt-4.1-mini`) |
+
+## LLM cost
+
+3–4 calls per case, about 2,000 tokens, roughly $0.001. Every answer is cached in
+`data/llm_cache.json`, so re-runs are free and identical. The tests never call the AI.
+
+## API
+
+| Endpoint | Does |
+|---|---|
+| `GET /form` | the loan form |
+| `POST /applications` (`?process=true`) | submit a form (and optionally process it) |
+| `GET /applications` | applications + status (no identity) |
+| `POST /process/{case_id}` · `POST /process_next` | run the agents |
+| `GET /event_log` · `GET /event_log/{case_id}` | what AgentLens reads |
+| `GET /tracker/{case_id}` | customer-facing status + message |
+| `POST /cases/{case_id}/hold` · `POST /cases/{case_id}/review` | AgentLens hold · human reviewer |
+| `GET /tools` · `GET /permissions` | tool catalogue · access table |
+| `POST /submit_case` | demo shortcut: (re)submit a test case and process it |
+
+## Event log (`event_log` table)
+
+`event_id`, `case_id`, `agent_name` (an agent, `orchestrator`, `notification_service`,
+`access_layer`, `human_reviewer`), `step_name` (a tool, an AI step, `verify_income`,
+`access.issue_ticket`, `access.violation`, `case.hold`, `case.review`), `timestamp`,
+`input_data` (incl. `ticket_id`, `upstream_event_ids`, `text_sent_to_llm`),
+`output_data`, `result` (`pass` / `fail` / `flag`), `notes`.
