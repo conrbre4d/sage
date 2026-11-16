@@ -1,0 +1,28 @@
+# Secrets
+.env
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.venv/
+venv/
+*.egg-info/
+
+# Generated data and outputs (sample data in data/sample/ IS committed)
+data/generated/
+data/output/
+*.log
+*.db
+
+# Packaging
+dist/
+*.zip
+
+# Editors / OS
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+desktop.ini
+.streamlit/secrets.toml

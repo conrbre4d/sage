@@ -1,0 +1,21 @@
+# Core
+pandas>=2.1
+PyYAML>=6.0
+python-dotenv>=1.0
+
+# Process mining (Audit 1)
+pm4py>=2.7
+
+# Dashboard, licence board, tracker (Audit 2, Agent 2)
+streamlit>=1.35
+plotly>=5.20
+
+# Mock loan pipeline API (agents/)
+fastapi>=0.115
+uvicorn>=0.30
+
+# Claude: intake agent, AI explanations, triage text, customer assistant
+anthropic>=0.75
+
+# Tests
+pytest>=7.4

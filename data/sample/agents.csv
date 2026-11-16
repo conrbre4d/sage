@@ -1,0 +1,8 @@
+agent_name,licence_class,level,trust_score,model_version,last_change_reason,updated_at
+Account Scrutiny Agent,lending_general,Full licence,93,acct-scrutiny-1.4,initial,2026-11-12T07:00:00+10:00
+Payslip Reader,payslip_standard,Full licence,96,payslip-reader-3.2,initial,2026-11-12T07:00:00+10:00
+Payslip Reader,payslip_self_employed,L-plates,42,payslip-reader-3.2,initial,2026-11-12T07:00:00+10:00
+Payslip Verifier,payslip_standard,Green P,81,payslip-verifier-2.0,initial,2026-11-12T07:00:00+10:00
+Policy Agent,lending_general,Green P,78,policy-agent-2.1,initial,2026-11-12T07:00:00+10:00
+Decision Agent,lending_general,Red P,66,decision-agent-1.7,initial,2026-11-12T07:00:00+10:00
+Payments Agent,transfer_standard,Full licence,92,payments-agent-4.0,initial,2026-11-12T07:00:00+10:00

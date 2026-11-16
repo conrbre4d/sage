@@ -1,0 +1,246 @@
+# AgentLens audit configuration
+# Owned by Audit 1 (process mining, rules, trust score and licence engine).
+# Names (activities, agents, routes, severities) must match shared/constants.py.
+#
+# Rule fields:
+#   mistake   groups rules that describe the same underlying error. The
+#             repeat-mistake demotion counts by (agent, licence_class, mistake).
+#   on        for data checks on fields that can be written more than once in a
+#             case (e.g. a payslip re-read): 'last' = the value the decision used,
+#             'earlier' = values that were later corrected, 'any' = every value.
+# Check with:  python -m shared.validate --config audit/config.yaml
+
+version: 1
+
+# ---------------------------------------------------------------------------
+# Rules: each one produces rows in the flags table (shared.constants.FLAG_COLUMNS)
+# ---------------------------------------------------------------------------
+rules:
+  # ---- Step order ---------------------------------------------------------
+  - id: ORD-01
+    mistake: skipped_policy_check
+    type: step_order
+    process: loan
+    description: A loan decision must come after a policy check.
+    check: { activity: Decision, requires_before: Policy check }
+    severity: major
+    responsible: Decision Agent
+    route: improve_agent
+
+  - id: ORD-02
+    mistake: verify_before_extract
+    type: step_order
+    process: loan
+    description: A payslip must be extracted before it is verified.
+    check: { activity: Verify payslip, requires_before: Extract payslip }
+    severity: minor
+    responsible: Payslip Verifier
+    route: improve_agent
+
+  - id: ORD-03
+    mistake: skipped_scam_check
+    type: step_order
+    process: transfer
+    description: Money must not be released before the scam check.
+    check: { activity: Release, requires_before: Scam check }
+    severity: critical
+    responsible: Payments Agent
+    route: notify_ops
+
+  - id: ORD-04
+    mistake: skipped_id_check
+    type: step_order
+    process: transfer
+    description: Money must not be released before the customer's ID is verified.
+    check: { activity: Release, requires_before: Verify ID }
+    severity: critical
+    responsible: Payments Agent
+    route: notify_ops
+
+  - id: ORD-05
+    mistake: skipped_confirmation
+    type: step_order
+    process: transfer
+    description: The customer should confirm the transfer before release.
+    check: { activity: Release, requires_before: Confirm }
+    severity: minor
+    responsible: Payments Agent
+    route: monitor
+
+  # ---- Data consistency ---------------------------------------------------
+  - id: DAT-01
+    mistake: pay_frequency_misread
+    type: data_consistency
+    process: loan
+    description: The pay frequency the agent used must match the one printed on the payslip.
+    check: { field: read_pay_frequency, equals_field: doc_pay_frequency, on: last }
+    severity: major
+    responsible: Payslip Reader
+    route: improve_agent
+
+  - id: DAT-02
+    mistake: income_mismatch
+    type: data_consistency
+    process: loan
+    description: Income read from the payslip must be close to the income the customer declared.
+    check:
+      ratio: [extracted_income_annual, declared_income_annual]
+      on: last
+      min: 0.80
+      max: 1.25
+    severity: major
+    responsible: Payslip Reader
+    route: improve_agent
+
+  - id: DAT-03
+    mistake: income_arithmetic
+    type: data_consistency
+    process: loan
+    description: Annual income must equal gross pay times pay periods per year.
+    check:
+      annualise: { gross: payslip_gross, frequency: read_pay_frequency, result: extracted_income_annual }
+      tolerance: 0.01   # 1%
+      on: last
+    severity: minor
+    responsible: Payslip Reader
+    route: improve_agent
+
+  - id: DAT-04
+    mistake: pay_frequency_misread
+    type: data_consistency
+    process: loan
+    description: The agent misread the pay frequency, but it was caught and re-read before the decision.
+    check: { field: read_pay_frequency, equals_field: doc_pay_frequency, on: earlier }
+    severity: minor
+    responsible: Payslip Reader
+    route: improve_agent
+
+  # ---- Escalation ---------------------------------------------------------
+  - id: ESC-01
+    mistake: missed_scam_escalation
+    type: escalation
+    process: transfer
+    description: A high scam score must be escalated to a human before release.
+    check: { when: { field: scam_score, gte: 0.70 }, requires_before: { activity: Escalate to human, target: Release } }
+    severity: critical
+    responsible: Payments Agent
+    route: notify_ops
+
+  - id: ESC-02
+    mistake: missed_large_transfer_review
+    type: escalation
+    process: transfer
+    description: Large transfers to a new payee need a human review before release.
+    check:
+      when: { all: [ { field: transfer_amount, gte: 10000 }, { field: payee_is_new, equals: true } ] }
+      requires_before: { activity: Human review, target: Release }
+    severity: major
+    responsible: Payments Agent
+    route: policy_review
+
+  - id: ESC-03
+    mistake: missed_high_dti_review
+    type: escalation
+    process: loan
+    description: Approving a loan above 6x income needs a human review.
+    check:
+      when: { ratio: [loan_amount, extracted_income_annual], gt: 6.0 }
+      requires_before: { activity: Human review, target: Decision }
+    severity: major
+    responsible: Decision Agent
+    route: policy_review
+
+# ---------------------------------------------------------------------------
+# Trust score (out of 100) and L-Plates licensing
+# ---------------------------------------------------------------------------
+trust_score:
+  min: 0
+  max: 100
+  deltas:
+    correct_case: +1
+    minor_slip: -2
+    human_override: -3
+    customer_challenge_upheld: -5
+    major_mistake: -10
+    critical_mistake: suspend   # instant suspension, score set to suspend_score
+  suspend_score: 0
+
+licence:
+  # Minimum score to hold each level. Falling below it demotes automatically.
+  level_min_score:
+    Suspended: 0
+    L-plates: 30
+    Red P: 60
+    Green P: 75
+    Full licence: 90
+
+  # Easy to lose: demotion is automatic.
+  demotion:
+    on_critical: Suspended
+    repeat_mistake:            # same 'mistake', same agent + licence, inside a window
+      count: 3
+      window_hours: 24
+      cap_level: Red P
+    on_model_update: Red P     # vendor model version changed -> re-test (pitch only)
+
+  # Hard to earn: promotion needs every box ticked plus a human sign-off.
+  promotion:
+    L-plates:     { min_cases: 20,  min_score: 30, clean_cases: 10,  driving_test: true, human_signoff: true }
+    Red P:        { min_cases: 50,  min_score: 60, clean_cases: 25,  driving_test: true, human_signoff: true }
+    Green P:      { min_cases: 150, min_score: 75, clean_cases: 75,  driving_test: true, human_signoff: true }
+    Full licence: { min_cases: 400, min_score: 90, clean_cases: 200, driving_test: true, human_signoff: true }
+
+  # After an agent is fixed: back to L-plates, replay past failures, fast-track if all pass.
+  after_fix:
+    reset_to: L-plates
+    replay_past_failures: true
+    fast_track_to: Red P
+    fast_track_score: 60
+
+  # Share of cases a human must approve at each level. The circuit breaker
+  # (below) still holds any flagged case at every level.
+  human_review_rate:
+    Suspended: 1.0      # agent may not act; every case goes to a human
+    L-plates: 1.0       # a human approves everything
+    Red P: 0.5
+    Green P: 0.1
+    Full licence: 0.0
+
+circuit_breaker:
+  hold_on_severity: [major, critical]   # cases with these flags are held at every level
+
+# ---------------------------------------------------------------------------
+# Triage list
+# ---------------------------------------------------------------------------
+triage:
+  severity_weight: { minor: 10, major: 50, critical: 100 }
+  repeat_bonus_per_occurrence: 15   # same rule + agent seen again in window
+  window_hours: 24
+  routes: [improve_agent, notify_ops, policy_review, monitor]
+
+# ---------------------------------------------------------------------------
+# Privacy: what the AI explainer may see
+# ---------------------------------------------------------------------------
+privacy:
+  llm_allowed_columns:
+    - case_id
+    - process
+    - activity
+    - timestamp
+    - agent_name
+    - licence_class
+    - outcome
+    - doc_pay_frequency
+    - read_pay_frequency
+    - decision
+  # Numbers are bucketed before the LLM sees them (e.g. "$700k-$750k").
+  llm_bucketed_columns:
+    - loan_amount
+    - declared_income_annual
+    - extracted_income_annual
+    - transfer_amount
+  never_send_to_llm:
+    - customer_ref
+    - note
+    - gt_fault
+  sensitive_case_keywords: [hardship, deceased, family violence, vulnerable]   # route to human only
