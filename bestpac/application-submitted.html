@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Form complete | Bestpac</title>
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link crossorigin href="https://fonts.gstatic.com" rel="preconnect">
+  <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@600;700;800&amp;family=Source+Sans+3:wght@400;600;700&amp;display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&amp;display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="min-h-screen bg-[#f9f9ff] font-['Source_Sans_3'] text-[#151c27] antialiased">
+  <header class="border-b border-[#e2e8f8] bg-white shadow-sm">
+    <div class="mx-auto flex h-16 max-w-5xl items-center px-5 sm:px-8">
+      <a aria-label="Bestpac home" class="font-['Outfit'] text-2xl font-bold tracking-tight text-[#b00002]" href="index.html">Bestpac</a>
+    </div>
+  </header>
+  <main class="mx-auto flex min-h-[calc(100vh-4rem)] w-full max-w-5xl items-center justify-center px-5 py-12 sm:px-8">
+    <section aria-labelledby="submitted-heading" class="w-full max-w-3xl rounded-2xl border border-[#dce2f3] bg-white p-6 shadow-sm sm:p-10">
+      <div class="text-center">
+        <span class="inline-flex items-center gap-2 rounded-full bg-[#dfe4df] px-3 py-1 text-sm font-semibold text-[#434844]">
+          <span aria-hidden="true" class="h-2 w-2 rounded-full bg-[#da1710]"></span>
+          Form complete
+        </span>
+        <h1 class="mt-5 font-['Outfit'] text-3xl font-bold tracking-tight sm:text-4xl" id="submitted-heading">Thank you</h1>
+        <p class="mt-2 text-lg text-[#5a605c]">You have completed the application form.</p>
+      </div>
+
+      <nav aria-label="Form completion progress" class="mt-10 rounded-xl border border-[#e2e8f8] bg-[#f9f9ff] px-3 py-7 sm:px-7">
+        <ol class="relative grid grid-cols-4">
+          <li aria-label="Step 1: Finances, complete" class="relative z-10 flex min-w-0 flex-col items-center text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-[#da1710] text-white shadow-sm sm:h-14 sm:w-14">
+              <span aria-hidden="true" class="material-symbols-outlined">check</span>
+            </span>
+            <span class="mt-3 text-xs font-bold text-[#151c27] sm:text-sm">1. Finances</span>
+            <span class="mt-1 text-[11px] leading-tight text-[#5a605c] sm:text-xs">Income and expenses</span>
+          </li>
+          <li aria-label="Step 2: About you, complete" class="relative z-10 flex min-w-0 flex-col items-center text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-[#da1710] text-white shadow-sm sm:h-14 sm:w-14">
+              <span aria-hidden="true" class="material-symbols-outlined">check</span>
+            </span>
+            <span class="mt-3 text-xs font-bold text-[#151c27] sm:text-sm">2. About you</span>
+            <span class="mt-1 text-[11px] leading-tight text-[#5a605c] sm:text-xs">Personal details</span>
+          </li>
+          <li aria-label="Step 3: Review, complete" class="relative z-10 flex min-w-0 flex-col items-center text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-[#da1710] text-white shadow-sm sm:h-14 sm:w-14">
+              <span aria-hidden="true" class="material-symbols-outlined">check</span>
+            </span>
+            <span class="mt-3 text-xs font-bold text-[#151c27] sm:text-sm">3. Review</span>
+            <span class="mt-1 text-[11px] leading-tight text-[#5a605c] sm:text-xs">Final step</span>
+          </li>
+          <li aria-current="step" aria-label="Step 4: Form complete" class="relative z-10 flex min-w-0 flex-col items-center text-center">
+            <span class="flex h-12 w-12 items-center justify-center rounded-full bg-[#da1710] text-white shadow-sm sm:h-14 sm:w-14">
+              <span aria-hidden="true" class="material-symbols-outlined">check</span>
+            </span>
+            <span class="mt-3 text-xs font-bold text-[#b00002] sm:text-sm">4. Complete</span>
+            <span class="mt-1 text-[11px] leading-tight text-[#5a605c] sm:text-xs">Form finished</span>
+          </li>
+          <li aria-hidden="true" class="absolute left-[12.5%] right-[12.5%] top-6 h-1 -translate-y-1/2 bg-[#da1710] sm:top-7"></li>
+        </ol>
+      </nav>
+
+      <div class="mt-10 rounded-xl border border-[#e2e8f8] bg-[#f0f3ff] p-5 sm:p-7">
+        <div class="flex flex-col items-center text-center">
+          <div class="flex h-16 w-16 items-center justify-center rounded-full bg-[#da1710] text-white shadow-md" aria-hidden="true">
+            <span class="material-symbols-outlined text-3xl">check</span>
+          </div>
+          <h2 class="mt-4 font-['Outfit'] text-xl font-bold">Application form completed</h2>
+          <p class="mt-2 max-w-lg leading-relaxed text-[#5a605c]">You can close this page or return to Bestpac.</p>
+        </div>
+      </div>
+
+      <div class="mt-8 flex justify-center">
+        <a class="inline-flex items-center justify-center gap-2 rounded-lg bg-[#da1710] px-6 py-3 font-semibold text-white transition-colors hover:bg-[#b00002] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-[#b00002]" href="index.html">
+          Return to Bestpac
+          <span aria-hidden="true" class="material-symbols-outlined text-lg">arrow_forward</span>
+        </a>
+      </div>
+    </section>
+  </main>
+  <script>
+    if (sessionStorage.getItem('bestpac-personal-loan-submitted') !== 'true') {
+      window.location.replace('loan-application-form.html');
+    }
+  </script>
+</body>
+</html>

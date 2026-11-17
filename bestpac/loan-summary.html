@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Personal Loan Summary | Bestpac</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            brand: {
+              red: '#DA1710',
+              redHover: '#B9120C',
+              text: '#1C1C1C',
+              muted: '#595959',
+              border: '#E2E5E8',
+              cardBg: '#F4F5F7'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .summary-heading {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, sans-serif;
+      font-stretch: condensed;
+      font-weight: 900;
+      letter-spacing: -0.02em;
+      text-transform: uppercase;
+    }
+
+    .custom-checkbox:checked {
+      background-color: #DA1710;
+      border-color: #DA1710;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-white font-sans text-[#1C1C1C] antialiased">
+  <header class="w-full border-b border-gray-200 bg-white">
+    <div class="mx-auto flex h-16 max-w-[1440px] items-center justify-between px-6 lg:px-12">
+      <a aria-label="Bestpac home" class="text-2xl font-bold tracking-tight text-[#DA1710]" href="/">
+        Bestpac
+      </a>
+      <p class="hidden items-center gap-2 text-xs text-gray-600 md:flex">
+        <span aria-hidden="true">☎</span>
+        <span>If you have a disability or difficulty accessing this page, call <strong class="text-gray-800">132 651</strong> for assistance</span>
+      </p>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1440px] flex-1 px-6 py-10 lg:px-12">
+    <div class="grid grid-cols-1 gap-10 lg:grid-cols-12">
+      <aside class="lg:col-span-4">
+        <div class="rounded-2xl border border-gray-100 bg-[#F4F6F8] p-6">
+          <h2 class="mb-4 text-xs font-semibold uppercase tracking-wider text-gray-500">What you're applying for</h2>
+          <div class="flex items-center gap-4 rounded-xl border border-gray-100 bg-white p-5 shadow-sm">
+            <div class="flex h-14 w-14 shrink-0 items-center justify-center rounded-xl border border-red-100 bg-red-50 text-[#DA1710]">
+              <svg aria-hidden="true" class="h-8 w-8" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" viewBox="0 0 24 24">
+                <ellipse cx="12" cy="5" rx="9" ry="3"></ellipse>
+                <path d="M21 12c0 1.66-4 3-9 3s-9-1.34-9-3M3 5v14c0 1.66 4 3 9 3s9-1.34 9-3V5"></path>
+              </svg>
+            </div>
+            <p class="font-bold leading-snug text-gray-900">Unsecured Personal Loan</p>
+          </div>
+        </div>
+      </aside>
+
+      <section aria-labelledby="summary-title" class="flex flex-col space-y-10 lg:col-span-8">
+        <div>
+          <h1 id="summary-title" class="summary-heading mb-3 text-4xl tracking-tight text-gray-900 sm:text-5xl">Summary</h1>
+          <p class="text-gray-600">Let's recap on your choice of an Unsecured Personal Loan.</p>
+        </div>
+
+        <section aria-labelledby="overview-title" class="space-y-4">
+          <h2 id="overview-title" class="text-2xl font-bold tracking-tight text-gray-900">Overview</h2>
+          <div class="space-y-5 rounded-2xl border border-gray-200 bg-white p-6 sm:p-8">
+            <h3 class="mb-2 text-lg font-bold text-gray-900">The important numbers</h3>
+            <ul class="space-y-3.5 text-[15px] leading-relaxed text-gray-800">
+              <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Borrow <strong class="font-bold text-black">$4,000 to $70,000</strong> on a 1–7 year loan term</span></li>
+              <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Fixed rate range <strong class="font-bold text-black">7.29% p.a. – 23.25% p.a.</strong> (comparison rate of <strong class="font-bold text-black">8.69% p.a. – 24.53% p.a.</strong>)</span></li>
+              <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Fees include a $15 monthly loan account fee</span></li>
+            </ul>
+
+            <div class="space-y-3 pt-2 text-[15px] leading-relaxed text-gray-800">
+              <p>Save up to 100% of the establishment fee for a Personal Loan for the purpose of debt consolidation.</p>
+              <ul class="space-y-3 pl-2">
+                <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Loans above $20,000 and up to $70,000: $0 establishment fee (save $250)</span></li>
+                <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Loans above $10,000 and up to $20,000: $100 establishment fee (save $150)</span></li>
+                <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>Loans under $10,000: $250 establishment fee</span></li>
+                <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>A $175 prepayment fee applies if you choose a 3–7 year loan term and repay it within 2 years</span></li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <hr class="border-gray-200">
+
+        <section aria-labelledby="confirm-title" class="grid grid-cols-1 items-start gap-8 pt-2 md:grid-cols-12">
+          <div class="md:col-span-5">
+            <h2 id="confirm-title" class="text-2xl font-bold leading-snug text-gray-900">Confirm to continue with your application</h2>
+          </div>
+          <div class="space-y-6 md:col-span-7">
+            <div class="flex items-center gap-3">
+              <input class="custom-checkbox h-6 w-6 cursor-pointer rounded border-2 border-gray-400 text-[#DA1710] transition focus:ring-red-500 focus:ring-offset-0" id="loan-confirmation" type="checkbox">
+              <label class="cursor-pointer select-none text-[15px] text-gray-800" for="loan-confirmation">Yes, this is what I'm looking for</label>
+            </div>
+            <div>
+              <button class="block w-36 rounded-md bg-[#DA1710] px-6 py-3 text-center text-base font-medium text-white shadow-sm transition hover:bg-[#b9120c] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50" disabled id="continue-button" type="button">Continue</button>
+              <p aria-live="polite" class="mt-3 hidden text-sm text-gray-600" id="continue-notice">Please confirm this is the loan you're looking for.</p>
+            </div>
+            <a class="inline-block text-[15px] text-[#DA1710] hover:underline" href="/">No, I want to look at something else</a>
+          </div>
+        </section>
+
+        <section aria-labelledby="other-options-title" class="space-y-4 border-t border-gray-200 pt-8">
+          <h2 id="other-options-title" class="text-2xl font-bold tracking-tight text-gray-900">Other options</h2>
+          <p class="text-[15px] leading-relaxed text-gray-800">Personal loans can be a good way to secure a lump sum of money for a specific need. However, there are instances where it's worth considering another form of credit:</p>
+          <ul class="space-y-3.5 pl-1 text-[15px] leading-relaxed text-gray-800">
+            <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>You need a payment tool for everyday purchases on an ongoing basis. Consider <a class="text-[#DA1710] hover:underline" href="/">Credit Cards</a>.</span></li>
+            <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>If you need ongoing short-term cashflow or prefer paying in stages instead of a lump sum, consider a <a class="text-[#DA1710] hover:underline" href="/">Flexi Loan</a>.</span></li>
+            <li class="flex items-start gap-3"><span aria-hidden="true" class="text-xl font-bold leading-none">•</span><span>For home renovations costing more than $70,000, consider <a class="text-[#DA1710] hover:underline" href="/">increasing your home loan</a> or a <a class="text-[#DA1710] hover:underline" href="/">construction option</a>.</span></li>
+          </ul>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <footer class="mt-16 border-t border-gray-200 bg-white py-8">
+    <div class="mx-auto flex max-w-[1440px] flex-col items-center justify-between gap-4 px-6 text-xs text-gray-500 md:flex-row lg:px-12">
+      <p>Our site and your transactions are secure. You can read our <a class="underline text-gray-600 hover:text-gray-900" href="/">security information</a>.</p>
+      <p>© 2026 Bestpac Banking demo.</p>
+    </div>
+  </footer>
+
+  <script>
+    const confirmation = document.getElementById('loan-confirmation');
+    const continueButton = document.getElementById('continue-button');
+    const continueNotice = document.getElementById('continue-notice');
+
+    confirmation.addEventListener('change', () => {
+      continueButton.disabled = !confirmation.checked;
+      continueNotice.classList.add('hidden');
+    });
+
+    continueButton.addEventListener('click', () => {
+      if (!confirmation.checked) {
+        continueNotice.classList.remove('hidden');
+        return;
+      }
+      window.location.href = 'personal-loan-application.html';
+    });
+  </script>
+</body>
+</html>

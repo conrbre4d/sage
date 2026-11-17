@@ -96,12 +96,145 @@ textarea.input{height:auto;min-height:96px;padding:8px 12px;resize:vertical;line
 .case-link{cursor:pointer;background:none;border:0;padding:0;color:inherit}
 .ai-box p{font-size:11px}
 .ai-box .ai-action{display:block;margin-top:8px;font-weight:600}
-.pill .plate{width:15px;height:15px;font-size:11px;border-radius:2px}
-.agent-mini .agent-avatar{gap:5px}
+/* bigger UI: scale the whole layout up on laptop and desktop screens */
+@media (min-width:1000px){ html{zoom:1.1} }
+@media (min-width:1300px){ html{zoom:1.2} }
+
+/* licence plates (L / Red P / Green P / Full) */
+.licence{display:inline-flex;align-items:center;gap:8px;flex-shrink:0}
+.licence-name{font-size:11px;font-weight:600;white-space:nowrap}
+.lp{--lp:40px;display:inline-grid;place-items:center;flex-shrink:0;width:var(--lp);height:var(--lp);border-radius:calc(var(--lp) * .2);
+    border:max(2px, calc(var(--lp) * .075)) solid #fff;box-shadow:0 0 0 1px var(--border),0 1px 3px oklch(.2 .01 264 / .18);
+    font-family:"Inter","Arial Black",sans-serif;font-weight:800;font-size:calc(var(--lp) * .56);line-height:1}
+.lp-L{background:#F4B72B;color:#141A22}
+.lp-P1{background:#D63D2D;color:#FFF7F4}
+.lp-P2{background:#1E7A50;color:#FFF7F4}
+.lp-FULL{background:#141A22;color:#FFF7F4}
+.lp-FULL svg{width:50%;height:50%;stroke-width:2.2}
+.agent-mini .licence{gap:6px}
+.agent-mini .licence-name{font-size:9px;color:var(--muted-foreground);min-width:62px}
+.ladder-step .lp{margin:0 auto 5px;display:grid}
+.ladder-step:not(.current) .lp{opacity:.4;box-shadow:none}
+.ladder-step.current{color:var(--foreground);font-weight:600}
+.sidebar>.brand{margin-bottom:34px}
 .stat-heading svg{width:16px;height:16px}
 .sidebar nav button.nav-link{display:flex}
 .history-item p.muted{font-size:10px}
-.fact-tile .probability{margin-top:2px}
+.fact-tile .probability{margin-top:2px;min-width:0}
+.probability strong{white-space:nowrap}
+.sidebar nav>div.nav-demo{margin-top:27px}
+
+/* read-only summary cards */
+.summary-label{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted-foreground);margin:0 0 10px}
+.summary-label strong{color:var(--foreground);font-weight:600}
+.summary-grid .stat-card{cursor:default;user-select:text;background:color-mix(in oklch,var(--card) 70%,var(--muted));border-style:dashed}
+
+/* pagination */
+.pager{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;padding:12px 15px;border-top:1px solid var(--border);font-size:11px}
+.pager.plain{border:0;padding:14px 2px 0}
+.pager strong{color:var(--foreground);font-weight:600}
+.pager-buttons{display:flex;align-items:center;gap:5px}
+.pager-buttons .btn{min-width:32px;padding:0 9px;font-size:11px}
+.pager-gap{padding:0 3px;color:var(--muted-foreground)}
+
+/* review queue controls */
+.queue-heading h2{display:flex;align-items:center;gap:10px}
+.queue-heading h2 .pill{font-size:11px}
+.sort-box{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:500;color:var(--muted-foreground)}
+.sort-box select{width:auto;height:32px;font-size:11px;padding:0 10px}
+.queue-filters{margin-bottom:16px}
+.queue-filters button span{font-family:var(--font-mono);font-size:9px;opacity:.65}
+.queue-card-date{display:flex;align-items:center;gap:5px;margin-top:9px;font-size:10px;color:var(--muted-foreground)}
+
+/* grouped mistakes (agents page) */
+.mgroup{background:var(--card);border:1px solid var(--border);border-radius:12px;margin-bottom:12px;overflow:hidden;position:relative}
+.mgroup::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--tone-accent)}
+.mgroup>summary{list-style:none;display:flex;align-items:flex-start;gap:14px;padding:16px 16px 16px 20px;cursor:pointer}
+.mgroup>summary::-webkit-details-marker{display:none}
+.mgroup>summary:hover{background:var(--accent)}
+.mgroup>summary:focus-visible{outline:2px solid var(--ring);outline-offset:-2px}
+.mgroup-count{display:flex;flex-direction:column;align-items:center;justify-content:center;min-width:52px;height:52px;border-radius:10px;background:var(--tone-bg);color:var(--tone-text);flex-shrink:0}
+.mgroup-count strong{font-size:20px;line-height:1}
+.mgroup-count span{font-size:9px}
+.mgroup-main{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.mgroup-top{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.mgroup-top strong{font-size:13px}
+.mgroup-sub{display:flex;align-items:center;gap:6px;flex-wrap:wrap;font-size:10px;color:var(--muted-foreground)}
+.mgroup-cases{display:flex;gap:6px;flex-wrap:wrap}
+.mgroup-cases .case-chip{cursor:default;font-size:10px;padding:2px 8px}
+.mgroup-chev{color:var(--muted-foreground);transition:transform .2s;margin-top:2px}
+.mgroup[open] .mgroup-chev{transform:rotate(180deg)}
+.mgroup-body{padding:4px 16px 4px 20px;border-top:1px solid var(--border);background:color-mix(in oklch,var(--card) 60%,var(--muted))}
+.mgroup-body .mistake-card{background:var(--card);margin:12px 0}
+.mgroup-open{margin-left:auto;height:26px;font-size:10px}
+
+/* Improvements: pipeline stages + fix cards */
+.imp-flow{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px;margin-bottom:26px}
+.imp-stage{position:relative;background:var(--card);border:1px solid var(--border);border-radius:14px;padding:16px 16px 14px;display:flex;flex-direction:column;gap:5px}
+.imp-stage:not(:last-child)::after{content:"";position:absolute;top:50%;right:-13px;width:9px;height:9px;border-top:2px solid var(--muted-foreground);border-right:2px solid var(--muted-foreground);transform:translateY(-50%) rotate(45deg);opacity:.45}
+.imp-stage-top{display:flex;align-items:center;gap:10px;margin-bottom:6px}
+.imp-icon{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;background:var(--tone-bg);color:var(--tone-text);flex-shrink:0}
+.imp-step{font-size:9px;font-weight:600;letter-spacing:.8px;text-transform:uppercase;color:var(--muted-foreground)}
+.imp-count{margin-left:auto;font-size:28px;font-weight:700;line-height:1;color:var(--tone-text)}
+.imp-stage strong{font-size:13px}
+.imp-stage p{font-size:11px;color:var(--muted-foreground);line-height:1.5}
+.imp-badge{display:inline-flex;align-items:center;gap:5px;margin-top:6px;width:max-content;font-size:10px;font-weight:600;padding:2px 9px;border-radius:999px;background:var(--tone-bg);color:var(--tone-text)}
+.tone-low{--tone-bg:var(--muted);--tone-text:var(--muted-foreground);--tone-accent:var(--border)}
+.fix-card{position:relative;background:var(--card);border:1px solid var(--border);border-radius:16px;padding:22px 24px 18px 30px;margin-bottom:18px;overflow:hidden;box-shadow:var(--paper-shadow)}
+.fix-card::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;background:var(--tone-accent)}
+.fix-card.needs-action{border-color:color-mix(in oklch,var(--tone-accent) 55%,var(--border));box-shadow:0 0 0 3px color-mix(in oklch,var(--tone-accent) 14%,transparent),var(--paper-shadow)}
+.fix-head{display:flex;gap:14px;align-items:flex-start}
+.fix-icon{width:44px;height:44px;border-radius:12px;display:grid;place-items:center;background:var(--tone-bg);color:var(--tone-text);flex-shrink:0}
+.fix-title{flex:1;min-width:0}
+.fix-meta{font-family:var(--font-mono);font-size:10px;color:var(--muted-foreground)}
+.fix-title h3{font-size:16px;line-height:1.35;margin:3px 0 7px}
+.fix-title h3::first-letter{text-transform:uppercase}
+.fix-agent{display:flex;align-items:center;gap:7px;font-size:11px;color:var(--muted-foreground)}
+.fix-agent strong{color:var(--foreground);font-weight:600}
+.fix-head>.pill{flex-shrink:0}
+.fix-track{list-style:none;display:grid;grid-template-columns:repeat(4,1fr);margin:20px 0;padding:0}
+.fix-track li{position:relative;display:flex;flex-direction:column;align-items:center;gap:6px;font-size:10px;color:var(--muted-foreground);text-align:center}
+.fix-track li:not(:first-child)::before{content:"";position:absolute;top:12px;right:50%;width:100%;height:2px;background:var(--border)}
+.fix-track li.done::before,.fix-track li.current::before,.fix-track li.failed::before{background:var(--success-accent)}
+.fix-dot{position:relative;z-index:1;width:26px;height:26px;border-radius:50%;display:grid;place-items:center;font-size:10px;font-weight:600;background:var(--card);border:2px solid var(--border);color:var(--muted-foreground)}
+.fix-track li.done .fix-dot{background:var(--success-accent);border-color:var(--success-accent);color:#fff}
+.fix-track li.current .fix-dot{background:var(--high-bg);border-color:var(--high-accent);color:var(--high-text);box-shadow:0 0 0 4px color-mix(in oklch,var(--high-accent) 20%,transparent)}
+.fix-track li.failed .fix-dot{background:var(--critical-bg);border-color:var(--critical-text);color:var(--critical-text)}
+.fix-track li.done,.fix-track li.current,.fix-track li.failed{color:var(--foreground);font-weight:600}
+.fix-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.fix-box{border-radius:10px;padding:14px 16px;font-size:12px;line-height:1.55}
+.fix-box label{display:flex;align-items:center;gap:6px;font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;margin-bottom:6px}
+.fix-box.problem{background:var(--critical-bg)}.fix-box.problem label{color:var(--critical-text)}
+.fix-box.solution{background:var(--success-bg)}.fix-box.solution label{color:var(--success-text)}
+.fix-by{display:flex;align-items:center;gap:6px;margin-top:10px;font-size:11px;color:var(--muted-foreground)}
+.fix-cases{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-top:16px}
+.fix-cases>label{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.6px;color:var(--muted-foreground);margin-right:4px}
+.case-chip{display:inline-flex;align-items:center;gap:5px;font-family:var(--font-mono);font-size:11px;font-weight:600;padding:4px 10px;border-radius:999px;border:1px solid var(--border);background:var(--muted);color:var(--foreground);cursor:pointer}
+.case-chip:hover{text-decoration:underline}
+.case-chip.pass{background:var(--success-bg);color:var(--success-text);border-color:color-mix(in oklch,var(--success-text) 30%,var(--card))}
+.case-chip.fail{background:var(--critical-bg);color:var(--critical-text);border-color:color-mix(in oklch,var(--critical-text) 30%,var(--card))}
+.fix-replay{display:flex;align-items:center;gap:10px;margin-left:auto;font-size:11px;font-weight:600}
+.fix-replay .progress-track{width:120px;height:7px}
+.fix-actions{display:flex;justify-content:flex-end;align-items:center;gap:10px;margin-top:16px;padding-top:14px;border-top:1px solid var(--border)}
+.fix-actions .muted{font-size:11px;margin-right:auto}
+@media(max-width:900px){.imp-flow{grid-template-columns:1fr 1fr}.imp-stage::after{display:none}.fix-grid{grid-template-columns:1fr}.fix-head{flex-wrap:wrap}.fix-replay{margin-left:0}}
+
+/* the agent card being viewed */
+.agent-card{position:relative;transition:box-shadow .2s,transform .2s,opacity .2s,border-color .2s}
+.agent-card:not(.selected){opacity:.72}
+.agent-card:not(.selected):hover{opacity:1;border-color:color-mix(in oklch,var(--primary) 35%,var(--border))}
+.agent-card.selected{border-color:var(--primary);transform:translateY(-3px);
+  box-shadow:0 0 0 2px var(--primary),0 0 0 7px color-mix(in oklch,var(--ring) 16%,transparent),0 14px 30px oklch(.2 .02 264 / .14)}
+.agent-card.selected::before{content:"";position:absolute;inset:0 0 auto 0;height:5px;border-radius:16px 16px 0 0;background:var(--primary)}
+.agent-card.selected::after{content:"Viewing";position:absolute;top:-12px;left:20px;padding:2px 10px;border-radius:999px;
+  background:var(--primary);color:var(--primary-foreground);font-size:10px;font-weight:600;letter-spacing:.4px}
+@media (prefers-reduced-motion:reduce){.agent-card.selected{transform:none}}
+.agent-focus{display:flex;align-items:center;gap:12px;margin:4px 0 18px;padding-top:6px}
+.agent-focus h2{font-size:16px}
+.history-body{flex:1;min-width:0}
+.history-body>p{margin-top:4px}
+.history-body p.muted{display:flex;align-items:center;gap:6px;flex-wrap:wrap}
+.history-item>.pill{align-self:flex-start}
 .event-finding{display:flex;gap:5px;align-items:center}
 .timeline-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
 .timeline-controls .muted{margin-left:auto;font-size:10px}
@@ -122,24 +255,17 @@ textarea.input{height:auto;min-height:96px;padding:8px 12px;resize:vertical;line
 
   <aside class="sidebar" id="sidebar">
     <a href="?view=review" class="brand" data-home><span class="brand-symbol" data-icon="search" data-size="23"></span><strong>AgentLens<span class="brand-period">.</span></strong></a>
-    <div class="prototype"><span></span>Prototype · synthetic data</div>
     <nav aria-label="Main navigation">
-      <div><p class="nav-group">Applications</p><button class="btn btn-ghost nav-link" data-view="review"><span data-icon="list-filter" data-size="18"></span><span>Review queue</span><span class="nav-count queue-count" id="nReview">—</span></button></div>
-      <div><button class="btn btn-ghost nav-link" data-view="applications"><span data-icon="layout-list" data-size="18"></span><span>All applications</span><span class="nav-count" id="nApps">—</span></button></div>
+      <div><p class="nav-group">Applications</p><button class="btn btn-ghost nav-link" data-view="applications"><span data-icon="layout-list" data-size="18"></span><span>All applications</span><span class="nav-count" id="nApps">—</span></button></div>
+      <div><button class="btn btn-ghost nav-link" data-view="review"><span data-icon="list-filter" data-size="18"></span><span>Review queue</span><span class="nav-count queue-count" id="nReview">—</span></button></div>
       <div><button class="btn btn-ghost nav-link" data-view="reviewed"><span data-icon="check-check" data-size="18"></span><span>Reviewed</span><span class="nav-count" id="nReviewed">—</span></button></div>
       <div><p class="nav-group">Agents</p><button class="btn btn-ghost nav-link" data-view="agents"><span data-icon="bot" data-size="18"></span><span>Agents &amp; licences</span><span class="nav-count" id="nAgents">—</span></button></div>
       <div><button class="btn btn-ghost nav-link" data-view="improve"><span data-icon="lightbulb" data-size="18"></span><span>Improvements</span><span class="nav-count" id="nSug">—</span></button></div>
+      <div class="nav-demo"><p class="nav-group">Demo</p><a class="btn btn-ghost nav-link" href="/bank/form"><span data-icon="plus" data-size="18"></span><span>New application</span></a></div>
+      <div><button class="btn btn-ghost nav-link" id="runBtn" data-idle><span data-icon="play" data-size="18"></span><span>Run demo batch</span></button></div>
+      <div><button class="btn btn-ghost nav-link" id="waitBtn" hidden data-idle><span data-icon="rotate" data-size="18"></span><span>Process waiting</span><span class="nav-count queue-count" id="nWait">0</span></button></div>
     </nav>
     <div class="sidebar-bottom">
-      <div class="demo-controls">
-        <div class="demo-caption"><span data-icon="radio" data-size="13"></span> DEMO WORKSPACE</div>
-        <a class="btn w-full" href="/bank/form"><span data-icon="plus"></span>New application</a>
-        <div class="batch-selector"><label for="count">Applications</label>
-          <select id="count" data-idle><option value="22">22</option><option value="30" selected>30</option><option value="45">45</option><option value="60">60</option></select><span data-icon="chevron-down" data-size="13"></span></div>
-        <button class="btn btn-outline w-full" id="runBtn" data-idle><span data-icon="play" data-size="14"></span>Run demo batch</button>
-        <button class="btn btn-outline w-full mt-2" id="waitBtn" hidden data-idle>Process waiting</button>
-      </div>
-      <div class="reviewer"><div class="avatar">CR</div><div><strong>Credit reviewer</strong><span>Human oversight</span></div><span data-icon="shield-check"></span></div>
       <div class="sidebar-footer">
         <span class="storage-label"><span class="offline-dot" id="dot"></span><span id="storage">Connecting…</span></span>
         <button class="btn btn-ghost btn-sm" id="themeBtn"><span data-icon="moon" data-size="13"></span><span id="themeLabel">Dark</span></button>
@@ -148,16 +274,11 @@ textarea.input{height:auto;min-height:96px;padding:8px 12px;resize:vertical;line
   </aside>
 
   <div class="workspace">
-    <div class="workspace-topbar">
-      <span>Credit operations <span class="breadcrumb-slash">/</span> Agent oversight</span>
-      <div><span class="offline-dot" id="topDot"></span><span id="topState">Awaiting connection</span><span class="topbar-divider"></span><span>AU</span><span class="mini-avatar">CR</span></div>
-    </div>
     <main>
       <div id="pageHead"></div>
       <div class="job-banner" id="jobBanner" role="status" aria-live="polite"></div>
       <div id="view"></div>
     </main>
-    <footer class="main-footer"><span data-icon="shield-check" data-size="13"></span>AI agents earn the right to work alone<span>AgentLens · Human accountability, by design</span></footer>
   </div>
 </div>
 
@@ -213,6 +334,8 @@ const ICONS = {
   "moon":'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
   "sun":'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
   "circle":'<circle cx="12" cy="12" r="10"/>',
+  "clock":'<circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>',
+  "chevron-right":'<path d="m9 18 6-6-6-6"/>',
   "user":'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
 };
 const icon = (name, size = 16, cls = "") => `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ""}</svg>`;
@@ -237,15 +360,12 @@ const statusPill = (s) => pill(`${s === "approved" ? icon("check", 12) : icon("d
                                 (s === "verifying" || s === "deciding") ? "gentle-pulse" : "");
 const sevPill = (sev) => pill(esc(sev), String(sev || "").toLowerCase());
 const typeTone = (t) => t === "CRITICAL" ? "critical" : t === "MAJOR" ? "high" : "medium";
-function licence(level, size = 46) {
-  const i = LV[level] || LV.L, eye = level === "L" ? 2.4 : 2;
-  const plate = i.plate ? `<span class="plate plate-${i.plate}">${i.letter}</span>` : icon("check", 11);
-  return `<span class="agent-avatar lvl-${level}" title="${i.name}"><svg viewBox="0 0 40 40" width="${size}" height="${size}" aria-hidden="true"><g class="bot">`
-    + (level === "FULL" ? `<path class="crown" d="M12 9l4 4 4-6 4 6 4-4-1 6H13z"/>` : "")
-    + (level === "L" ? `<rect class="cap" x="13" y="7" width="14" height="6" rx="2"/>` : "")
-    + `<line x1="20" y1="14" x2="20" y2="10" class="stroke"/><circle cx="20" cy="9" r="1.6" class="antenna"/><rect x="9" y="14" width="22" height="17" rx="6" class="head"/>`
-    + `<g class="eyes"><circle cx="16" cy="22" r="${eye}"/><circle cx="24" cy="22" r="${eye}"/></g>`
-    + `<path d="${level === "FULL" || level === "P2" ? "M15.5 26.5q4.5 3 9 0" : "M17 27h6"}" class="stroke"/></g></svg>${pill(plate + i.name, i.tone)}</span>`;
+// Australian licence plates: yellow L, red P, green P, and a dark plate with a tick for a full licence
+const plate = (level, size = 40) => { const i = LV[level] || LV.L;
+  return `<span class="lp lp-${level}" style="--lp:${size}px" aria-hidden="true">${level === "FULL" ? icon("check", size) : i.letter}</span>`; };
+function licence(level, size = 40) {
+  const i = LV[level] || LV.L;
+  return `<span class="licence" title="${i.name}">${plate(level, size)}<span class="licence-name">${i.name}</span></span>`;
 }
 const bar = (value, tone = "success") => `<div class="progress-track tone-${tone}"><progress max="100" value="${Math.max(0, Math.min(100, value || 0))}"></progress></div>`;
 const probTone = (p) => p >= .7 ? "success" : p >= .4 ? "high" : "critical";
@@ -278,7 +398,9 @@ function dialog({title, description = "", fields = [], label = "Confirm", danger
   const box = $("dlg");
   box.innerHTML = `<div class="dialog-content" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
     <div><h2 id="dlgTitle">${esc(title)}</h2>${description ? `<p class="dialog-desc" style="margin-top:6px">${esc(description)}</p>` : ""}</div>
-    ${fields.map(f => `<label class="field">${esc(f.label)}${f.textarea
+    ${fields.map(f => `<label class="field">${esc(f.label)}${f.options
+        ? `<select class="input" id="f_${f.id}">${f.options.map(([v, l]) => `<option value="${esc(v)}" ${v === f.value ? "selected" : ""}>${esc(l)}</option>`).join("")}</select>`
+        : f.textarea
         ? `<textarea class="input" id="f_${f.id}" rows="4">${esc(f.value || "")}</textarea>`
         : `<input class="input" id="f_${f.id}" value="${esc(f.value || "")}" placeholder="${esc(f.placeholder || "")}" autocomplete="off">`}${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`).join("")}
     <p class="text-destructive small" id="dlgErr" role="alert" style="color:var(--critical-text)" hidden></p>
@@ -307,7 +429,7 @@ const rememberName = (n) => { try { localStorage.setItem("agentlens-reviewer", n
 
 // ---------------------------------------------------------------- state + api
 const S = {view:"review", o:null, caseId:null, caseTab:"summary", caseStatus:null, caseData:null, appsFilter:"all",
-           search:"", agent:"verification_agent", reveal:{}, explain:{}, showSystem:false, back:null, head:null, sig:null, offline:false};
+           search:"", agent:"verification_agent", fixAgent:"all", page:{}, qSort:"severity", qSev:"all", openGroups:{}, jobWasRunning:false, reveal:{}, explain:{}, showSystem:false, back:null, head:null, sig:null, offline:false};
 
 async function api(path, opts = {}) {
   let r;
@@ -353,8 +475,7 @@ function setHead(title, description, action = "") {
   const key = title + "|" + description + "|" + action;
   if (S.head === key) return;
   S.head = key;
-  $("pageHead").innerHTML = `<div class="page-header"><div><div class="eyebrow">HUMAN OVERSIGHT, BUILT IN</div><h1>${title}</h1><p>${description}</p></div>
-    ${action || `<div class="reviewer-label">${icon("shield-check", 15)}Credit reviewer</div>`}</div>`;
+  $("pageHead").innerHTML = `<div class="page-header"><div><h1>${title}</h1><p>${description}</p></div>${action}</div>`;
   wireHeadActions();
 }
 function wireHeadActions() {
@@ -372,23 +493,25 @@ function renderChrome(o) {
   $("nAgents").textContent = o.agents.length;
   $("nSug").textContent = o.suggestions.filter(x => ["proposed","testing"].includes(x.status)).length;
   $("storage").textContent = o.storage === "supabase" ? "Supabase" : "Local storage";
-  $("dot").className = $("topDot").className = "online-dot";
-  $("topState").textContent = "Live monitoring";
-  $("waitBtn").hidden = !s.waiting; $("waitBtn").textContent = `Process waiting (${s.waiting})`;
-  let html;
+  $("dot").className = "online-dot";
+  $("waitBtn").hidden = !s.waiting; $("nWait").textContent = s.waiting;
+  let html = "";
   if (j.running) html = `${icon("loader", 15, "spin")}<span>${esc(j.message || "Processing applications…")}</span><span class="job-count">${j.done} / ${j.total}</span>${bar(j.total ? j.done / j.total * 100 : 0)}`;
-  else if (j.error) html = `${pill("Error", "critical")}<span>${esc(j.message || j.error)}</span>`;
-  else if (s.in_progress) html = `${icon("loader", 15, "spin")}<span>The agents are working</span><span class="job-count">${s.in_progress} application${s.in_progress === 1 ? "" : "s"} being processed</span>`;
-  else if (j.message) html = `${icon("check-check", 16, "success-text")}<span>${esc(j.message)}</span>`;
-  else html = `<span class="online-dot"></span><span>AgentLens is monitoring every decision.</span><span class="job-count">Human review stays in control</span>`;
+  else if (j.error) html = `${pill("Error", "critical")}<span>${esc(typeof j.error === "string" ? j.error : j.message)}</span>`;
+  else if (s.in_progress) html = `${icon("loader", 15, "spin")}<span>${s.in_progress} application${s.in_progress === 1 ? "" : "s"} being processed</span>`;
+  // a finished job is announced once as a toast, not kept as a banner on every page
+  if (S.jobWasRunning && !j.running && !j.error && j.message) toast(j.message);
+  S.jobWasRunning = j.running;
   $("jobBanner").innerHTML = html;
+  $("jobBanner").hidden = !html;
   idle(j.running);
 }
 function renderOffline(msg) {
-  $("dot").className = $("topDot").className = "offline-dot";
-  $("storage").textContent = "Not connected"; $("topState").textContent = "Awaiting connection";
+  $("dot").className = "offline-dot";
+  $("storage").textContent = "Not connected";
   $("jobBanner").innerHTML = `<span class="offline-dot"></span><span>${esc(msg)}</span>`;
-  if (!S.o) { setHead("AgentLens", "Connecting to your AgentLens API…"); $("view").innerHTML = errorNote(msg); }
+  $("jobBanner").hidden = false;
+  if (!S.o) { setHead("AgentLens", "Cannot reach the API."); $("view").innerHTML = errorNote(msg); }
 }
 
 // ---------------------------------------------------------------- render dispatch
@@ -400,48 +523,93 @@ function render() {
 }
 
 // ---------------------------------------------------------------- Review queue
+// agents are always shown in pipeline order
+const AGENT_ORDER = ["intake_agent", "verification_agent", "decision_agent"];
+const inOrder = (agents) => agents.slice().sort((a, b) => AGENT_ORDER.indexOf(a.agent_name) - AGENT_ORDER.indexOf(b.agent_name));
+
+// pagination: 10 rows per page on every list
+const PAGE_SIZE = 10;
+function paginate(rows, key) {
+  const pages = Math.max(1, Math.ceil(rows.length / PAGE_SIZE));
+  S.page[key] = Math.min(Math.max(1, S.page[key] || 1), pages);
+  const start = (S.page[key] - 1) * PAGE_SIZE;
+  return {items:rows.slice(start, start + PAGE_SIZE), page:S.page[key], pages, start, total:rows.length};
+}
+function pager(p, key, noun, plain = false) {
+  const from = p.total ? p.start + 1 : 0, to = Math.min(p.start + PAGE_SIZE, p.total);
+  const nums = [];
+  for (let n = 1; n <= p.pages; n++) {
+    if (n === 1 || n === p.pages || Math.abs(n - p.page) <= 1) nums.push(n);
+    else if (nums[nums.length - 1] !== "…") nums.push("…");
+  }
+  return `<div class="pager ${plain ? "plain" : ""}"><span class="muted">Showing <strong>${from}–${to}</strong> of <strong>${p.total}</strong> ${noun}</span>
+    <div class="pager-buttons" role="navigation" aria-label="Pages">
+      <button class="btn btn-outline btn-sm" data-page="${key}:${p.page - 1}" ${p.page <= 1 ? "disabled" : ""} aria-label="Previous page">${icon("arrow-left", 14)}</button>
+      ${nums.map(n => n === "…" ? `<span class="pager-gap">…</span>` : `<button class="btn btn-sm ${n === p.page ? "" : "btn-outline"}" data-page="${key}:${n}" ${n === p.page ? 'aria-current="page"' : ""}>${n}</button>`).join("")}
+      <button class="btn btn-outline btn-sm" data-page="${key}:${p.page + 1}" ${p.page >= p.pages ? "disabled" : ""} aria-label="Next page">${icon("arrow-right", 14)}</button></div></div>`;
+}
+function wirePager(rerender) {
+  document.querySelectorAll("[data-page]").forEach(b => b.onclick = () => { const [k, n] = b.dataset.page.split(":"); S.page[k] = Number(n); S.sig = null; rerender(); });
+}
+
 function statCards(o) {
   const s = o.stats;
-  return `<div class="stat-grid">
+  return `<div class="summary-label">${icon("info", 13)}<span><strong>Summary</strong> · read-only figures that update automatically. These cards can't be clicked or edited.</span></div>
+  <div class="stat-grid summary-grid" aria-label="Summary (read-only)">
     <div class="stat-card"><div class="stat-heading">Processed ${icon("layout-list")}</div>
       <div class="stat-value">${s.processed}<span>of ${s.total}</span></div>${bar(s.total ? s.processed / s.total * 100 : 0)}
       <p class="caption">${s.cleared} cleared automatically · ${s.reviewed} reviewed by a person</p></div>
-    <div class="stat-card stat-held"><div class="stat-heading">Held for review ${icon("alert")}</div>
+    <div class="stat-card"><div class="stat-heading">Held for review ${icon("alert")}</div>
       <div class="stat-value">${s.held}</div>
-      <div class="severity-chips">${["Critical","High","Medium"].filter(k => s.held_by_severity[k]).map(k => pill(`${s.held_by_severity[k]} ${k.toLowerCase()}`, k.toLowerCase())).join("") || pill("Nothing held", "success")}</div>
-      <p class="caption">Nothing has been sent to these customers yet.</p></div>
+      <div class="severity-chips">${["Critical","High","Medium"].filter(k => s.held_by_severity[k]).map(k => pill(`${s.held_by_severity[k]} ${k.toLowerCase()}`, k.toLowerCase())).join("") || pill("Nothing held", "success")}</div></div>
     <div class="stat-card stat-agents"><div class="stat-heading">Agents ${icon("bot")}</div>
       <div class="stat-value">${o.agents.length}<span>${o.agents.filter(a => a.level !== "FULL").length} learning</span></div>
-      <div class="agent-mini-list">${o.agents.map(a => `<div class="agent-mini">${licence(a.level, 24)}<span class="agent-mini-name">${esc(a.label)}</span><strong>${Math.round(a.trust_score)}</strong></div>`).join("")}</div></div>
+      <div class="agent-mini-list">${inOrder(o.agents).map(a => `<div class="agent-mini">${licence(a.level, 24)}<span class="agent-mini-name">${esc(a.label)}</span><strong>${Math.round(a.trust_score)}</strong></div>`).join("")}</div></div>
   </div>`;
 }
+const SEVERITIES = ["Critical", "High", "Medium", "Low"];
+const QUEUE_SORTS = [["severity", "Most critical first"], ["newest", "Newest submitted first"], ["oldest", "Oldest submitted first"]];
 function renderReview() {
-  const o = S.o, q = o.queue;
+  const o = S.o, submitted = Object.fromEntries(o.applications.map(a => [a.case_id, a.submitted_at]));
+  const time = (c) => new Date(submitted[c.case_id] || 0).getTime();
+  const sevRank = (c) => { const i = SEVERITIES.indexOf(c.severity); return i < 0 ? 9 : i; };
+  const sorted = o.queue.slice().sort((a, b) => S.qSort === "newest" ? time(b) - time(a) : S.qSort === "oldest" ? time(a) - time(b)
+                                                  : sevRank(a) - sevRank(b) || time(b) - time(a));
+  const q = S.qSev === "all" ? sorted : sorted.filter(c => c.severity === S.qSev);
+  const p = paginate(q, "review");
   setHead("Review queue", "Applications the agents held for a person to check. Nothing was sent to these customers yet.");
-  if (!S.caseId || !q.some(x => x.case_id === S.caseId)) { S.caseId = q[0]?.case_id || null; S.caseStatus = null; }
+  if (!S.caseId || !p.items.some(x => x.case_id === S.caseId)) { S.caseId = p.items[0]?.case_id || null; S.caseStatus = null; }
   if (!$("reviewLayout")) {
-    $("view").innerHTML = `<div id="reviewStats"></div>
-      <div class="section-heading"><h2>Waiting for you</h2><span id="queueCount"></span></div>
-      <div id="reviewLayout"></div>`;
+    $("view").innerHTML = `<div id="reviewStats"></div><div id="queueControls"></div><div id="reviewLayout"></div>`;
   }
   $("reviewStats").innerHTML = statCards(o);
-  $("queueCount").textContent = q.length ? `${q.length} held · most serious first` : "";
+  const n = o.queue.length;
+  $("queueControls").innerHTML = `<div class="section-heading queue-heading"><h2>Waiting for you ${pill(`${n} application${n === 1 ? "" : "s"} waiting`, n ? "high" : "success")}</h2>
+      <label class="sort-box">Sort by <select id="qSort" class="input">${QUEUE_SORTS.map(([k, l]) => `<option value="${k}" ${S.qSort === k ? "selected" : ""}>${l}</option>`).join("")}</select></label></div>
+    <div class="filter-list queue-filters" role="group" aria-label="Filter by severity">${["all", ...SEVERITIES].map(k => {
+      const c = k === "all" ? n : o.queue.filter(x => x.severity === k).length;
+      return `<button class="btn btn-sm ${S.qSev === k ? "" : "btn-outline"}" data-sev="${k}" aria-pressed="${S.qSev === k}">${k === "all" ? "All severities" : k} <span>${c}</span></button>`; }).join("")}</div>`;
+  $("qSort").onchange = (e) => { S.qSort = e.target.value; S.page.review = 1; S.sig = null; renderReview(); };
+  document.querySelectorAll("[data-sev]").forEach(b => b.onclick = () => { S.qSev = b.dataset.sev; S.page.review = 1; S.sig = null; renderReview(); });
   const layout = $("reviewLayout");
   if (!q.length) {
-    layout.className = ""; layout.innerHTML = o.stats.total
-      ? empty("Nothing to review", "Every decision so far passed the checks.")
-      : empty("No applications yet", "Use Run demo batch or New application in the sidebar to start.");
+    layout.className = ""; layout.innerHTML = `<div class="data-table-wrap">${n
+      ? empty(`No ${esc(S.qSev.toLowerCase())} severity cases`, "Choose another severity to see the other held cases.")
+      : o.stats.total ? empty("Nothing to review", "Every decision so far passed the checks.")
+      : empty("No applications yet", "Use Run demo batch or New application in the sidebar to start.")}</div>`;
     return;
   }
   if (!$("caseHost")) {
     layout.className = "queue-layout";
-    layout.innerHTML = `<div><div class="held-case-list" id="queueList"></div>
-        <p class="queue-note">${icon("info", 13)}AgentLens holds a case the moment an agent makes a mistake, before the customer is told anything.</p></div>
+    layout.innerHTML = `<div><div class="held-case-list" id="queueList"></div><div id="queuePager"></div></div>
       <section class="case-panel" id="caseHost" data-case="" aria-live="polite"></section>`;
   }
-  $("queueList").innerHTML = q.map(c => `<button class="queue-card tone-${esc(c.severity.toLowerCase())} ${c.case_id === S.caseId ? "selected" : ""}" data-case="${esc(c.case_id)}">
+  $("queueList").innerHTML = p.items.map(c => `<button class="queue-card tone-${esc(c.severity.toLowerCase())} ${c.case_id === S.caseId ? "selected" : ""}" data-case="${esc(c.case_id)}">
       <strong>${esc(c.title)}</strong>
-      <div class="queue-card-bottom"><span class="mono">${esc(c.case_id)} · ${kmoney(c.amount)}</span>${sevPill(c.severity)}</div></button>`).join("");
+      <div class="queue-card-bottom"><span class="mono">${esc(c.case_id)} · ${kmoney(c.amount)}</span>${sevPill(c.severity)}</div>
+      <span class="queue-card-date">${icon("clock", 11)}Submitted ${when(submitted[c.case_id])}</span></button>`).join("");
+  $("queuePager").innerHTML = p.pages > 1 || p.total > 0 ? pager(p, "review", "held", true) : "";
+  wirePager(renderReview);
   document.querySelectorAll(".queue-card").forEach(b => b.onclick = () => { S.caseId = b.dataset.case; S.caseTab = "summary"; S.caseStatus = null; renderReview(); });
   const host = $("caseHost");
   if (host.dataset.case !== S.caseId || o.statuses[S.caseId] !== S.caseStatus) { host.dataset.case = S.caseId; loadCase(host); }
@@ -455,13 +623,14 @@ function renderApplications() {
   setHead("All applications", "Every loan application, newest first. Open one to see the form, documents and what the agents did.",
           `<a class="btn" href="/bank/form">${icon("plus")}New application</a>`);
   const rows = o.applications.filter(test).filter(a => !q || a.case_id.includes(q));
+  const p = paginate(rows, "applications");
   const focused = document.activeElement && document.activeElement.id === "search";
   $("view").innerHTML = `<div class="table-controls">
       <div class="filter-list" role="group" aria-label="Filter by status">${FILTERS.map(([k, l, f]) =>
         `<button class="btn btn-sm ${S.appsFilter === k ? "" : "btn-outline"}" data-f="${k}" aria-pressed="${S.appsFilter === k}">${l} <span>${o.applications.filter(f).length}</span></button>`).join("")}</div>
       <div class="search-box">${icon("search")}<input class="input" id="search" placeholder="Search case ID…" value="${esc(S.search)}" aria-label="Search case ID"></div></div>
     ${rows.length ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Loan</th><th>Status</th><th>Approval chance</th><th>Estimated result</th><th>AgentLens</th></tr></thead><tbody>
-      ${rows.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
+      ${p.items.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
         <td data-label="Case"><span class="case-link">${esc(a.case_id)}</span></td>
         <td data-label="Loan" class="loan-details"><strong>${money(a.amount)}</strong><span>${esc(a.purpose)}${a.term_years ? ` · ${a.term_years} yrs` : ""}</span></td>
         <td data-label="Status">${statusPill(a.status)}</td>
@@ -469,11 +638,12 @@ function renderApplications() {
         <td data-label="Estimated result" class="small muted">${esc(a.estimated_timeframe || "—")}</td>
         <td data-label="AgentLens">${a.flagged ? `<span class="finding-note">${icon("flag", 12)}${esc(a.finding || "Flagged")}</span>`
           : WORKING.includes(a.status) ? `<span class="muted small">Watching…</span>` : `<span class="small success-text">${icon("check", 12)} No problems</span>`}</td>
-      </tr>`).join("")}</tbody></table><div class="table-foot">Showing ${rows.length} of ${o.applications.length} applications</div></div>`
+      </tr>`).join("")}</tbody></table>${pager(p, "applications", "applications")}</div>`
       : `<div class="data-table-wrap">${empty(o.applications.length ? "No applications match" : "No applications yet", o.applications.length ? "Try another filter or search." : "They will appear here as the agents process them.")}</div>`}`;
-  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.appsFilter = b.dataset.f; renderApplications(); });
-  const s = $("search"); s.oninput = () => { S.search = s.value; renderApplications(); };
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.appsFilter = b.dataset.f; S.page.applications = 1; renderApplications(); });
+  const s = $("search"); s.oninput = () => { S.search = s.value; S.page.applications = 1; renderApplications(); };
   if (focused) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+  wirePager(renderApplications);
   wireRows("applications");
 }
 function wireRows(from) {
@@ -485,18 +655,19 @@ function wireRows(from) {
 
 // ---------------------------------------------------------------- Reviewed
 function renderReviewed() {
-  const rows = S.o.reviewed;
+  const rows = S.o.reviewed, p = paginate(rows, "reviewed");
   setHead("Reviewed", "Applications a person decided after AgentLens held them.");
   $("view").innerHTML = rows.length ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Loan</th><th>What AgentLens found</th><th>Outcome</th><th>Reviewed by</th><th>When</th></tr></thead><tbody>
-      ${rows.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
+      ${p.items.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
         <td data-label="Case"><span class="case-link">${esc(a.case_id)}</span></td>
         <td data-label="Loan" class="loan-details"><strong>${money(a.amount)}</strong><span>${esc(a.purpose)}</span></td>
         <td data-label="What AgentLens found">${a.finding ? `<span class="finding-note">${icon("flag", 12)}${esc(a.finding)}</span>` : "—"}</td>
         <td data-label="Outcome">${statusPill(a.status)}</td>
         <td data-label="Reviewed by">${esc(a.reviewed_by || "—")}</td>
         <td data-label="When" class="small muted">${when(a.reviewed_at)}</td></tr>`).join("")}</tbody></table>
-      <div class="table-foot">${rows.length} reviewed application${rows.length === 1 ? "" : "s"}</div></div>`
+      ${pager(p, "reviewed", "reviewed applications")}</div>`
     : `<div class="data-table-wrap">${empty("No reviewed applications yet", "Open a case in the Review queue and choose Recalculate, Approve or Decline.")}</div>`;
+  wirePager(renderReviewed);
   wireRows("reviewed");
 }
 
@@ -587,38 +758,26 @@ function review(id, action) {
     onConfirm:async ({name}) => { rememberName(name); await post(`/api/jobs/review/${id}`, {action, reviewer:name}); S.explain[id] = null; S.caseStatus = null; }});
 }
 
-function privacyBar(id) {
-  const on = S.reveal[id];
-  return `<div class="privacy-bar">${icon(on ? "eye" : "lock")}<span>${on ? "Personal details are showing. This view was logged in the audit trail." : "Personal details are hidden. The AI agents never see them either."}</span>
-    <button class="btn btn-outline btn-sm" id="revealBtn">${icon(on ? "eye-off" : "eye", 14)}${on ? "Hide personal details" : "Show personal details"}</button></div>`;
-}
-function wireReveal(id, rerender) {
-  $("revealBtn").onclick = () => {
-    if (S.reveal[id]) { S.reveal[id] = false; rerender(); return; }
-    dialog({title:"Show personal details?", description:`This shows the customer's name, date of birth, address and account for ${id}. Every view is logged in the audit trail.`,
-            label:"Show details", onConfirm:async () => { S.reveal[id] = true; rerender(); }});
-  };
-}
+// Staff always see the customer's personal details here (the server still records each view in the audit trail).
 async function caseForm(t, d) {
   t.innerHTML = skeleton(5);
   let f;
-  try { f = await api(`/bank/applications/${d.case_id}/form?reveal=${!!S.reveal[d.case_id]}`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
+  try { f = await api(`/bank/applications/${d.case_id}/form?reveal=true`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
   if (S.caseTab !== "form" || S.caseId !== d.case_id) return;
-  t.innerHTML = privacyBar(d.case_id) + `<div class="form-sections">${f.sections.map(s => `<section class="readonly-form"><h3>${s.private ? icon("lock", 13) : ""}${esc(s.title)}</h3>
+  t.innerHTML = `<div class="form-sections">${f.sections.map(s => `<section class="readonly-form"><h3>${esc(s.title)}</h3>
       <dl>${s.fields.filter(x => x[1] != null).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></section>`).join("")}</div>
     <div class="steps-section" style="padding-bottom:0"><h3>In the customer’s own words</h3></div><blockquote class="customer-quote" style="margin:0">${esc(f.message)}</blockquote>`;
-  wireReveal(d.case_id, () => caseForm(t, d));
 }
 async function caseDocs(t, d) {
   t.innerHTML = skeleton(4);
   let r;
-  try { r = await api(`/bank/applications/${d.case_id}/documents?reveal=${!!S.reveal[d.case_id]}`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
+  try { r = await api(`/bank/applications/${d.case_id}/documents?reveal=true`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
   if (S.caseTab !== "docs" || S.caseId !== d.case_id) return;
   const docs = Object.entries(r.documents);
   const body = (doc) => doc.kind === "table"
     ? `<div class="paper-content"><strong>${esc(doc.title)}</strong><div class="muted">${esc(doc.source || "")}</div><table>${doc.rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table></div>`
     : `<div class="paper-content">${esc(doc.text)}</div>`;
-  t.innerHTML = privacyBar(d.case_id) + `<div class="document-grid">${docs.map(([k, doc]) => `<div class="document-tile">
+  t.innerHTML = `<div class="document-grid">${docs.map(([k, doc]) => `<div class="document-tile">
       <button class="paper-preview" data-doc="${k}" aria-label="Open ${esc(doc.title)}">${body(doc)}</button>
       <div class="document-title">${icon("file-text", 14)}<strong>${esc(doc.title)}</strong></div>
       <button class="btn btn-ghost btn-sm enlarge" data-doc="${k}">${icon("maximize", 13)}Enlarge</button></div>`).join("")}</div>
@@ -626,11 +785,10 @@ async function caseDocs(t, d) {
   t.querySelectorAll("[data-doc]").forEach(b => b.onclick = () => {
     const doc = r.documents[b.dataset.doc];
     $("modalTitle").textContent = doc.title;
-    $("modalSub").textContent = `${d.case_id} · ${S.reveal[d.case_id] ? "personal details showing" : "personal details hidden"}`;
+    $("modalSub").textContent = d.case_id;
     $("modalBody").innerHTML = body(doc);
     $("modal").hidden = false; $("modalClose").focus();
   });
-  wireReveal(d.case_id, () => caseDocs(t, d));
 }
 $("modalClose").onclick = () => $("modal").hidden = true;
 $("modal").onclick = (e) => { if (e.target === $("modal")) $("modal").hidden = true; };
@@ -663,12 +821,14 @@ function caseActivity(t, d) {
 // ---------------------------------------------------------------- Agents & licences
 function renderAgents() {
   const o = S.o;
+  const history = o.history.filter(h => h.agent_name === S.agent);
+  const fixes = o.suggestions.filter(s => s.agent_name === S.agent);
   setHead("Agents &amp; licences", "Agents earn more independence as their trust score grows. Demotion is automatic; promotion always needs a named person.");
-  $("view").innerHTML = `<div class="agent-grid">${o.agents.map(a => { const idx = LEVELS.indexOf(a.level); return `
-      <article class="agent-card ${a.agent_name === S.agent ? "selected" : ""}" data-agent="${esc(a.agent_name)}">
+  $("view").innerHTML = `<div class="agent-grid">${inOrder(o.agents).map(a => { const idx = LEVELS.indexOf(a.level); return `
+      <article class="agent-card ${a.agent_name === S.agent ? "selected" : ""}" data-agent="${esc(a.agent_name)}" ${a.agent_name === S.agent ? 'aria-current="true"' : ""}>
         <div class="agent-card-header"><button class="btn btn-ghost agent-select"><h3>${esc(a.label)}</h3></button>${licence(a.level)}</div>
         <div class="trust-score">${Math.round(a.trust_score)}</div><div class="trust-label">trust score</div>
-        <div class="licence-ladder tone-${LADDER_TONE[a.level]}">${LEVELS.map((l, i) => `<span class="ladder-step ${i <= idx ? "filled" : ""}">${LV[l].name}</span>`).join("")}</div>
+        <div class="licence-ladder tone-${LADDER_TONE[a.level]}">${LEVELS.map((l, i) => `<span class="ladder-step ${i <= idx ? "filled" : ""} ${i === idx ? "current" : ""}">${plate(l, 22)}${LV[l].name}</span>`).join("")}</div>
         <dl class="agent-metrics">
           <dt>Mistake rate (last ${a.recent_cases.length} cases)</dt><dd>${Math.round(a.mistake_rate * 100)}%</dd>
           <dt>A person checks</dt><dd>${Math.round(a.human_review_rate * 100)}% of its cases</dd>
@@ -678,16 +838,30 @@ function renderAgents() {
         ${a.fast_track ? pill(`${icon("zap", 11)}Fast-tracked after a fix`, "ai") : ""}
         ${a.level !== "FULL" ? `<button class="btn btn-outline promote-button" data-promote="${esc(a.agent_name)}" data-idle>Promote to ${LV[LEVELS[idx + 1]].name}…</button>` : ""}
       </article>`; }).join("")}</div>
+    <div class="agent-focus">${licence((o.agents.find(a => a.agent_name === S.agent) || {}).level || "FULL", 28)}
+      <div><h2>${esc(AGENT[S.agent])}</h2><p class="muted small">Its mistakes, licence history and fixes. Click another agent card to switch.</p></div></div>
     <div class="agent-detail-columns">
-      <section><div class="section-heading"><h2>Mistakes · ${esc(AGENT[S.agent])}</h2></div><div id="mlog">${skeleton(3)}</div></section>
-      <section><div class="section-heading"><h2>Licence history</h2><span>${o.history.length} changes</span></div>
-        <div class="history-list">${o.history.length ? o.history.map(h => `<div class="history-item">
-          <span class="score-change ${h.score_change < 0 ? "" : "unchanged"}">${h.score_change > 0 ? "+" : ""}${h.score_change}</span>
-          <div><strong>${esc(AGENT[h.agent_name] || h.agent_name)}</strong>: ${esc(h.reason)}
-            <p class="muted">Score ${h.new_score} · ${esc((LV[h.new_level] || {}).name || h.new_level)}${h.case_id ? " · " + esc(h.case_id) : ""}</p></div></div>`).join("")
-          : empty("No changes yet")}</div></section>
+      <section><div class="section-heading"><h2>Mistakes</h2><span id="mcount"></span></div><div id="mlog">${skeleton(3)}</div></section>
+      <div>
+        <section><div class="section-heading"><h2>Licence history</h2><span>${history.length} change${history.length === 1 ? "" : "s"}</span></div>
+          <div class="history-list">${history.length ? history.map(h => `<div class="history-item">
+            <span class="score-change ${h.score_change < 0 ? "" : "unchanged"}">${h.score_change > 0 ? "+" : ""}${h.score_change}</span>
+            <div class="history-body">${esc(h.reason)}
+              <p class="muted">${plate(h.new_level, 16)}Score ${h.new_score} · ${esc((LV[h.new_level] || {}).name || h.new_level)}${h.case_id ? ` · <button class="case-link" data-case="${esc(h.case_id)}">${esc(h.case_id)}</button>` : ""}</p></div></div>`).join("")
+            : empty("No changes yet", "This agent's licence hasn't changed.")}</div></section>
+        <section style="margin-top:25px"><div class="section-heading"><h2>Fixes</h2><span>${fixes.length} suggested</span></div>
+          <div class="history-list">${fixes.length ? fixes.map(s => { const vr = s.verify_result; return `<div class="history-item">
+            ${pill(esc(s.status), s.status)}
+            <div class="history-body"><strong>#${s.id} · ${esc(s.pattern_description)}</strong>
+              <p>${esc(s.fix_description || s.suggested_fix)}</p>
+              <p class="muted">Round ${s.iteration} · ${(s.case_ids || []).length} cases${vr ? ` · replay: ${vr.passed.length} of ${vr.replayed} pass` : ""}${s.applied_by ? ` · approved by ${esc(s.applied_by)}` : ""}</p></div></div>`; }).join("")
+            + `<div class="history-item"><button class="btn btn-outline btn-sm" id="openFixes">${icon("lightbulb", 14)}Open in Improvements</button></div>`
+            : empty("No fixes yet", "A fix is suggested when this agent repeats the same mistake on 3 cases.")}</div></section>
+      </div>
     </div>`;
   document.querySelectorAll(".agent-card").forEach(c => c.onclick = () => { S.agent = c.dataset.agent; S.sig = null; renderAgents(); });
+  document.querySelectorAll(".history-body [data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "agents"));
+  if ($("openFixes")) $("openFixes").onclick = () => { S.fixAgent = S.agent; go("improve"); };
   document.querySelectorAll("[data-promote]").forEach(b => b.onclick = (e) => { e.stopPropagation(); promote(b.dataset.promote); });
   loadMistakes();
 }
@@ -696,9 +870,33 @@ async function loadMistakes() {
   try {
     const d = await api(`/api/agent/${agent}`);
     if (S.view !== "agents" || S.agent !== agent || !$("mlog")) return;
-    $("mlog").innerHTML = d.mistakes.length
-      ? d.mistakes.slice().reverse().map(x => mistakeCard({...x, agent_label:AGENT[agent]}, `<button class="case-link" data-case="${esc(x.case_id)}">${esc(x.case_id)}</button>`)).join("")
+    // group the same mistake together; most frequent first, then most severe
+    const RANK = {CRITICAL:0, MAJOR:1, MINOR:2};
+    const groups = new Map();
+    for (const m of d.mistakes) {
+      const k = `${m.mistake_type}|${m.title}`;
+      if (!groups.has(k)) groups.set(k, {key:k, title:m.title, type:m.mistake_type, rule:m.rule, items:[]});
+      groups.get(k).items.push(m);
+    }
+    const list = [...groups.values()].sort((a, b) => b.items.length - a.items.length || RANK[a.type] - RANK[b.type] || a.title.localeCompare(b.title));
+    $("mcount").textContent = d.mistakes.length ? `${d.mistakes.length} mistake${d.mistakes.length === 1 ? "" : "s"} · ${list.length} kind${list.length === 1 ? "" : "s"}` : "";
+    const openKey = (g) => `${agent}|${g.key}`;
+    $("mlog").innerHTML = list.length ? list.map((g, i) => {
+      const open = S.openGroups[openKey(g)] ?? (i === 0);
+      const cases = [...new Set(g.items.map(m => m.case_id))], fixed = g.items.filter(m => m.resolved).length;
+      return `<details class="mgroup tone-${typeTone(g.type)}" data-key="${esc(openKey(g))}" ${open ? "open" : ""}>
+        <summary>
+          <span class="mgroup-count" title="Times this mistake happened"><strong>${g.items.length}</strong><span>time${g.items.length === 1 ? "" : "s"}</span></span>
+          <span class="mgroup-main"><span class="mgroup-top">${pill(esc(g.type), typeTone(g.type))}<strong>${esc(g.title)}</strong></span>
+            <span class="mgroup-sub">${cases.length} case${cases.length === 1 ? "" : "s"} · rule ${esc(g.rule)}${fixed ? ` · ${pill(`${icon("check", 10)}${fixed} fixed`, "success")}` : ""}</span>
+            <span class="mgroup-cases">${cases.map(c => `<span class="case-chip ${g.items.every(m => m.case_id !== c || m.resolved) ? "pass" : ""}">${esc(c)}</span>`).join("")}</span></span>
+          <span class="mgroup-chev">${icon("chevron-down", 18)}</span>
+        </summary>
+        <div class="mgroup-body">${g.items.slice().reverse().map(x => mistakeCard({...x, agent_label:AGENT[agent]},
+          `<button class="btn btn-outline btn-sm mgroup-open" data-case="${esc(x.case_id)}">${icon("arrow-right", 12)}Open ${esc(x.case_id)}</button>`)).join("")}</div>
+      </details>`; }).join("")
       : `<div class="history-list">${empty("A clean record", "No mistakes recorded for this agent.")}</div>`;
+    $("mlog").querySelectorAll("details.mgroup").forEach(el => el.ontoggle = () => { S.openGroups[el.dataset.key] = el.open; });
     $("mlog").querySelectorAll("[data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "agents"));
   } catch (e) { if ($("mlog")) $("mlog").innerHTML = errorNote(e.message); }
 }
@@ -714,27 +912,72 @@ function renderImprove() {
   const o = S.o;
   setHead("Improvements", "When an agent repeats the same mistake on 3 cases, AgentLens suggests a fix, then proves it by replaying the failed cases.",
           `<button class="btn btn-outline danger-outline" id="incident" data-idle>${icon("alert", 14)}Simulate a critical incident</button>`);
-  const steps = [["Pattern","The same mistake on 3+ cases becomes a suggested fix."],["Apply","A named person approves it. The agent goes back to L-plates."],
-                 ["Verify","Replay every case it got wrong, with the fix."],["Resolve or iterate","All pass: fast-track. Some fail: a new suggestion."]];
-  $("view").innerHTML = `<div class="improvement-strip">${steps.map(([t, p], i) => `<div class="improvement-step"><span>${i + 1}</span><div><strong>${t}</strong><p>${p}</p></div></div>`).join("")}</div>
-    ${o.suggestions.length ? o.suggestions.map(s => { const vr = s.verify_result; return `<article class="suggestion-card">
-      <div class="suggestion-header">${pill(esc(s.status), s.status)}<strong>#${s.id} · ${esc(AGENT[s.agent_name] || s.agent_name)}</strong>${pill(`Round ${s.iteration}`, "neutral")}
-        <span class="muted">${(s.case_ids || []).length} cases${s.parent_id ? ` · follows #${s.parent_id}` : ""}</span></div>
-      <dl class="definition-list"><dt>Pattern</dt><dd>${esc(s.pattern_description)}</dd><dt>Root cause</dt><dd>${esc(s.root_cause)}</dd>
-        <dt>Fix</dt><dd><strong>${esc(s.fix_description || s.suggested_fix)}</strong>${s.applied_by ? ` <span class="muted">· approved by ${esc(s.applied_by)}</span>` : ""}</dd>
-        <dt>Cases</dt><dd class="case-links">${(s.case_ids || []).map(c => `<button class="case-link" data-case="${esc(c)}">${esc(c)}</button>`).join("")}</dd>
-        ${vr ? `<dt>Replay result</dt><dd>${vr.passed.length} of ${vr.replayed} now pass${vr.failed.length ? `; still failing: <strong>${esc(vr.failed.join(", "))}</strong>` : ` ${icon("check", 12)}`}</dd>` : ""}</dl>
-      ${s.status === "proposed" ? `<button class="btn" data-apply="${s.id}" data-idle>${icon("check", 14)}Apply fix…</button>` : ""}
-      ${s.status === "testing" ? `<button class="btn" data-verify="${s.id}" data-idle>${icon("rotate", 14)}Verify: replay ${(s.case_ids || []).length} cases</button>` : ""}
-    </article>`; }).join("") : `<div class="data-table-wrap">${empty("No improvements suggested yet", "Run the demo batch: the verification agent repeats the same mistake 3 times.")}</div>`}`;
+  const all = S.fixAgent === "all" ? o.suggestions : o.suggestions.filter(s => s.agent_name === S.fixAgent);
+  const ORDER = {proposed:0, testing:1, applied:2, resolved:3, rejected:4};
+  const list = all.slice().sort((a, b) => (ORDER[a.status] ?? 5) - (ORDER[b.status] ?? 5) || b.id - a.id);
+  const count = (f) => all.filter(f).length;
+  const waiting = count(s => s.status === "proposed"), ready = count(s => s.status === "testing");
+  const stages = [
+    {t:"Pattern found", p:"The same mistake on 3+ cases becomes a suggested fix.", ic:"search", tone:"ai", n:all.length},
+    {t:"Approved & applied", p:"A named person approves it. The agent goes back to L-plates.", ic:"user", tone:"medium",
+     n:count(s => s.status !== "proposed" && s.status !== "rejected"), attn:waiting && `${waiting} waiting for approval`},
+    {t:"Replayed", p:"Every case it got wrong is re-run with the fix.", ic:"rotate", tone:"high",
+     n:count(s => s.verify_result), attn:ready && `${ready} ready to verify`},
+    {t:"Resolved", p:"All pass: fast-track. Some fail: a new round.", ic:"check-check", tone:"success", n:count(s => s.status === "resolved")}];
+  const agentFilter = [["all", "All agents"], ...Object.entries(AGENT)].map(([k, l]) => {
+    const n = k === "all" ? o.suggestions.length : o.suggestions.filter(s => s.agent_name === k).length;
+    return `<button class="btn btn-sm ${S.fixAgent === k ? "" : "btn-outline"}" data-fa="${k}" aria-pressed="${S.fixAgent === k}">${l} <span>${n}</span></button>`; }).join("");
+  $("view").innerHTML = `<div class="imp-flow">${stages.map((g, i) => `<div class="imp-stage tone-${g.tone} ${g.attn ? "attention" : ""}">
+      <div class="imp-stage-top"><span class="imp-icon">${icon(g.ic, 17)}</span><span class="imp-step">Step ${i + 1}</span><span class="imp-count">${g.n}</span></div>
+      <strong>${g.t}</strong><p>${g.p}</p>${g.attn ? `<span class="imp-badge">${icon("dot", 7)}${g.attn}</span>` : ""}</div>`).join("")}</div>
+    <div class="table-controls"><div class="filter-list" role="group" aria-label="Filter fixes by agent">${agentFilter}</div></div>
+    ${list.length ? list.map(s => fixCard(s, o)).join("") : `<div class="data-table-wrap">${S.fixAgent === "all"
+        ? empty("No improvements suggested yet", "Run the demo batch: the verification agent repeats the same mistake 3 times.")
+        : empty(`No fixes for the ${esc(AGENT[S.fixAgent])}`, "A fix is suggested when an agent repeats the same mistake on 3 cases.")}</div>`}`;
+  document.querySelectorAll("[data-fa]").forEach(b => b.onclick = () => { S.fixAgent = b.dataset.fa; S.sig = null; renderImprove(); });
   document.querySelectorAll("[data-apply]").forEach(b => b.onclick = () => applyFix(b.dataset.apply));
   document.querySelectorAll("[data-verify]").forEach(b => b.onclick = async () => {
     b.disabled = true;
     try { await post(`/api/jobs/verify/${b.dataset.verify}`); toast("Replaying the failed cases with the fix…"); } catch (e) { toast(e.message, "err"); }
     refresh();
   });
-  document.querySelectorAll(".case-links [data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "improve"));
+  document.querySelectorAll(".fix-cases [data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "improve"));
   wireHeadActions();
+}
+const FIX_STATE = {proposed:["Waiting for approval", "ai", "lightbulb"], testing:["Applied · ready to verify", "high", "rotate"],
+                   applied:["Needs another round", "critical", "alert"], resolved:["Resolved", "success", "check-check"], rejected:["Rejected", "neutral", "x"]};
+function fixCard(s, o) {
+  const [label, tone, ic] = FIX_STATE[s.status] || [s.status, "neutral", "info"];
+  const vr = s.verify_result, cases = s.case_ids || [];
+  const agent = o.agents.find(a => a.agent_name === s.agent_name);
+  const child = o.suggestions.find(x => x.parent_id === s.id);
+  const stage = {proposed:1, testing:2, applied:3, resolved:4}[s.status] ?? 0;
+  const track = ["Suggested", "Approved", "Replayed", s.status === "applied" ? "New round" : "Resolved"].map((t, i) => {
+    const st = s.status === "applied" && i === 3 ? "failed" : i < stage || s.status === "resolved" ? "done" : i === stage ? "current" : "";
+    return `<li class="${st}"><span class="fix-dot">${st === "done" ? icon("check", 12) : st === "failed" ? icon("rotate", 12) : i + 1}</span>${t}</li>`; }).join("");
+  const chip = (c) => { const r = !vr ? "" : vr.failed.includes(c) ? "fail" : vr.passed.includes(c) ? "pass" : "";
+    return `<button class="case-chip ${r}" data-case="${esc(c)}">${r === "pass" ? icon("check", 11) : r === "fail" ? icon("x", 11) : ""}${esc(c)}</button>`; };
+  const note = {proposed:"A named person must approve this fix. The agent goes back to L-plates while it is tested.",
+                testing:`Replay the ${cases.length} cases it got wrong, with the fix applied.`,
+                applied:`Still failing: ${vr ? vr.failed.join(", ") : ""}. ${child ? `AgentLens suggested round ${child.iteration} (#${child.id}).` : ""}`,
+                resolved:"Every replayed case now passes. The mistakes are marked fixed and the agent was fast-tracked."}[s.status] || "";
+  return `<article class="fix-card tone-${tone} ${s.status === "proposed" || s.status === "testing" ? "needs-action" : ""}">
+    <div class="fix-head"><span class="fix-icon">${icon(ic, 20)}</span>
+      <div class="fix-title"><div class="fix-meta">#${s.id} · Round ${s.iteration}${s.parent_id ? ` · follows #${s.parent_id}` : ""}</div>
+        <h3>${esc(s.pattern_description)}</h3>
+        <div class="fix-agent">${agent ? plate(agent.level, 18) : ""}<strong>${esc(AGENT[s.agent_name] || s.agent_name)}</strong>· ${cases.length} cases</div></div>
+      ${pill(`${icon(ic, 11)}${label}`, tone)}</div>
+    <ol class="fix-track">${track}</ol>
+    <div class="fix-grid">
+      <div class="fix-box problem"><label>${icon("alert", 13)}Root cause</label><p>${esc(s.root_cause)}</p></div>
+      <div class="fix-box solution"><label>${icon("lightbulb", 13)}The fix</label><p><strong>${esc(s.fix_description || s.suggested_fix)}</strong></p>
+        ${s.applied_by ? `<span class="fix-by">${icon("user", 12)}Approved by ${esc(s.applied_by)}</span>` : ""}</div></div>
+    <div class="fix-cases"><label>${vr ? "Replay result" : "Cases"}</label>${cases.map(chip).join("")}
+      ${vr ? `<span class="fix-replay">${bar(vr.replayed ? vr.passed.length / vr.replayed * 100 : 0, vr.failed.length ? "high" : "success")}${vr.passed.length} of ${vr.replayed} pass</span>` : ""}</div>
+    <div class="fix-actions"><span class="muted">${esc(note)}</span>
+      ${s.status === "proposed" ? `<button class="btn" data-apply="${s.id}" data-idle>${icon("check", 14)}Apply fix…</button>` : ""}
+      ${s.status === "testing" ? `<button class="btn" data-verify="${s.id}" data-idle>${icon("rotate", 14)}Verify: replay ${cases.length} cases</button>` : ""}</div>
+  </article>`;
 }
 function applyFix(id) {
   const s = S.o.suggestions.find(x => String(x.id) === String(id));
@@ -745,9 +988,11 @@ function applyFix(id) {
 
 // ---------------------------------------------------------------- demo controls
 $("runBtn").onclick = () => {
-  const n = Number($("count").value);
+  $("sidebar").classList.remove("sidebar-open");
   dialog({title:"Run a fresh demo batch?", description:"This CLEARS the demo data and submits a fresh batch of synthetic applications. The agents process them one by one while AgentLens watches.",
-    label:`Run ${n} applications`, onConfirm:async () => { S.caseId = null; S.explain = {}; S.reveal = {}; await post("/api/jobs/batch", {count:n}); go("review"); }});
+    label:"Run demo batch", fields:[{id:"count", label:"Number of applications", value:"30",
+      options:[["22", "22 (quickest)"], ["30", "30"], ["45", "45"], ["60", "60"]]}],
+    onConfirm:async ({count}) => { S.caseId = null; S.explain = {}; S.reveal = {}; await post("/api/jobs/batch", {count:Number(count)}); go("review"); }});
 };
 $("waitBtn").onclick = async () => { try { await post("/api/jobs/process_waiting"); } catch (e) { toast(e.message, "err"); } refresh(); };
 
@@ -758,7 +1003,7 @@ async function refresh() {
   S.o = o;
   renderChrome(o);
   // redraw only when something on this view changed (keeps open tabs, scroll and dialogs as they are)
-  const sig = JSON.stringify([S.view, S.agent, o.queue, o.stats, o.agents.map(a => [a.level, a.trust_score, a.cases_at_level, a.open_mistakes, a.fast_track]),
+  const sig = JSON.stringify([S.view, S.agent, S.fixAgent, o.queue, o.stats, o.agents.map(a => [a.level, a.trust_score, a.cases_at_level, a.open_mistakes, a.fast_track]),
                               o.applications, o.history, o.suggestions, o.job.running, S.caseId && o.statuses[S.caseId]]);
   if (sig !== S.sig && !dialogOpen()) { S.sig = sig; render(); }
 }
@@ -766,7 +1011,7 @@ const params = new URLSearchParams(location.search);
 if (params.get("case")) { S.caseId = params.get("case"); S.view = "case"; S.back = "applications"; }
 else if (params.get("view")) S.view = params.get("view");
 markNav();
-$("pageHead").innerHTML = `<div class="page-header"><div><div class="eyebrow">HUMAN OVERSIGHT, BUILT IN</div><h1>AgentLens</h1><p>Connecting to your AgentLens API…</p></div></div>`;
+$("pageHead").innerHTML = `<div class="page-header"><div><h1>AgentLens</h1><p>Loading…</p></div></div>`;
 $("view").innerHTML = skeleton(5);
 refresh();
 setInterval(refresh, 2500);

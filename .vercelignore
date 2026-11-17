@@ -1,0 +1,16 @@
+# Never upload secrets (set them in Vercel -> Settings -> Environment Variables)
+.env
+.env.*
+
+# Not needed by the deployed app
+tests/
+dist/
+docs/
+audit/
+scripts/
+*.zip
+*.db
+data/vault.json
+data/llm_cache.json
+.pytest_cache/
+__pycache__/

@@ -35,6 +35,21 @@ import store
 app = FastAPI(title="AgentLens", description="AI agents earn the right to work alone.")
 app.mount("/bank", pipeline.app)  # the bank's pipeline API + loan form, same server
 
+# Bestpac customer site: Red, the chat / voice assistant, takes applications and answers tracker questions
+import bestpac_chat  # noqa: E402
+from fastapi.staticfiles import StaticFiles  # noqa: E402
+
+BESTPAC_DIR = Path(__file__).resolve().parent.parent / "bestpac"
+app.include_router(bestpac_chat.router)
+
+
+@app.get("/bestpac", include_in_schema=False)
+def bestpac_home():
+    return RedirectResponse("/bestpac/")
+
+
+app.mount("/bestpac", StaticFiles(directory=BESTPAC_DIR, html=True), name="bestpac")
+
 # Let a separate front end (e.g. a Lovable app, or one running on localhost) call this API.
 # Override with AGENTLENS_CORS_ORIGINS="https://my-app.example,http://localhost:5173".
 import os  # noqa: E402
@@ -478,7 +493,13 @@ def submit_form(body: pipeline.LoanForm):
     background with AgentLens watching. The dashboard shows it live."""
     data = body.model_dump()
     message, replies = data.pop("customer_message"), data.pop("customer_replies")
-    case_id = pipeline.submissions.submit_application(data, message, customer_replies=replies)
+    case_id = submit_and_process(data, message, replies)
+    return {"case_id": case_id, "status": "submitted", "dashboard": f"/dashboard?case={case_id}"}
+
+
+def submit_and_process(data: dict, message: str, replies: list[str] | None = None) -> str:
+    """Save the application to the database, then the agents pick it up from there (background thread)."""
+    case_id = pipeline.submissions.submit_application(data, message, customer_replies=replies or [])
     LIVE[case_id] = "queued"
 
     def go():
@@ -490,7 +511,10 @@ def submit_form(body: pipeline.LoanForm):
             LIVE[case_id] = f"error: {e}"
             traceback.print_exc()
     threading.Thread(target=go, daemon=True).start()
-    return {"case_id": case_id, "status": "submitted", "dashboard": f"/dashboard?case={case_id}"}
+    return case_id
+
+
+bestpac_chat.SUBMIT = submit_and_process  # Red submits applications the same way as the web form
 
 
 @app.post("/api/jobs/process_waiting")
