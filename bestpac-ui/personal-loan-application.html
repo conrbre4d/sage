@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unsecured Personal Loan Application | Bestpac</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            'w-red': '#da1710',
+            'w-red-hover': '#b7120c',
+            'w-plum': '#4a183d',
+            'w-plum-dark': '#3d1232',
+            'w-plum-text': '#582451',
+            'w-text': '#333333',
+            'w-muted': '#5c5c5c'
+          },
+          fontFamily: {
+            sans: ['Segoe UI', 'Helvetica Neue', 'Arial', 'sans-serif']
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .hero-plum-clip {
+      background-color: #4a183d;
+      clip-path: polygon(0 0, 100% 0, 82% 100%, 0 100%);
+    }
+
+    .section-title {
+      color: #582451;
+      font-weight: 300;
+      letter-spacing: -0.01em;
+    }
+
+    .westpac-link {
+      color: #da1710;
+      text-decoration: none;
+    }
+
+    .westpac-link:hover {
+      text-decoration: underline;
+    }
+
+    @media (max-width: 768px) {
+      .hero-plum-clip {
+        clip-path: none;
+      }
+    }
+  </style>
+</head>
+<body class="flex min-h-screen flex-col bg-[#f0f2f4] font-sans text-sm text-[#2b2b2b] antialiased">
+  <header class="sticky top-0 z-30 border-b border-gray-200 bg-white">
+    <div class="mx-auto flex h-14 max-w-[1240px] items-center justify-between px-4 sm:px-6">
+      <div class="flex items-center space-x-4">
+        <a aria-label="Back to loan summary" class="p-1 text-gray-500 transition hover:text-gray-800" href="/loan-summary.html">
+          <svg aria-hidden="true" class="h-5 w-5 stroke-[2.5]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path d="M15 19l-7-7 7-7" stroke-linecap="round" stroke-linejoin="round"></path>
+          </svg>
+        </a>
+        <a aria-label="Bestpac home" class="text-xl font-bold tracking-tight text-[#da1710]" href="/">Bestpac</a>
+      </div>
+      <p class="hidden items-center gap-2 text-[12px] text-gray-700 sm:flex sm:text-[13px]">
+        <span aria-hidden="true">☎</span>
+        <span>If you have a disability or difficulty accessing this page, please call <strong class="font-semibold text-gray-900">132 651</strong> for assistance</span>
+      </p>
+    </div>
+  </header>
+
+  <main class="flex-grow px-3 py-5 sm:px-6">
+    <div class="mx-auto max-w-[1240px] overflow-hidden rounded-sm border border-gray-200 bg-white pb-12 shadow-sm">
+      <section aria-label="Loan application" class="relative flex min-h-[220px] items-stretch overflow-hidden bg-[#eee8e2] sm:min-h-[240px]">
+        <div class="absolute inset-y-0 right-0 h-full w-full sm:w-[58%]">
+          <img alt="A couple painting a room" class="h-full w-full object-cover object-[center_right]" src="https://lh3.googleusercontent.com/aida-public/AB6AXuCAI9Tzxgn3P2LEKXRjamzGEP9Wzwuo2z_jhvtGBpiOr5w53DbGWyHDnk_5u1vUpDGOxz_OINyZQWERDKv1MrB8XvLnEdFzD5S9AKqSTYHuDZp3CjV_d-gn5aSDrUWI09nn8RSwHh5RDXWkrsL-s8I3tUTt-DuSLQPcRfzwtiBU8vSXwK6F9zcgmxoGdZpnv_P-XF5sWyqygDx0EwXCyDuiKfn0YSSObBUb4lpsHrRs">
+        </div>
+        <div class="hero-plum-clip relative z-10 flex w-full flex-col justify-center px-8 py-10 text-white sm:w-[56%] sm:px-12">
+          <h1 class="mb-2 text-3xl font-light leading-tight tracking-normal text-white sm:text-[34px]">Unsecured Personal Loan</h1>
+          <p class="text-base font-light text-gray-200 sm:text-lg">Secure online application</p>
+        </div>
+      </section>
+
+      <section aria-labelledby="customer-check-heading" class="px-6 pb-4 pt-8 sm:px-12">
+        <div class="mx-auto max-w-4xl rounded border border-gray-200 bg-[#f7f7f8] p-7 text-center shadow-sm">
+          <h2 class="mb-5 text-xl font-light text-gray-800 sm:text-[22px]" id="customer-check-heading">Are you a Bestpac customer?</h2>
+          <div aria-label="Are you a Bestpac customer?" class="inline-flex overflow-hidden rounded border border-gray-300 text-sm" role="group">
+            <button aria-pressed="false" class="border-r border-gray-300 bg-white px-7 py-1.5 font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4a183d] focus:ring-inset" id="btn-customer-yes" type="button">Yes</button>
+            <button aria-pressed="false" class="bg-white px-7 py-1.5 font-medium text-gray-700 transition hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-[#4a183d] focus:ring-inset" id="btn-customer-no" type="button">No</button>
+          </div>
+        </div>
+      </section>
+
+      <section aria-label="Application guidelines" class="border-b border-gray-200 px-6 py-8 sm:px-12">
+        <div class="grid grid-cols-1 gap-8 md:grid-cols-3 lg:gap-10">
+          <section class="space-y-4">
+            <h2 class="section-title border-b border-transparent text-xl sm:text-[22px]">Who can apply</h2>
+            <div class="space-y-4 pt-1">
+              <div class="flex items-start gap-3.5">
+                <svg aria-hidden="true" class="mt-0.5 h-6 w-6 shrink-0 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M3 5a2 2 0 012-2h14a2 2 0 012 2v14a2 2 0 01-2 2H5a2 2 0 01-2-2V5zm4 3a2 2 0 100 4 2 2 0 000-4zm-2 7a2 2 0 012-2h6a2 2 0 012 2v1H5v-1zm9-6h4v1h-4V9zm0 2h4v1h-4v-1zm0 2h3v1h-3v-1z"></path>
+                </svg>
+                <p class="text-[14px] text-gray-800">You're aged 18 or over</p>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <svg aria-hidden="true" class="mt-0.5 h-6 w-6 shrink-0 text-gray-700" fill="currentColor" viewBox="0 0 24 24">
+                  <path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7zm0 9.5a2.5 2.5 0 110-5 2.5 2.5 0 010 5z"></path>
+                </svg>
+                <div class="text-[14px] leading-relaxed text-gray-800">
+                  <p>You're an Australian citizen or have permanent residency in Australia/NZ OR;</p>
+                  <ul class="ml-5 mt-2 list-disc space-y-1">
+                    <li>You're a non-resident or migrant and hold an <a class="westpac-link" href="#">acceptable Visa (PDF 24KB)</a></li>
+                  </ul>
+                </div>
+              </div>
+            </div>
+          </section>
+
+          <section class="space-y-4">
+            <h2 class="section-title text-xl sm:text-[22px]">How this works</h2>
+            <div class="space-y-5 pt-1">
+              <div class="flex items-start gap-3.5">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#2e3138] text-xs font-bold text-white">1</span>
+                <div>
+                  <p class="text-[14px] leading-snug text-gray-800">It takes 10–15 minutes to apply online</p>
+                  <p class="mt-0.5 text-xs italic text-gray-500">Save and retrieve your application anytime within 14 days.</p>
+                </div>
+              </div>
+              <div class="flex items-start gap-3.5">
+                <span class="flex h-6 w-6 shrink-0 items-center justify-center rounded-full bg-[#2e3138] text-xs font-bold text-white">2</span>
+                <p class="text-[14px] leading-snug text-gray-800">Get a response in 60 seconds once your application is submitted</p>
+              </div>
+            </div>
+          </section>
+
+          <section class="space-y-4">
+            <h2 class="section-title text-xl sm:text-[22px]">What you'll need</h2>
+            <div class="space-y-4 pt-1">
+              <div class="flex items-center gap-3.5">
+                <svg aria-hidden="true" class="h-6 w-6 shrink-0 text-gray-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span class="text-[14px] text-gray-800">Personal details</span>
+              </div>
+              <div class="flex items-center gap-3.5">
+                <svg aria-hidden="true" class="h-6 w-6 shrink-0 text-gray-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V6m0 8v2m0-10a9 9 0 110 18 9 9 0 010-18z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span class="text-[14px] text-gray-800">Income and expenses</span>
+              </div>
+              <div class="flex items-center gap-3.5">
+                <svg aria-hidden="true" class="h-6 w-6 shrink-0 text-gray-700" fill="none" stroke="currentColor" stroke-width="1.8" viewBox="0 0 24 24"><path d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" stroke-linecap="round" stroke-linejoin="round"></path></svg>
+                <span class="text-[14px] text-gray-800">Employment details</span>
+              </div>
+            </div>
+          </section>
+        </div>
+      </section>
+
+      <section aria-label="Declarations and terms" class="px-6 py-10 sm:px-12">
+        <div class="grid grid-cols-1 gap-6 rounded-sm bg-[#eaeaea] p-6 sm:p-8 md:grid-cols-12">
+          <div class="md:col-span-3">
+            <h2 class="text-base font-bold text-gray-900 md:pr-4 md:text-right">You agree:</h2>
+          </div>
+          <div class="space-y-6 text-[13.5px] leading-relaxed text-gray-800 md:col-span-9">
+            <section class="space-y-2">
+              <h3 class="text-sm font-bold text-gray-900">To begin:</h3>
+              <ul class="list-disc space-y-2 pl-5">
+                <li>You have read our <a class="westpac-link" href="#">Privacy Statement</a> which explains how we collect, use and disclose your personal information and credit related information, and <a class="westpac-link" href="#">marketing communications</a> which we send to you.</li>
+                <li>We are giving you our <a class="westpac-link" href="#">Financial Service Guide and Credit Guide</a>.</li>
+              </ul>
+            </section>
+            <section class="space-y-2 pt-1">
+              <h3 class="text-sm font-bold text-gray-900">What you're agreeing to</h3>
+              <ul class="list-disc space-y-2.5 pl-5">
+                <li>To provide your <a class="westpac-link" href="#">consents</a> to the actions we may take in processing your application, including:
+                  <ul class="mt-2 list-[circle] space-y-2 pl-6 text-gray-700">
+                    <li>To give you a personalised rate for your personal loan application, we'll send information you give us to Equifax.</li>
+                    <li>For us to conduct a credit check, which will appear on your credit report and may help pre-fill details about your liabilities in your application form.</li>
+                    <li>For you to accept your contract, receive communications about your account, statements, and terms and conditions electronically. You may change your communication preferences in Online Banking or by contacting us.</li>
+                    <li>For us to collect, use, and disclose your personal information to Equifax Verification Exchange® to verify your employment or employment income.</li>
+                  </ul>
+                </li>
+                <li>To the <a class="westpac-link" href="#">Financial Verification Terms</a>.</li>
+                <li>To the <a class="westpac-link" href="#">Identity Verification Privacy Notice</a> and <a class="westpac-link" href="#">Online Banking Terms and Conditions</a>.</li>
+                <li>You will need to acknowledge your obligations including <a class="westpac-link" href="#">Anti-Money Laundering/Counter-Terrorism Funding</a> requirements and your <a class="westpac-link" href="#">reporting obligations if you are a foreign tax resident</a>.</li>
+              </ul>
+            </section>
+            <p class="pt-2"><strong class="font-bold text-gray-900">Important Note:</strong> By selecting <strong class="font-semibold text-gray-900">Continue</strong> you are making a credit application and we will perform a credit check, which will appear on your credit report. We suggest you don't make multiple credit applications with us or any other lender. Every enquiry is listed on your credit report, and too many may reduce your chances of approval.</p>
+          </div>
+        </div>
+        <div class="flex justify-end pt-8">
+          <button class="rounded-md bg-[#da1710] px-10 py-2.5 text-center text-base font-semibold text-white shadow transition duration-150 ease-in-out hover:bg-[#b7120c] focus:outline-none focus:ring-2 focus:ring-red-600 focus:ring-offset-2" id="application-continue" type="button">Continue</button>
+        </div>
+      </section>
+    </div>
+  </main>
+
+  <footer class="mx-auto flex w-full max-w-[1240px] flex-col items-center justify-between gap-3 px-4 py-6 text-xs text-gray-500 sm:flex-row sm:px-6">
+    <p>Our site and your transactions are secure. You can read our <a class="underline text-gray-600 hover:text-black" href="#">security information</a>.</p>
+    <p>© 2026 Bestpac Banking demo.</p>
+  </footer>
+
+  <script>
+    const customerButtons = [
+      document.getElementById('btn-customer-yes'),
+      document.getElementById('btn-customer-no')
+    ];
+
+    for (const button of customerButtons) {
+      button.addEventListener('click', () => {
+        for (const option of customerButtons) {
+          const selected = option === button;
+          option.setAttribute('aria-pressed', String(selected));
+          option.classList.toggle('bg-[#4a183d]', selected);
+          option.classList.toggle('text-white', selected);
+          option.classList.toggle('bg-white', !selected);
+          option.classList.toggle('text-gray-700', !selected);
+          option.classList.toggle('hover:bg-[#3d1232]', selected);
+          option.classList.toggle('hover:bg-gray-50', !selected);
+        }
+      });
+    }
+
+    document.getElementById('application-continue').addEventListener('click', () => {
+      window.location.href = '/loan-application-form.html';
+    });
+  </script>
+</body>
+</html>

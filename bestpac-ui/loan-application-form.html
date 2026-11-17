@@ -1,0 +1,673 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Unsecured Personal Loan Application | Bestpac</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            westpac: {
+              red: '#DA1710',
+              plum: '#4A1832',
+              heading: '#4C1832',
+              text: '#333333',
+              inputborder: '#b8b8b8',
+              infoblue: '#f0f7fc'
+            }
+          }
+        }
+      }
+    };
+  </script>
+  <style>
+    .westpac-input {
+      min-height: 40px;
+      border: 1px solid #737373;
+      border-radius: 4px;
+      color: #222;
+      font-size: 15px;
+    }
+
+    .westpac-input:focus {
+      border-color: #da1710;
+      box-shadow: 0 0 0 1px #da1710;
+      outline: none;
+    }
+
+    #step-tabs > button {
+      border-bottom-color: transparent;
+    }
+
+    #step-tabs > button[aria-current="step"] {
+      border-bottom-color: #4c1832;
+    }
+
+    #step-tabs > button:focus-visible {
+      outline: 2px solid #4c1832;
+      outline-offset: -2px;
+    }
+  </style>
+</head>
+<body class="min-h-screen bg-gray-100 font-sans text-sm text-gray-800 antialiased">
+  <header class="border-b border-gray-200 bg-white">
+    <div class="mx-auto flex h-16 max-w-[1240px] items-center justify-between px-4 sm:px-6 lg:px-8">
+      <a aria-label="Back to application information" class="text-xl font-bold tracking-tight text-[#da1710]" href="/personal-loan-application.html">Bestpac</a>
+    </div>
+  </header>
+
+  <main class="mx-auto w-full max-w-[1240px] px-4 py-8 sm:px-6 lg:px-8">
+    <h1 class="mb-6 text-3xl font-light tracking-normal text-[#4c1832] sm:text-4xl">Unsecured Personal Loan</h1>
+
+    <nav aria-label="Application progress" class="mb-8 grid grid-cols-3 divide-x divide-gray-200 border-x border-t border-gray-200 bg-white shadow-sm" id="step-tabs">
+      <button aria-current="step" class="border-b-[3px] border-b-transparent px-4 py-3 text-left transition hover:bg-gray-50 sm:px-5" data-step="1" type="button">
+        <span class="block text-xs text-gray-500">Step 1</span><span class="font-bold text-gray-900">Finances</span>
+      </button>
+      <button class="border-b-[3px] border-b-transparent px-4 py-3 text-left transition hover:bg-gray-50 sm:px-5" data-step="2" type="button">
+        <span class="block text-xs text-gray-500">Step 2</span><span class="font-bold text-gray-900">About you</span>
+      </button>
+      <button class="border-b-[3px] border-b-transparent px-4 py-3 text-left transition hover:bg-gray-50 sm:px-5" data-step="3" type="button">
+        <span class="block text-xs text-gray-500">Step 3</span><span class="font-bold text-gray-900">Review</span>
+      </button>
+    </nav>
+
+    <form class="space-y-8 border border-gray-200 bg-white p-5 shadow-sm sm:p-10" id="application-form" novalidate>
+      <section class="space-y-10" data-panel="1">
+        <section aria-labelledby="autosave-heading" class="space-y-5 border-b border-gray-200 pb-6">
+          <div>
+            <h2 class="text-xl font-medium text-[#4c1832]" id="autosave-heading">Before we get started</h2>
+            <p class="mt-1 text-sm text-gray-600">Don't lose the hard work you've done. We'll save your progress so you can continue from where you left off.</p>
+          </div>
+          <div class="grid gap-5 sm:ml-[20%] sm:max-w-xl">
+            <div>
+              <label class="block text-sm text-gray-700" for="start-first-name">First name</label>
+              <input aria-describedby="start-first-name-hint" autocomplete="given-name" class="westpac-input mt-1 w-full px-3" id="start-first-name">
+              <p class="mt-1 text-xs text-gray-600" id="start-first-name-hint">As shown on your ID</p>
+            </div>
+            <div>
+              <label class="block text-sm text-gray-700" for="start-email">Email</label>
+              <input autocomplete="email" class="westpac-input mt-1 w-full px-3" id="start-email" type="email">
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="loan-details-heading" class="space-y-6">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="loan-details-heading">Loan details</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-start">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="loan-purpose">Primary loan purpose<span class="mt-1 block text-xs italic leading-snug text-gray-500">Select Refinance/consolidate debt if refinancing your existing Bestpac loan with a new Bestpac loan.</span></label>
+            <select class="westpac-input w-full bg-white px-3 sm:col-span-6" id="loan-purpose">
+              <option value="">Please select</option><option value="Refinance/consolidate debt">Refinance/consolidate debt</option><option value="Buy a car">Buy a car</option><option value="Home renovations">Home renovations</option><option value="Personal expenditure">Personal expenditure</option><option value="Debt consolidation">Debt consolidation</option><option value="Other">Other</option>
+            </select>
+          </div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="loan-purpose" data-show-value="Buy a car">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="car-details">Car details</label>
+            <input class="westpac-input w-full px-3 sm:col-span-6" id="car-details" placeholder="Make, model and year">
+          </div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="loan-purpose" data-show-value="Buy a car">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="car-price">Car price</label>
+            <input class="westpac-input w-full px-3 sm:col-span-4" id="car-price" min="0" placeholder="$0" type="number">
+          </div>
+          <section aria-labelledby="refinance-heading" class="space-y-6 border-t border-gray-200 pt-6" id="refinance-details">
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-start">
+              <div class="text-sm sm:col-span-4 sm:text-right">
+                <h3 class="font-normal text-gray-800" id="refinance-heading">Reason to refinance/consolidate</h3>
+                <p class="mt-0.5 text-xs italic text-gray-500">You can select more than one</p>
+              </div>
+              <div class="space-y-3 sm:col-span-7">
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-gray-800"><input class="h-5 w-5 rounded border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" type="checkbox" name="refinance-reason" value="Cost savings"><span>Cost savings</span></label>
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-gray-800"><input class="h-5 w-5 rounded border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" type="checkbox" name="refinance-reason" value="More flexibility"><span>More flexibility in repayment amount or frequency</span></label>
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-gray-800"><input class="h-5 w-5 rounded border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" type="checkbox" name="refinance-reason" value="One repayment"><span>Convenience of one repayment</span></label>
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-gray-800"><input class="h-5 w-5 rounded border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" type="checkbox" name="refinance-reason" value="Change institution"><span>Change in financial institution</span></label>
+              </div>
+            </div>
+
+            <aside class="sm:ml-[33.333%] max-w-xl border border-[#cde5f7] bg-[#f0f7fc] p-5 text-sm text-[#2869bd]" aria-label="Refinance information">
+              <div class="flex items-start gap-3">
+                <span aria-hidden="true" class="mt-0.5 text-2xl leading-none">ⓘ</span>
+                <div class="space-y-3 leading-relaxed">
+                  <p>Refinancing or consolidating debt? Remember to compare your current debts with this loan and make sure you:</p>
+                  <ul class="list-disc space-y-1 pl-5">
+                    <li>Compare all fees, including break costs</li>
+                    <li>Compare interest rates and repayment amounts</li>
+                    <li>Check how much interest you'll pay over the term of the new loan</li>
+                    <li>Learn about key loan features (e.g. fixed or variable rate)</li>
+                  </ul>
+                  <p>If your loan is approved, Bestpac accounts listed below will be closed after approval. Don't list accounts you want to keep open. Accounts with other financial institutions that you choose to refinance need to be closed by you.</p>
+                </div>
+              </div>
+            </aside>
+
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+              <div class="sm:col-start-5 sm:col-span-7">
+                <label class="flex cursor-pointer items-center gap-3 text-sm text-gray-800">
+                  <input class="h-5 w-5 rounded border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" id="refinance-confirmation" type="checkbox">
+                  <span>I confirm I have understood the above</span>
+                </label>
+              </div>
+            </div>
+
+            <fieldset class="space-y-5 border-t border-gray-200 pt-5">
+              <legend class="sr-only">Debt to refinance or consolidate</legend>
+              <div class="grid gap-3 sm:grid-cols-12 sm:items-start">
+                <span class="text-sm sm:col-span-4 sm:text-right">I am looking to:</span>
+                <div class="space-y-3 sm:col-span-7">
+                  <label class="flex cursor-pointer items-start gap-3 text-sm text-gray-800">
+                    <input checked class="mt-0.5 h-5 w-5 border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" name="debt-source" type="radio" value="westpac">
+                    <span>Refinance my existing Bestpac loan with a new Bestpac loan</span>
+                  </label>
+                  <label class="flex cursor-pointer items-start gap-3 text-sm text-gray-800">
+                    <input class="mt-0.5 h-5 w-5 border-gray-400 text-[#4c1832] focus:ring-[#4c1832]" name="debt-source" type="radio" value="other">
+                    <span>Consolidate non-Bestpac debt</span>
+                  </label>
+                </div>
+              </div>
+
+              <div class="space-y-4" id="debts-list">
+                <div class="debt-entry space-y-4">
+                  <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+                    <label class="text-sm sm:col-span-4 sm:text-right" for="debt-type-1">Type of debt</label>
+                    <select class="westpac-input debt-type w-full bg-white px-3 sm:col-span-6" id="debt-type-1">
+                      <option value="">Please select</option><option>Bestpac credit card</option><option>Bestpac personal loan</option>
+                    </select>
+                  </div>
+                  <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+                    <label class="text-sm sm:col-span-4 sm:text-right" for="amount-owing-1">Amount owing</label>
+                    <div class="flex sm:col-span-4"><span class="inline-flex items-center rounded-l border border-r-0 border-gray-400 bg-gray-50 px-3 text-gray-500">$</span><input class="westpac-input debt-amount min-w-0 flex-1 rounded-l-none px-3" id="amount-owing-1" inputmode="decimal" placeholder="0" type="number" min="0"></div>
+                  </div>
+                  <div class="account-number-row grid gap-3 sm:grid-cols-12 sm:items-center">
+                    <label class="text-sm sm:col-span-4 sm:text-right" for="account-number-1">Account or card number <span class="text-xs italic text-gray-500">(optional)</span></label>
+                    <input class="westpac-input account-number w-full px-3 sm:col-span-6" id="account-number-1" autocomplete="off">
+                  </div>
+                </div>
+              </div>
+              <div class="sm:ml-[33.333%]">
+                <button class="rounded-md border border-[#4c1832] bg-white px-4 py-2 text-sm font-medium text-[#4c1832] hover:bg-gray-50" id="add-debt-button" type="button"><span aria-hidden="true" class="mr-2 font-bold">+</span>Add another debt</button>
+              </div>
+              <div class="grid gap-3 border-t border-gray-200 pt-5 sm:grid-cols-12 sm:items-start">
+                <span class="text-sm sm:col-span-4 sm:text-right">Total loan amount</span>
+                <div class="sm:col-span-7">
+                  <span class="block text-lg font-bold text-[#4c1832]" id="refinance-total">$0</span>
+                  <p class="mt-1 max-w-lg text-xs italic leading-relaxed text-gray-500">Consider any current and future personal circumstances that may affect your financial position before proceeding.</p>
+                </div>
+              </div>
+            </fieldset>
+          </section>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="loan-amount">Total loan amount</label>
+            <div class="flex sm:col-span-4"><span class="inline-flex items-center rounded-l border border-r-0 border-gray-400 bg-gray-50 px-3 text-gray-500">$</span><input class="westpac-input min-w-0 flex-1 rounded-l-none px-3" id="loan-amount" inputmode="decimal" placeholder="0" type="number" min="0"></div>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="loan-term">Over how many years?</label>
+            <select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="loan-term"><option value="">Please select</option><option>1 year</option><option>2 years</option><option>3 years</option><option>4 years</option><option>5 years</option><option>6 years</option><option>7 years</option></select>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="loan-state">State</label>
+            <select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="loan-state"><option value="">Please select</option><option>Australian Capital Territory</option><option>New South Wales</option><option>Northern Territory</option><option>Queensland</option><option>South Australia</option><option>Tasmania</option><option>Victoria</option><option>Western Australia</option></select>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="loan-postcode">Postcode</label>
+            <input class="westpac-input w-full px-3 sm:col-span-3" id="loan-postcode" inputmode="numeric" maxlength="4" placeholder="e.g. 2000">
+          </div>
+        </section>
+
+        <section aria-labelledby="income-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="income-heading">Income — what you earn</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="income-salary">Gross income <span class="text-xs italic text-gray-500">(before tax)</span></label>
+            <div class="flex sm:col-span-6">
+              <span class="inline-flex items-center rounded-l border border-r-0 border-gray-400 bg-gray-50 px-3 text-gray-500">$</span>
+              <input class="westpac-input min-w-0 flex-1 rounded-l-none px-3" id="income-salary" inputmode="decimal" placeholder="0" type="number" min="0">
+              <select aria-label="Income frequency" class="westpac-input rounded-l-none bg-white px-3" id="income-frequency"><option value="">Pay frequency</option><option>Weekly</option><option>Fortnightly</option><option>Monthly</option></select>
+            </div>
+          </div>
+        </section>
+
+        <section aria-labelledby="assets-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="assets-heading">Savings and other assets</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="property-value">Total market value of properties</label><input class="westpac-input w-full px-3 sm:col-span-4" id="property-value" inputmode="decimal" placeholder="$0" type="number" min="0"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="savings-balance">Savings / investment accounts</label><input class="westpac-input w-full px-3 sm:col-span-4" id="savings-balance" inputmode="decimal" placeholder="$0" type="number" min="0"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="vehicle-value">Approximate value of vehicles</label><input class="westpac-input w-full px-3 sm:col-span-4" id="vehicle-value" min="0" placeholder="$0" type="number"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="shares-value">Approximate value of shares / investments</label><input class="westpac-input w-full px-3 sm:col-span-4" id="shares-value" min="0" placeholder="$0" type="number"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="other-assets">Other assets</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="other-assets"><option value="">Please select</option><option>Furniture / contents</option><option>Superannuation</option><option>Other</option></select></div>
+        </section>
+
+        <section aria-labelledby="housing-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="housing-heading">Housing and relationship</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="relationship-status">Relationship status</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="relationship-status"><option value="">Please select</option><option>Single</option><option>Married / De facto</option><option>Separated</option><option>Divorced</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="dependants">Number of dependants</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="dependants"><option value="">Please select</option><option>0</option><option>1</option><option>2</option><option>3+</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="housing-situation">Current housing situation</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="housing-situation"><option value="">Please select</option><option>Mortgaged</option><option>Own outright</option><option>Renting</option><option>Boarding / Living with family</option></select></div>
+          <div class="hidden space-y-3" data-show-when="housing-situation" data-show-value="Mortgaged|Renting">
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="housing-payment">Rent or mortgage repayment</label><input class="westpac-input w-full px-3 sm:col-span-4" id="housing-payment" min="0" placeholder="$0" type="number"></div>
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="housing-payment-frequency">How often do you pay?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="housing-payment-frequency"><option value="">Please select</option><option>Weekly</option><option>Fortnightly</option><option>Monthly</option></select></div>
+          </div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="applying-with-partner">Are you applying alone or with a partner?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="applying-with-partner"><option value="">Please select</option><option>Alone</option><option>With a partner</option></select></div>
+        </section>
+
+        <section aria-labelledby="expense-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="expense-heading">Expenses</h2>
+          <p class="text-sm text-gray-600">Enter your estimated monthly amounts.</p>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="living-expenses">Total living expenses</label><input class="westpac-input w-full px-3 sm:col-span-4" id="living-expenses" inputmode="decimal" placeholder="$0 per month" type="number" min="0"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="other-expenses">Other regular expenses</label><input class="westpac-input w-full px-3 sm:col-span-4" id="other-expenses" inputmode="decimal" placeholder="$0 per month" type="number" min="0"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-start"><label class="text-sm sm:col-span-4 sm:text-right" for="expense-breakdown">Expense breakdown</label><textarea class="westpac-input min-h-24 w-full px-3 py-2 sm:col-span-6" id="expense-breakdown" placeholder="Groceries, utilities, transport, insurance, childcare, school fees, entertainment"></textarea></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><span class="text-sm sm:col-span-4 sm:text-right">Do you expect significant changes to negatively impact repayments?</span><div aria-label="Expected financial changes" class="flex gap-2" role="group"><button class="choice-button rounded border border-gray-400 px-4 py-2" type="button">Yes</button><button class="choice-button rounded border border-gray-400 px-4 py-2" type="button">No</button></div></div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-start" data-show-when-group="Expected financial changes" data-show-value="Yes">
+            <label class="text-sm sm:col-span-4 sm:text-right" for="future-changes">What may change in the next 12 months?</label>
+            <textarea class="westpac-input min-h-20 w-full px-3 py-2 sm:col-span-6" id="future-changes" placeholder="For example: parental leave, retirement, job change or a large expense"></textarea>
+          </div>
+        </section>
+
+        <section aria-labelledby="debts-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="debts-heading">Debts and commitments</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="credit-card-limit">Total limit across all credit cards</label><input class="westpac-input w-full px-3 sm:col-span-4" id="credit-card-limit" min="0" placeholder="$0 (limits, not balances)" type="number"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-start"><label class="text-sm sm:col-span-4 sm:text-right" for="other-loans">Other personal, car or home loans</label><textarea class="westpac-input min-h-24 w-full px-3 py-2 sm:col-span-6" id="other-loans" placeholder="For each loan: type, balance and repayment amount/frequency"></textarea></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="buy-now-pay-later">Do you use buy now, pay later (e.g. Afterpay or Zip)?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="buy-now-pay-later"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="buy-now-pay-later" data-show-value="Yes"><label class="text-sm sm:col-span-4 sm:text-right" for="bnpl-details">Which services and balance?</label><input class="westpac-input w-full px-3 sm:col-span-6" id="bnpl-details"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="hecs-help">Do you have a HECS / HELP debt?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="hecs-help"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-start"><label class="text-sm sm:col-span-4 sm:text-right" for="regular-commitments">Child support or other regular commitments</label><textarea class="westpac-input min-h-20 w-full px-3 py-2 sm:col-span-6" id="regular-commitments" placeholder="Include amount and frequency, if applicable"></textarea></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="loan-guarantor">Have you guaranteed anyone else's loan?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="loan-guarantor"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+        </section>
+
+        <section aria-labelledby="credit-history-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="credit-history-heading">Credit history</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="credit-default-history">Have you had a default, bankruptcy or debt agreement?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="credit-default-history"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="recent-credit-applications">Have you applied for other credit in the last 6 months?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="recent-credit-applications"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+        </section>
+      </section>
+
+      <section class="hidden space-y-10" data-panel="2">
+        <section aria-labelledby="about-heading" class="space-y-6">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="about-heading">About you</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="personal-title">Title</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="personal-title"><option value="">Please select</option><option>Mr</option><option>Mrs</option><option>Ms</option><option>Miss</option><option>Dr</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="first-name">First name (legal name)</label><input class="westpac-input w-full px-3 sm:col-span-6" id="first-name" autocomplete="given-name" placeholder="Name"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="middle-name">Middle name <span class="text-xs italic text-gray-500">(optional)</span></label><input class="westpac-input w-full px-3 sm:col-span-6" id="middle-name" placeholder="Optional"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="last-name">Last name</label><input class="westpac-input w-full px-3 sm:col-span-6" id="last-name" autocomplete="family-name" placeholder="Name"></div>
+          <fieldset class="grid justify-items-center gap-3 text-center">
+            <legend class="text-sm">Are you known by any other name? <span class="italic text-xs text-gray-500">(if any, e.g. maiden name)</span></legend>
+            <div class="w-full">
+              <div aria-label="Are you known by any other name?" class="yes-no-control inline-flex overflow-hidden rounded border border-[#737373]" role="group">
+                <button aria-pressed="false" class="choice-button border-r border-[#737373] px-6 py-2 text-sm text-gray-800 transition hover:bg-gray-50" type="button">Yes</button>
+                <button aria-pressed="false" class="choice-button px-6 py-2 text-sm text-gray-800 transition hover:bg-gray-50" type="button">No</button>
+              </div>
+              <p class="mx-auto mt-2 max-w-lg text-xs italic leading-relaxed text-gray-500">It is an offence under the Anti-Money Laundering and Counter-Terrorism Financing Act 2006 to give false or misleading information.</p>
+            </div>
+          </fieldset>
+          <fieldset class="grid justify-items-center gap-3 text-center">
+            <legend class="text-sm">Are you a tax resident in a country other than Australia?</legend>
+            <div class="w-full">
+              <div aria-label="Are you a tax resident in a country other than Australia?" class="yes-no-control inline-flex overflow-hidden rounded border border-[#737373]" role="group">
+                <button aria-pressed="false" class="choice-button border-r border-[#737373] px-6 py-2 text-sm text-gray-800 transition hover:bg-gray-50" type="button">Yes</button>
+                <button aria-pressed="false" class="choice-button px-6 py-2 text-sm text-gray-800 transition hover:bg-gray-50" type="button">No</button>
+              </div>
+              <p class="mx-auto mt-2 max-w-lg text-xs leading-relaxed text-gray-500">You are a foreign tax resident if you're required to pay tax in another country, even if you don't need to fill out a tax return.</p>
+            </div>
+          </fieldset>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="date-of-birth">Date of birth</label><input class="westpac-input w-full px-3 sm:col-span-4" id="date-of-birth" type="date"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="mobile-number">Phone number</label><input class="westpac-input w-full px-3 sm:col-span-5" id="mobile-number" autocomplete="tel" inputmode="tel" placeholder="Phone number"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="email-address">Email</label><input class="westpac-input w-full px-3 sm:col-span-6" id="email-address" autocomplete="email" placeholder="example@example.test" type="email"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="residency-status">Citizenship / residency status</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="residency-status"><option value="">Please select</option><option>Australian citizen</option><option>Permanent resident</option><option>Visa holder</option></select></div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="residency-status" data-show-value="Visa holder"><label class="text-sm sm:col-span-4 sm:text-right" for="visa-details">Visa type and expiry date</label><input class="westpac-input w-full px-3 sm:col-span-5" id="visa-details" placeholder="Visa type and expiry date"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="id-type">ID you will provide</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="id-type"><option value="">Please select</option><option>Driver licence</option><option>Passport</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="id-number">ID number</label><input class="westpac-input w-full px-3 sm:col-span-5" id="id-number" autocomplete="off"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="existing-customer">Are you an existing customer?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="existing-customer"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="existing-customer" data-show-value="Yes"><label class="text-sm sm:col-span-4 sm:text-right" for="customer-account-number">Account number</label><input class="westpac-input w-full px-3 sm:col-span-5" id="customer-account-number" autocomplete="off"></div>
+        </section>
+
+        <section aria-labelledby="address-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="address-heading">Residential address</h2>
+          <p class="text-xs italic text-gray-500">Street addresses only; no PO boxes.</p>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="residential-address">Residential address</label><input class="westpac-input w-full px-3 sm:col-span-6" id="residential-address" autocomplete="street-address" placeholder="Demo address"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="time-at-address">Length of time at this address</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="time-at-address"><option value="">Please select</option><option>Less than 1 year</option><option>1–3 years (under 3)</option><option>3–5 years</option><option>5+ years</option></select></div>
+          <div class="hidden space-y-3" data-show-when="time-at-address" data-show-value="Less than 1 year|1–3 years (under 3)">
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="previous-address">Previous address</label><input class="westpac-input w-full px-3 sm:col-span-6" id="previous-address" autocomplete="street-address"></div>
+          </div>
+        </section>
+
+        <section aria-labelledby="employment-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="employment-heading">Employment details</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="employer-name">Employer</label><input class="westpac-input w-full px-3 sm:col-span-5" id="employer-name" autocomplete="organization"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="job-title">Job title</label><input class="westpac-input w-full px-3 sm:col-span-5" id="job-title"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="employment-type">Employment type</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="employment-type"><option value="">Please select</option><option>Full Time</option><option>Part Time</option><option>Casual</option><option>Self Employed</option><option>Retired</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="time-in-job">How long have you been in this job?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-5" id="time-in-job"><option value="">Please select</option><option>Under 12 months</option><option>1–2 years</option><option>2+ years</option></select></div>
+          <div class="hidden grid gap-3 sm:grid-cols-12 sm:items-center" data-show-when="time-in-job" data-show-value="Under 12 months"><label class="text-sm sm:col-span-4 sm:text-right" for="previous-job">Previous job</label><input class="westpac-input w-full px-3 sm:col-span-5" id="previous-job"></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="on-probation">Are you currently on probation?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="on-probation"><option value="">Please select</option><option>No</option><option>Yes</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-start"><label class="text-sm sm:col-span-4 sm:text-right" for="other-income">Other income</label><textarea class="westpac-input min-h-20 w-full px-3 py-2 sm:col-span-6" id="other-income" placeholder="Overtime, bonuses, rent, Centrelink payments or investments"></textarea></div>
+          <div class="hidden space-y-3" data-show-when="employment-type" data-show-value="Self Employed">
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="self-employed-abn">ABN</label><input class="westpac-input w-full px-3 sm:col-span-5" id="self-employed-abn" inputmode="numeric"></div>
+            <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-4 sm:text-right" for="trading-years">Years trading</label><input class="westpac-input w-full px-3 sm:col-span-3" id="trading-years" min="0" step="0.5" type="number"></div>
+          </div>
+        </section>
+
+        <section aria-labelledby="consent-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="consent-heading">Consent and declarations</h2>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-5" for="consent-credit-check">Do you agree to a credit check?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="consent-credit-check"><option value="">Please select</option><option>Yes</option><option>No</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-5" for="consent-privacy">Do you agree to your information being collected and used under the privacy policy?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="consent-privacy"><option value="">Please select</option><option>Yes</option><option>No</option></select></div>
+          <div class="grid gap-3 sm:grid-cols-12 sm:items-center"><label class="text-sm sm:col-span-5" for="consent-accuracy">Do you confirm the information is true and complete?</label><select class="westpac-input w-full bg-white px-3 sm:col-span-4" id="consent-accuracy"><option value="">Please select</option><option>Yes</option><option>No</option></select></div>
+        </section>
+
+        <section aria-labelledby="documents-heading" class="space-y-5 border-t border-gray-200 pt-8">
+          <h2 class="text-lg font-medium text-[#4c1832]" id="documents-heading">Documents to provide</h2>
+          <p class="text-sm text-gray-600">You can select files to preview this step, but they will not be uploaded or saved.</p>
+          <div class="space-y-2"><label class="block text-sm" for="document-photo-id">Photo ID</label><input class="block w-full text-sm" id="document-photo-id" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf"></div>
+          <div class="space-y-2"><label class="block text-sm" for="document-payslips">Your 2 most recent payslips (no older than 60 days)</label><input class="block w-full text-sm" id="document-payslips" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple></div>
+          <div class="space-y-2"><label class="block text-sm" for="document-bank-statements">3 months of bank statements</label><input class="block w-full text-sm" id="document-bank-statements" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple></div>
+          <div class="space-y-2"><label class="block text-sm" for="document-tax-returns">Self-employed: last 2 tax returns or Notices of Assessment</label><input class="block w-full text-sm" id="document-tax-returns" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple></div>
+          <div class="space-y-2"><label class="block text-sm" for="document-loan-statements">Statements for existing loans</label><input class="block w-full text-sm" id="document-loan-statements" type="file" accept=".jpg,.jpeg,.png,.webp,.pdf" multiple></div>
+        </section>
+      </section>
+
+      <section class="hidden space-y-6" data-panel="3">
+        <div class="border-b border-gray-200 pb-4">
+          <h2 class="text-2xl font-light text-[#4c1832]">Review your application</h2>
+          <p class="mt-1 text-sm text-gray-600">Review your application answers before saving them.</p>
+        </div>
+        <div class="overflow-hidden border border-gray-200">
+          <div class="bg-gray-50 px-5 py-3 font-medium text-[#4c1832]">Your answers</div>
+          <dl class="divide-y divide-gray-200" id="review-answers"></dl>
+        </div>
+      </section>
+
+      <div class="flex flex-col-reverse justify-between gap-3 border-t border-gray-200 pt-6 sm:flex-row">
+        <button class="rounded border border-gray-400 px-6 py-2.5 font-medium text-gray-800 hover:bg-gray-50 disabled:cursor-not-allowed disabled:opacity-50" id="back-button" type="button">Back</button>
+        <button class="rounded bg-[#da1710] px-8 py-2.5 font-semibold text-white hover:bg-[#b7120c] disabled:cursor-not-allowed disabled:opacity-60" id="next-button" type="button">Continue</button>
+      </div>
+    </form>
+  </main>
+
+  <script>
+    const form = document.getElementById('application-form');
+    const tabs = Array.from(document.querySelectorAll('#step-tabs button'));
+    const panels = Array.from(document.querySelectorAll('[data-panel]'));
+    const backButton = document.getElementById('back-button');
+    const nextButton = document.getElementById('next-button');
+    const loanPurpose = document.getElementById('loan-purpose');
+    const refinanceDetails = document.getElementById('refinance-details');
+    const debtsList = document.getElementById('debts-list');
+    const progressStorageKey = 'westpac-personal-loan-demo-progress';
+    const submissionCompleteKey = 'bestpac-personal-loan-submitted';
+    let activeStep = 1;
+    sessionStorage.removeItem(submissionCompleteKey);
+
+    function saveProgress() {
+      const controls = Array.from(form.elements)
+        .filter((control) => (control.id || control.name) && !['button', 'submit', 'file'].includes(control.type));
+      const fields = {};
+      controls.forEach((control, index) => {
+        fields[control.id || `${control.name}:${index}`] = {
+          value: control.value,
+          checked: control.checked
+        };
+      });
+      sessionStorage.setItem(progressStorageKey, JSON.stringify({
+        step: activeStep,
+        debtCount: debtsList.querySelectorAll('.debt-entry').length,
+        fields,
+        choices: Array.from(document.querySelectorAll('.choice-button'))
+          .map((button) => button.getAttribute('aria-pressed') === 'true')
+      }));
+    }
+
+    function submitApplication() {
+      sessionStorage.removeItem(progressStorageKey);
+      sessionStorage.setItem(submissionCompleteKey, 'true');
+      window.location.href = 'application-submitted.html';
+    }
+
+    function updateDebtSource() {
+      const source = form.querySelector('input[name="debt-source"]:checked')?.value || 'westpac';
+      const options = source === 'westpac'
+        ? ['Bestpac credit card', 'Bestpac personal loan']
+        : ['Credit card', 'Personal loan', 'Line of credit', 'Overdraft', 'Family / private loan', 'Other debt'];
+
+      debtsList.querySelectorAll('.debt-entry').forEach((entry) => {
+        const select = entry.querySelector('.debt-type');
+        const previousValue = select.value;
+        select.replaceChildren(new Option('Please select', ''));
+        options.forEach((option) => select.add(new Option(option, option)));
+        if (options.includes(previousValue)) select.value = previousValue;
+        entry.querySelector('.account-number-row').classList.toggle('hidden', source !== 'westpac');
+      });
+    }
+
+    function updateRefinanceVisibility() {
+      const showRefinance = loanPurpose.value === 'Refinance/consolidate debt';
+      refinanceDetails.classList.toggle('hidden', !showRefinance);
+      refinanceDetails.querySelectorAll('input, select, button').forEach((control) => {
+        control.disabled = !showRefinance;
+      });
+      if (showRefinance) updateDebtSource();
+      updateRefinanceTotal();
+    }
+
+    function updateRefinanceTotal() {
+      const amount = Array.from(debtsList.querySelectorAll('.debt-amount'))
+        .reduce((sum, input) => sum + (Number(input.value) || 0), 0);
+      document.getElementById('refinance-total').textContent =
+        amount.toLocaleString('en-AU', { style: 'currency', currency: 'AUD', maximumFractionDigits: 0 });
+    }
+
+    function updateConditionalFields() {
+      document.querySelectorAll('[data-show-when], [data-show-when-group]').forEach((container) => {
+        let currentValue = '';
+        if (container.dataset.showWhen) {
+          currentValue = document.getElementById(container.dataset.showWhen)?.value || '';
+        } else {
+          const group = Array.from(document.querySelectorAll('[role="group"]'))
+            .find((candidate) => candidate.getAttribute('aria-label') === container.dataset.showWhenGroup);
+          currentValue = group?.querySelector('.choice-button[aria-pressed="true"]')?.textContent.trim() || '';
+        }
+        const values = container.dataset.showValue.split('|');
+        const visible = values.includes(currentValue);
+        container.classList.toggle('hidden', !visible);
+        container.querySelectorAll('input, select, textarea').forEach((control) => {
+          control.disabled = !visible;
+        });
+      });
+    }
+
+    function addDebtEntry() {
+      const template = debtsList.querySelector('.debt-entry');
+      const entry = template.cloneNode(true);
+      const index = debtsList.querySelectorAll('.debt-entry').length + 1;
+      const select = entry.querySelector('.debt-type');
+      const amount = entry.querySelector('.debt-amount');
+      const account = entry.querySelector('.account-number');
+      select.id = `debt-type-${index}`;
+      select.value = '';
+      entry.querySelector('label[for^="debt-type-"]').htmlFor = select.id;
+      amount.id = `amount-owing-${index}`;
+      amount.value = '';
+      entry.querySelector('label[for^="amount-owing-"]').htmlFor = amount.id;
+      account.id = `account-number-${index}`;
+      account.value = '';
+      entry.querySelector('label[for^="account-number-"]').htmlFor = account.id;
+      debtsList.appendChild(entry);
+      updateDebtSource();
+    }
+
+    function restoreProgress() {
+      const saved = JSON.parse(sessionStorage.getItem(progressStorageKey) || '{}');
+      while (debtsList.querySelectorAll('.debt-entry').length < (saved.debtCount || 1)) {
+        addDebtEntry();
+      }
+
+      const controls = Array.from(form.elements)
+        .filter((control) => (control.id || control.name) && !['button', 'submit', 'file'].includes(control.type));
+      controls.forEach((control, index) => {
+        const field = saved.fields?.[control.id || `${control.name}:${index}`];
+        if (field && control.type === 'radio') control.checked = field.checked;
+      });
+      updateDebtSource();
+      controls.forEach((control, index) => {
+        const field = saved.fields?.[control.id || `${control.name}:${index}`];
+        if (!field || ['radio', 'file'].includes(control.type)) return;
+        if (control.type === 'checkbox' || control.type === 'radio') control.checked = field.checked;
+        else control.value = field.value;
+      });
+
+      document.querySelectorAll('.choice-button').forEach((button, index) => {
+        const selected = Boolean(saved.choices?.[index]);
+        button.classList.toggle('bg-[#4a1a2f]', selected);
+        button.classList.toggle('text-white', selected);
+        button.classList.toggle('font-medium', selected);
+        button.classList.toggle('bg-white', !selected);
+        button.setAttribute('aria-pressed', String(selected));
+      });
+      updateConditionalFields();
+      return saved;
+    }
+
+    function showStep(step) {
+      activeStep = step;
+      panels.forEach((panel) => panel.classList.toggle('hidden', Number(panel.dataset.panel) !== step));
+      tabs.forEach((tab) => {
+        tab.setAttribute('aria-current', Number(tab.dataset.step) === step ? 'step' : 'false');
+      });
+      backButton.disabled = step === 1;
+      nextButton.textContent = step === 3 ? 'Submit' : 'Continue';
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      if (step === 3) updateReview();
+      saveProgress();
+    }
+
+    function updateReview() {
+      const review = document.getElementById('review-answers');
+      review.replaceChildren();
+      const rows = [];
+      const seen = new Set();
+      const formatLabel = (control) => {
+        const label = control.labels?.[0]?.textContent.trim();
+        const accessibleName = control.getAttribute('aria-label');
+        if (accessibleName) return accessibleName;
+        if (label) {
+          const visibleLabel = Array.from(control.labels[0].childNodes)
+            .filter((node) => node.nodeType === Node.TEXT_NODE)
+            .map((node) => node.textContent.trim())
+            .filter(Boolean)
+            .join(' ');
+          return visibleLabel || label;
+        }
+        const group = control.closest('fieldset');
+        return group?.querySelector('legend')?.textContent.trim() || control.name || control.id;
+      };
+      const addRow = (section, label, value, key) => {
+        if (!value) return;
+        rows.push({ section, label, value, key });
+      };
+
+      Array.from(form.elements).forEach((control) => {
+        if (control.disabled || ['button', 'submit', 'reset', 'file'].includes(control.type)) return;
+        const key = control.name || control.id;
+        if (!key || seen.has(key)) return;
+        seen.add(key);
+        let value;
+        if (control.type === 'radio') {
+          value = form.querySelector(`input[name="${CSS.escape(control.name)}"]:checked`)?.value || '';
+        } else if (control.type === 'checkbox') {
+          if (control.name) {
+            value = Array.from(form.querySelectorAll(`input[name="${CSS.escape(control.name)}"]:checked`))
+              .map((checked) => checked.value).join(', ');
+          } else {
+            value = control.checked ? 'Yes' : '';
+          }
+        } else if (control.tagName === 'SELECT') {
+          value = control.value ? control.selectedOptions[0].textContent.trim() : '';
+        } else {
+          value = control.value.trim();
+        }
+        if (['id-number', 'customer-account-number'].includes(control.id) && value) {
+          value = `••••${value.slice(-4)}`;
+        }
+        const section = control.closest('section')?.querySelector('h2')?.textContent.trim() || 'Application details';
+        addRow(section, formatLabel(control), value, key);
+      });
+
+      document.querySelectorAll('[role="group"][aria-label]').forEach((group) => {
+        const selected = group.querySelector('.choice-button[aria-pressed="true"]');
+        if (!selected) return;
+        const section = group.closest('section')?.querySelector('h2')?.textContent.trim() || 'Application details';
+        addRow(section, group.getAttribute('aria-label'), selected.textContent.trim(), group.getAttribute('aria-label'));
+      });
+
+      let currentSection = '';
+      rows.forEach(({ section, label, value, key }, index) => {
+        if (section !== currentSection) {
+          currentSection = section;
+          const heading = document.createElement('div');
+          heading.className = 'bg-gray-50 px-5 py-3 font-medium text-[#4c1832]';
+          heading.textContent = section;
+          review.appendChild(heading);
+        }
+        const row = document.createElement('div');
+        row.className = `grid grid-cols-1 gap-1 px-5 py-3 sm:grid-cols-3${index % 2 ? ' bg-gray-50' : ''}`;
+        const term = document.createElement('dt');
+        term.className = 'text-gray-600';
+        term.textContent = label;
+        const detail = document.createElement('dd');
+        detail.className = 'font-medium sm:col-span-2';
+        detail.textContent = value;
+        detail.dataset.answer = key;
+        row.append(term, detail);
+        review.appendChild(row);
+      });
+    }
+
+    backButton.addEventListener('click', () => {
+      if (activeStep > 1) showStep(activeStep - 1);
+      else window.location.href = '/personal-loan-application.html';
+    });
+
+    nextButton.addEventListener('click', async () => {
+      if (activeStep < 3) {
+        showStep(activeStep + 1);
+        return;
+      }
+      submitApplication();
+    });
+
+    tabs.forEach((tab) => tab.addEventListener('click', () => showStep(Number(tab.dataset.step))));
+
+    loanPurpose.addEventListener('change', updateRefinanceVisibility);
+    refinanceDetails.addEventListener('change', (event) => {
+      if (event.target.matches('input[name="debt-source"]')) updateDebtSource();
+      if (event.target.matches('.debt-amount')) updateRefinanceTotal();
+    });
+    refinanceDetails.addEventListener('input', (event) => {
+      if (event.target.matches('.debt-amount')) updateRefinanceTotal();
+    });
+    document.getElementById('add-debt-button').addEventListener('click', () => {
+      addDebtEntry();
+      updateDebtSource();
+      updateRefinanceTotal();
+      saveProgress();
+    });
+
+    document.querySelectorAll('.choice-button').forEach((button) => {
+      button.addEventListener('click', () => {
+        button.parentElement.querySelectorAll('.choice-button').forEach((choice) => {
+          const selected = choice === button;
+          choice.classList.toggle('bg-[#4a1a2f]', selected);
+          choice.classList.toggle('text-white', selected);
+          choice.classList.toggle('font-medium', selected);
+          choice.classList.toggle('bg-white', !selected);
+          choice.setAttribute('aria-pressed', String(selected));
+        });
+        updateConditionalFields();
+        saveProgress();
+      });
+    });
+
+    form.addEventListener('submit', (event) => event.preventDefault());
+    form.addEventListener('input', saveProgress);
+    form.addEventListener('change', () => {
+      updateConditionalFields();
+      saveProgress();
+    });
+    const savedProgress = restoreProgress();
+    loanPurpose.dispatchEvent(new Event('change'));
+    showStep(savedProgress.step || 1);
+  </script>
+</body>
+</html>
