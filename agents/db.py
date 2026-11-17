@@ -367,7 +367,9 @@ class _local:  # namespace
         has_hecs INTEGER NOT NULL DEFAULT 0, existing_customer INTEGER NOT NULL DEFAULT 1,
         residency TEXT NOT NULL DEFAULT 'AU', household TEXT NOT NULL DEFAULT 'single',
         dependants INTEGER NOT NULL DEFAULT 0,
-        decision TEXT, decision_confidence INTEGER, decided_at TEXT
+        decision TEXT, decision_confidence INTEGER, decided_at TEXT,
+        approval_probability REAL, estimated_timeframe TEXT, estimated_decision_by TEXT,
+        status_updated_at TEXT, reviewed_by TEXT, reviewed_at TEXT
     );
     CREATE TABLE IF NOT EXISTS customer_identity (
         customer_token TEXT PRIMARY KEY, case_id TEXT NOT NULL,
@@ -451,7 +453,15 @@ class _local:  # namespace
             if "customer_tracker" in tables and "applications" not in tables:
                 conn.executescript("DROP TABLE IF EXISTS event_log; DROP TABLE IF EXISTS customer_tracker;")
             conn.executescript(cls.SCHEMA)
+            have = {r[1] for r in conn.execute("PRAGMA table_info(applications)")}
+            for col, typ in cls.NEW_APPLICATION_COLUMNS:  # databases made before these existed
+                if col not in have:
+                    conn.execute(f"ALTER TABLE applications ADD COLUMN {col} {typ}")
         cls._ready.add(path)
+
+    NEW_APPLICATION_COLUMNS = [("approval_probability", "REAL"), ("estimated_timeframe", "TEXT"),
+                               ("estimated_decision_by", "TEXT"), ("status_updated_at", "TEXT"),
+                               ("reviewed_by", "TEXT"), ("reviewed_at", "TEXT")]
 
     @classmethod
     def _row(cls, row):

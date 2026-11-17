@@ -26,7 +26,7 @@ FAULT_SWITCH = {
     "LOAN-0039": "credit_checks_ignored",
     "LOAN-0042": "old_payslip",
     "LOAN-0047": "approved_despite_fail",
-    # privacy / access demos (run on their own: they suspend the verification agent)
+    # privacy / access demos (run on their own: they send the verification agent back to L-plates)
     "LOAN-0026": "unredacted_payslip",
     "LOAN-0027": "cross_case_access",
 }

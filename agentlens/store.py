@@ -36,6 +36,7 @@ def licences() -> dict[str, dict]:
                 db.upsert("agent_licence", missing, "agent_name")
                 rows.update({m["agent_name"]: m for m in missing})
             for r in rows.values():
+                r["level"] = scoring.normalise_level(r.get("level"))
                 r["recent_cases"] = list(r.get("recent_cases") or [])
                 r["fast_track"] = bool(r.get("fast_track"))
             _cache["lic"] = rows

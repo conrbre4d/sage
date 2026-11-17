@@ -47,7 +47,7 @@ The demo script, mapped onto our agents:
    - The suggestion is **resolved** and the agent is **fast-tracked**: 10 cases instead of 30 to the next level.
    - After 10 more cases, a person promotes it.
 4. **decision_agent** approves a loan despite a failed credit check (LOAN-0047).
-   That's **CRITICAL**, so the agent is **instantly SUSPENDED**.
+   That's **CRITICAL**, so the agent goes **straight back to L-plates** (a person checks every case).
 
 Also in the batch, for the review queue:
 
@@ -59,7 +59,7 @@ Also in the batch, for the review queue:
 | LOAN-0039 | Many credit checks ignored |
 
 The batch also has normal declines, a hardship referral, and a customer the intake AI asks for their loan term.
-The privacy (LOAN-0026, DP3) and access (LOAN-0027, DP4) demos run separately, because they suspend the verification agent:
+The privacy (LOAN-0026, DP3) and access (LOAN-0027, DP4) demos run separately, because they send the verification agent back to L-plates:
 `python ../agents/main.py LOAN-0026 LOAN-0027` while AgentLens is running.
 
 ## How it works
@@ -88,7 +88,7 @@ with `what_should_have_happened`. MAJOR and CRITICAL mistakes **hold the case** 
 
 ### Step 2: score and rank ([`scoring.py`](scoring.py))
 
-- **Points:** MINOR −1 · MAJOR −2 · CRITICAL −10 (score kept between 0 and 100). Any CRITICAL means **instantly SUSPENDED**.
+- **Points:** MINOR −1 · MAJOR −2 · CRITICAL −10 (score kept between 0 and 100). Any CRITICAL sends the agent **straight back to L-plates**. There is no suspended level.
 - **Mistake rate:** weighted mistakes ÷ the agent's last 50 cases. The weights are MINOR 0.5 · MAJOR 1 · CRITICAL 2,
   which makes the demo work as written: 3 / 10 = 0.30 gives P1.
 

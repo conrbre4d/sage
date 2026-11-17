@@ -4,514 +4,772 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>AgentLens</title>
+<meta name="description" content="Review AI agent loan decisions, licences and improvements.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500;600&family=Inter:wght@400;500;600;650;700;800&display=swap" rel="stylesheet">
 <style>
-  :root {
-    --bg:#f3f4f6; --card:#ffffff; --ink:#111827; --muted:#6b7280; --line:#e5e7eb; --soft:#f9fafb;
-    --dark:#0f172a; --green:#16a34a; --green-bg:#ecfdf3; --green-line:#bbf7d0;
-    --orange:#c2410c; --orange-bg:#fff4e0; --orange-line:#f5b14c; --amber-ink:#92400e;
-    --blue:#1d4ed8; --blue-bg:#e8f0fe; --blue-line:#3b82f6;
-    --red:#b42318; --red-bg:#fef2f2; --red-line:#fecaca; --violet:#5b5bd6; --violet-bg:#eef2ff;
-  }
-  * { box-sizing:border-box; }
-  body { margin:0; background:var(--bg); color:var(--ink); font:14px/1.45 Inter, ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; }
-  button { font:inherit; cursor:pointer; }
-  .mono { font-family: ui-monospace, "SFMono-Regular", Consolas, monospace; }
-  header { background:var(--card); border-bottom:1px solid var(--line); }
-  .bar { max-width:1180px; margin:0 auto; padding:16px 24px 0; }
-  .brand { display:flex; align-items:center; gap:12px; }
-  .logo { width:36px; height:36px; border-radius:9px; background:var(--dark); display:grid; place-items:center; }
-  .brand h1 { font-size:20px; margin:0; font-weight:700; letter-spacing:-.01em; }
-  .pill { font-size:12px; padding:3px 10px; border-radius:999px; font-weight:500; }
-  .pill.proto { background:#fdf2c4; color:#7a5b00; }
-  .who { margin-left:auto; display:flex; align-items:center; gap:10px; color:var(--muted); font-size:13px; }
-  .avatar { width:32px; height:32px; border-radius:50%; background:#e0e7ff; color:#3730a3; display:grid; place-items:center; font-weight:700; font-size:12px; }
-  .tabs { display:flex; gap:28px; margin-top:14px; }
-  .tab { background:none; border:0; padding:10px 2px 12px; color:var(--muted); font-weight:500; border-bottom:2px solid transparent; display:flex; gap:8px; align-items:center; }
-  .tab.on { color:var(--ink); border-bottom-color:var(--ink); }
-  .count { font-size:11px; min-width:20px; padding:1px 6px; border-radius:999px; background:#eef0f3; color:var(--ink); }
-  .tab.on .count { background:var(--dark); color:#fff; }
-  main { max-width:1180px; margin:0 auto; padding:22px 24px 60px; }
+/* ---- Design system: copied from the Lovable project (project-reboot-main/src/styles.css) ---- */
+:root{--font-sans:'Inter',system-ui,-apple-system,"Segoe UI",sans-serif;--font-mono:'IBM Plex Mono',ui-monospace,Consolas,monospace}
+:root {
+ --background:oklch(.967 .003 264.5);--foreground:oklch(.21 .032 264.7);--card:oklch(1 0 0);--primary:oklch(.208 .04 265.8);--primary-foreground:oklch(.985 .002 247);--secondary:oklch(.967 .004 264);--muted:oklch(.965 .004 264);--muted-foreground:oklch(.49 .022 264);--accent:oklch(.95 .006 264);--border:oklch(.923 .004 264);--ring:oklch(.53 .1 254);--overlay:oklch(.15 .02 264 / .55);
+ --high-bg:oklch(.97 .032 83);--high-text:oklch(.535 .165 40);--high-accent:oklch(.799 .14 75);--critical-bg:oklch(.971 .013 17);--critical-text:oklch(.496 .174 28);--medium-bg:oklch(.947 .024 263);--medium-text:oklch(.487 .219 264);--success-bg:oklch(.979 .023 159);--success-text:oklch(.497 .15 151);--success-accent:oklch(.62 .155 156);--ai-bg:oklch(.955 .026 280);--ai-text:oklch(.51 .22 278);--plate-yellow:oklch(.886 .172 92);--plate-ink:oklch(.17 .01 264);--paper-shadow:0 3px 10px oklch(.2 .01 264 / .06);--radius:16px;
+}
+.dark {--background:oklch(.18 .015 264);--foreground:oklch(.94 .005 264);--card:oklch(.225 .016 264);--primary:oklch(.9 .009 264);--primary-foreground:oklch(.19 .018 264);--secondary:oklch(.27 .018 264);--muted:oklch(.265 .015 264);--muted-foreground:oklch(.71 .013 264);--accent:oklch(.3 .02 264);--border:oklch(.33 .017 264);--high-bg:oklch(.28 .038 70);--high-text:oklch(.82 .125 65);--critical-bg:oklch(.28 .045 26);--critical-text:oklch(.79 .115 26);--medium-bg:oklch(.28 .04 260);--medium-text:oklch(.79 .1 262);--success-bg:oklch(.265 .033 155);--success-text:oklch(.78 .13 154);--ai-bg:oklch(.28 .04 280);--ai-text:oklch(.79 .11 282);}
+*{border-color:var(--border);letter-spacing:0}body{margin:0;background:var(--background);color:var(--foreground);font:14px/1.6 var(--font-sans)}button,a,input,select,textarea{outline-offset:4px}a{text-decoration:none;color:inherit}h1,h2,h3,h4,p{margin:0}h1{font-size:22px;font-weight:600;line-height:1.5}h2{font-size:18px;font-weight:600}h3{font-size:14px;font-weight:600}p{overflow-wrap:anywhere}label{font-weight:500}button{font-family:inherit}select{color:var(--foreground);background:var(--card);border:1px solid var(--border);border-radius:6px;padding:8px 10px;font:inherit}.muted{color:var(--muted-foreground)}.small{font-size:12px}.mono{font-family:var(--font-mono);font-size:12px}.success-text{color:var(--success-text)}.eyebrow{font-size:10px;font-weight:600;letter-spacing:1.4px;color:var(--muted-foreground)}
+.app-shell{min-height:100vh}.sidebar{position:fixed;inset:0 auto 0 0;width:250px;background:var(--card);border-right:1px solid var(--border);padding:30px 19px 12px;display:flex;flex-direction:column;z-index:30}.brand{display:flex;align-items:center;gap:10px;width:max-content}.brand strong{font-size:23px;font-weight:650}.brand-symbol{width:37px;height:37px;border-radius:10px;display:grid;place-items:center;background:var(--primary);color:var(--primary-foreground)}.brand-period{color:var(--success-text)}.prototype{background:var(--high-bg);color:var(--high-text);font-size:10px;border-radius:4px;width:max-content;padding:3px 8px;margin:17px 0 28px;display:flex;align-items:center;gap:6px}.prototype>span{width:5px;height:5px;border-radius:50%;background:var(--high-accent)}.nav-group{font-size:10px;text-transform:uppercase;letter-spacing:1.5px;color:var(--muted-foreground);margin:0 10px 9px}.sidebar nav>div:nth-child(4){margin-top:27px}.nav-link{height:43px;width:100%;justify-content:flex-start;border-radius:7px;padding:0 11px;font-size:12px;font-weight:500;color:var(--muted-foreground);margin:2px 0}.nav-link>span:first-of-type{flex:1;text-align:left}.nav-link.nav-active{background:var(--primary);color:var(--primary-foreground)}.nav-count{font-size:10px;min-width:21px;padding:1px 5px;text-align:center;border-radius:4px;background:var(--muted);color:var(--muted-foreground)}.queue-count{background:var(--high-bg);color:var(--high-text)}.sidebar-bottom{margin-top:auto;padding-top:45px}.demo-controls{padding:16px 12px;background:var(--muted);border:1px solid var(--border);border-radius:10px}.demo-caption{display:flex;gap:6px;align-items:center;font-size:9px;font-weight:600;letter-spacing:1.1px;color:var(--muted-foreground);margin-bottom:13px}.demo-controls button,.demo-controls a{font-size:11px;height:36px}.batch-selector{display:flex;align-items:center;position:relative;gap:8px;padding:13px 0 9px;font-size:11px}.batch-selector label{flex:1;color:var(--muted-foreground)}.batch-selector select{appearance:none;width:62px;font-size:11px;padding:4px 9px}.batch-selector svg{position:absolute;right:8px;pointer-events:none}.reviewer{display:flex;align-items:center;gap:10px;border-top:1px solid var(--border);padding:20px 1px 15px;margin-top:22px}.avatar{width:33px;height:33px;background:var(--medium-bg);color:var(--medium-text);border-radius:50%;font-size:11px;font-weight:600;display:grid;place-items:center}.reviewer strong{font-size:11px;display:block}.reviewer span{font-size:10px;color:var(--muted-foreground);display:block}.reviewer>svg{margin-left:auto;color:var(--muted-foreground)}.sidebar-footer{display:flex;justify-content:space-between;align-items:center;border-top:1px solid var(--border);padding-top:9px}.sidebar-footer button{font-size:10px;padding:4px 6px}.storage-label{display:flex;align-items:center;gap:5px;font-size:10px;color:var(--muted-foreground)}.online-dot,.offline-dot{display:inline-block;flex-shrink:0;height:6px;width:6px;border-radius:50%;background:var(--success-accent)}.offline-dot{background:var(--high-accent)}
+.workspace{margin-left:250px;display:flex;flex-direction:column;min-height:100vh}.workspace-topbar{height:61px;background:var(--card);border-bottom:1px solid var(--border);padding:0 36px;display:flex;justify-content:space-between;align-items:center;font-size:10px;color:var(--muted-foreground)}.breadcrumb-slash{margin:0 12px;color:var(--border)}.workspace-topbar>div{display:flex;align-items:center;gap:7px}.topbar-divider{height:15px;width:1px;background:var(--border);margin:0 10px}.mini-avatar{display:grid;place-items:center;background:var(--muted);width:25px;height:25px;border-radius:50%;font-weight:600;margin-left:9px}main{padding:31px 36px 45px;width:100%;max-width:1640px;margin:auto;flex:1;min-width:0}.page-header{display:flex;justify-content:space-between;align-items:center;gap:20px;margin-bottom:22px}.page-header .eyebrow{margin-bottom:5px}.page-header p{margin-top:4px;font-size:12px;color:var(--muted-foreground)}.reviewer-label{font-size:11px;display:flex;align-items:center;gap:7px;color:var(--muted-foreground)}.job-banner{display:flex;align-items:center;gap:9px;min-height:43px;border:1px solid var(--border);border-radius:7px;background:var(--card);padding:10px 14px;font-size:11px;color:var(--muted-foreground);margin-bottom:25px}.job-count{margin-left:auto;font-size:10px}.job-banner>.progress-track{width:100px}.main-footer{display:flex;align-items:center;gap:6px;margin:0 36px;padding:20px 0;border-top:1px solid var(--border);font-size:9px;color:var(--muted-foreground)}.main-footer span{margin-left:auto}.mobile-header{display:none}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr 1.2fr;gap:18px;margin-bottom:30px}.stat-card{background:var(--card);border:1px solid var(--border);border-radius:16px;padding:21px 23px;min-height:188px}.stat-heading{display:flex;justify-content:space-between;align-items:center;margin-bottom:15px;font-size:12px;font-weight:500}.stat-heading svg{color:var(--muted-foreground)}.stat-value{font-size:34px;font-weight:700;line-height:1.2}.stat-value span{font-size:11px;font-weight:400;color:var(--muted-foreground);margin-left:9px}.stat-card>.progress-track{margin:18px 0 9px}.stat-card .caption{font-size:10px;color:var(--muted-foreground)}.stat-held{border:2px solid var(--high-accent);padding:20px 22px}.stat-held .stat-value{color:var(--high-text)}.stat-held .stat-heading svg{color:var(--high-text)}.severity-chips{display:flex;gap:5px;flex-wrap:wrap;margin:17px 0 9px}.stat-agents .stat-heading{margin-bottom:10px}.stat-agents .stat-value{font-size:30px}.agent-mini-list{margin-top:9px}.agent-mini{display:flex;align-items:center;gap:7px;font-size:10px;min-height:26px}.agent-mini .agent-mini-name{flex:1}.agent-mini strong{min-width:20px;text-align:right;font-family:var(--font-mono);font-size:11px}.agent-mini .plate{width:20px;height:20px;font-size:14px}.agent-mini .pill{font-size:8px;padding:2px 5px}.agent-mini .restriction-arrow{color:var(--high-text);font-size:12px}
+.pill{display:inline-flex;align-items:center;gap:4px;white-space:nowrap;border-radius:5px;padding:3px 7px;font-size:10px;font-weight:500;background:var(--tone-bg,var(--muted));color:var(--tone-text,var(--muted-foreground));line-height:1.6}.tone-neutral{--tone-bg:var(--muted);--tone-text:var(--muted-foreground);--tone-accent:var(--border)}.tone-high,.tone-major,.tone-applied,.tone-testing{--tone-bg:var(--high-bg);--tone-text:var(--high-text);--tone-accent:var(--high-accent)}.tone-critical{--tone-bg:var(--critical-bg);--tone-text:var(--critical-text);--tone-accent:var(--critical-text)}.tone-medium,.tone-minor,.tone-proposed{--tone-bg:var(--medium-bg);--tone-text:var(--medium-text);--tone-accent:var(--medium-text)}.tone-success,.tone-resolved{--tone-bg:var(--success-bg);--tone-text:var(--success-text);--tone-accent:var(--success-accent)}.tone-ai{--tone-bg:var(--ai-bg);--tone-text:var(--ai-text);--tone-accent:var(--ai-text)}.tone-ink{--tone-bg:var(--primary);--tone-text:var(--primary-foreground)}.plate{display:inline-grid;place-items:center;width:25px;height:25px;border-radius:3px;font-size:19px;font-weight:800;line-height:1;border:1px solid var(--border)}.plate-l{background:var(--plate-yellow);color:var(--plate-ink)}.plate-P1{background:var(--card);color:var(--critical-text)}.plate-P2{background:var(--card);color:var(--success-text)}.progress-track{height:5px;width:100%;border-radius:5px;background:var(--muted);overflow:hidden}.progress-track progress{display:block;width:100%;height:100%;appearance:none;border:0;color:var(--tone-accent,var(--success-accent));background:var(--muted)}progress::-webkit-progress-bar{background:var(--muted)}progress::-webkit-progress-value{background:var(--tone-accent,var(--success-accent));border-radius:5px;transition:width .3s}progress::-moz-progress-bar{background:var(--tone-accent,var(--success-accent))}.probability{display:flex;gap:9px;align-items:center;min-width:90px}.probability .progress-track{max-width:95px}.probability strong{font-size:11px}
+.section-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:15px}.section-heading h2{font-size:14px}.section-heading span{font-size:10px;color:var(--muted-foreground)}.queue-layout{display:grid;grid-template-columns:270px minmax(0,1fr);gap:23px}.held-case-list{display:flex;flex-direction:column;gap:10px}.queue-card{height:auto;min-height:108px;white-space:normal;border:1px solid var(--border);border-radius:10px;position:relative;background:var(--card);text-align:left;padding:16px;display:block;overflow:hidden;width:100%;box-shadow:none}.queue-card::before{content:'';position:absolute;left:0;top:17px;bottom:17px;width:3px;background:var(--tone-accent,var(--high-accent));border-radius:0 3px 3px 0}.queue-card.selected{border:2px solid var(--primary);padding:15px}.queue-card strong{font-size:12px;line-height:1.65;display:block;margin-bottom:11px}.queue-card-bottom{display:flex;justify-content:space-between;align-items:center;gap:5px}.queue-card-bottom .mono{font-size:10px;color:var(--muted-foreground)}.queue-card .pill{font-size:9px}.queue-note{display:flex;align-items:flex-start;gap:7px;font-size:10px;color:var(--muted-foreground);padding:18px 5px}.queue-note svg{flex-shrink:0;margin-top:2px}
+.case-panel{background:var(--card);border:1px solid var(--border);border-radius:16px;overflow:hidden;min-width:0}.case-header{padding:21px 23px 17px}.case-id-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap;margin-bottom:20px}.case-id-line>.mono{font-size:10px;color:var(--muted-foreground);flex:1}.fact-grid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:16px}.fact-tile label{display:block;font-size:9px;color:var(--muted-foreground);margin-bottom:5px}.fact-tile strong{font-size:11px;font-weight:600;display:block;overflow-wrap:anywhere}.fact-tile>span{font-size:9px;color:var(--muted-foreground);display:block;margin-top:4px}.case-tabs{padding:0 23px;display:flex;gap:21px;border-bottom:1px solid var(--border);overflow-x:auto}.case-tab{border-radius:0;height:42px;padding:0;font-size:11px;color:var(--muted-foreground);border-bottom:2px solid transparent;background:transparent}.case-tab.active{color:var(--foreground);border-bottom-color:var(--primary)}.case-body{padding:24px}.case-title{font-size:17px;line-height:1.5;margin-bottom:18px}.compare-values{display:grid;grid-template-columns:1fr 20px 1fr;align-items:center;gap:10px;margin-bottom:17px}.compare-box{border:1px solid var(--border);border-radius:9px;padding:14px;min-height:117px;background:var(--muted)}.compare-box.tone-critical{background:var(--critical-bg);border-color:color-mix(in oklch,var(--critical-text) 20%,var(--card))}.compare-box label{font-size:9px;color:var(--muted-foreground);display:block}.compare-box strong{display:block;font-size:30px;line-height:1.5}.compare-box.tone-critical strong{color:var(--critical-text)}.compare-box span{font-size:10px;color:var(--muted-foreground);display:block}.compare-values>svg{color:var(--muted-foreground)}.ai-box{display:flex;gap:10px;background:var(--ai-bg);border:1px solid color-mix(in oklch,var(--ai-text) 15%,var(--card));border-radius:8px;padding:15px;color:var(--ai-text);font-size:11px}.ai-box>svg{flex-shrink:0;margin-top:3px}.ai-box strong{display:block;margin-top:8px}.ai-tag{display:block;text-transform:uppercase;font-size:8px;letter-spacing:.8px;margin-top:10px;opacity:.8}.steps-section{padding:23px 0}.steps-section h3{font-size:11px;margin-bottom:11px}.step-chips{display:flex;align-items:center;gap:5px;flex-wrap:wrap}.step-chips>.pill{font-size:9px}.step-arrow{color:var(--muted-foreground);font-size:10px}.review-actions{display:flex;flex-wrap:wrap;gap:8px;padding:0 0 22px;border-bottom:1px solid var(--border)}.review-actions button{font-size:10px;flex:1;padding:0 11px}.danger-outline{color:var(--critical-text);border-color:color-mix(in oklch,var(--critical-text) 30%,var(--card));background:var(--card)}.reasoning{margin-top:20px;border:1px solid var(--border);border-radius:9px;padding:15px}.reasoning>h3{font-size:11px;margin-bottom:10px}.reasoning p{font-size:11px;margin-top:10px}.reasoning>p:last-child{font-size:10px;color:var(--muted-foreground)}.findings{margin-top:24px}.findings>h3{font-size:12px;margin-bottom:12px}.mistake-card{border:1px solid var(--border);border-radius:10px;padding:16px;margin-bottom:12px;font-size:11px}.mistake-card>p{margin-top:10px}.comparison-text{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:13px}.tinted{background:var(--tone-bg);color:var(--tone-text);padding:12px;border-radius:7px}.tinted label{display:block;font-size:9px;margin-bottom:7px;font-weight:600}.tinted p{font-size:11px}.clear-box{background:var(--success-bg);color:var(--success-text);padding:18px;display:flex;gap:10px;border-radius:8px;font-size:12px}.clear-box svg{flex-shrink:0}.back-link{margin-bottom:18px;font-size:12px;display:inline-flex;gap:6px;align-items:center}
+.connection-state{display:flex;align-items:center;gap:25px;border-top:1px solid var(--border);border-bottom:1px solid var(--border);padding:38px 15px;margin:25px 0 28px}.connection-icon{width:66px;height:66px;flex-shrink:0;background:var(--card);border:1px solid var(--border);border-radius:16px;display:grid;place-items:center;color:var(--muted-foreground)}.connection-state h2{margin:5px 0 8px;font-size:18px}.connection-state p{max-width:560px;font-size:12px;color:var(--muted-foreground)}.connection-actions{display:flex;gap:8px;flex-wrap:wrap;margin:18px 0 12px}.connection-actions button{font-size:11px}.connection-state .connection-error{font-size:10px;color:var(--high-text)}.connection-help{padding:14px;background:var(--muted);border-radius:8px;font-size:12px}.connection-help p{margin-top:5px;color:var(--muted-foreground)}.empty-state{text-align:center;padding:55px 25px;display:flex;flex-direction:column;align-items:center;gap:9px}.empty-icon{background:var(--success-bg);color:var(--success-text);width:48px;height:48px;border-radius:50%;display:grid;place-items:center;margin-bottom:6px}.empty-state p{max-width:300px;font-size:12px;color:var(--muted-foreground)}.empty-state button,.empty-state a{margin-top:8px}.loading-lines{padding:15px;display:grid;gap:15px;width:100%}.skeleton-line{height:18px;background:var(--muted);border-radius:5px;animation:pulse 2s infinite}.skeleton-line:nth-child(2n){width:74%}.error-note{display:flex;gap:10px;align-items:center;flex-wrap:wrap;background:var(--critical-bg);color:var(--critical-text);padding:16px;border-radius:8px;font-size:12px}
+.table-controls{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:18px}.filter-list{display:flex;gap:6px;flex-wrap:wrap}.filter-list button{font-size:10px;height:31px;padding:0 10px}.filter-list button span{font-family:var(--font-mono);font-size:9px;opacity:.65}.search-box{position:relative;max-width:220px;width:100%}.search-box svg{position:absolute;left:10px;top:10px;color:var(--muted-foreground);width:14px;height:14px}.search-box input{padding-left:32px;font-size:11px;background:var(--card)}.data-table-wrap{border:1px solid var(--border);border-radius:12px;background:var(--card);overflow:hidden}.data-table{width:100%;border-collapse:collapse;table-layout:fixed}.data-table th{text-align:left;padding:15px;font-size:10px;color:var(--muted-foreground);font-weight:500;background:var(--muted)}.data-table td{padding:18px 15px;border-top:1px solid var(--border);font-size:11px;vertical-align:middle;overflow-wrap:anywhere}.data-table tbody tr:hover{background:var(--accent)}.data-table .loan-details strong{font-size:11px;font-weight:500;display:block}.data-table .loan-details span{font-size:10px;color:var(--muted-foreground)}.case-link{font-family:var(--font-mono);font-size:10px;font-weight:600;text-decoration:underline;text-underline-offset:3px}.table-foot{padding:12px 15px;border-top:1px solid var(--border);font-size:10px;color:var(--muted-foreground)}.finding-note{display:flex;gap:5px;font-size:10px;color:var(--high-text)}.agent-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;margin-bottom:28px}.agent-card{padding:23px;border:1px solid var(--border);background:var(--card);border-radius:16px}.agent-card.selected{border-color:var(--primary)}.agent-card-header{display:flex;justify-content:space-between;align-items:center;gap:8px}.agent-select{height:auto;justify-content:flex-start;padding:0;font-weight:600;text-align:left;white-space:normal}.trust-score{font-size:36px;font-weight:700;margin-top:20px;line-height:1.2}.trust-label{font-size:10px;color:var(--muted-foreground)}.licence-ladder{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin:19px 0 22px}.ladder-step{text-align:center;font-size:9px;color:var(--muted-foreground)}.ladder-step::before{content:'';display:block;height:5px;border-radius:4px;background:var(--muted);margin-bottom:6px}.ladder-step.filled::before{background:var(--tone-accent)}.agent-metrics{display:grid;grid-template-columns:1fr auto;gap:10px;font-size:10px}.agent-metrics dt{color:var(--muted-foreground)}.agent-metrics dd{font-weight:500;margin:0;text-align:right}.agent-card>.pill{margin-top:12px}.agent-card>.promote-button{width:100%;margin-top:18px;font-size:11px}.agent-detail-columns{display:grid;grid-template-columns:1.4fr 1fr;gap:25px}.history-list{background:var(--card);border:1px solid var(--border);border-radius:12px;overflow:hidden}.history-item{display:flex;gap:12px;padding:17px;border-bottom:1px solid var(--border);font-size:11px}.history-item:last-child{border:0}.score-change{font-family:var(--font-mono);font-size:16px;color:var(--critical-text);min-width:32px}.score-change.unchanged{color:var(--muted-foreground)}.history-item .muted{font-size:10px;margin-top:4px}.improvement-strip{display:grid;grid-template-columns:repeat(4,1fr);gap:25px;padding:24px 0 28px;margin-bottom:25px;border-bottom:1px solid var(--border)}.improvement-step{display:flex;gap:10px}.improvement-step>span{background:var(--card);border:1px solid var(--border);height:27px;width:27px;flex-shrink:0;border-radius:50%;display:grid;place-items:center;font-family:var(--font-mono);font-size:10px}.improvement-step strong{font-size:12px}.improvement-step p{font-size:10px;color:var(--muted-foreground);margin-top:4px}.suggestion-card{padding:23px;background:var(--card);border:1px solid var(--border);border-radius:16px;margin-bottom:18px}.suggestion-header{display:flex;gap:10px;align-items:center;flex-wrap:wrap;margin-bottom:20px}.suggestion-header>.muted{margin-left:auto;font-size:11px}.definition-list{display:grid;grid-template-columns:105px 1fr;gap:12px;font-size:12px}.definition-list dt{color:var(--muted-foreground)}.definition-list dd{margin:0}.case-links{display:flex;gap:8px;flex-wrap:wrap}.suggestion-card>button{margin-top:20px;font-size:11px}
+.privacy-bar{display:flex;align-items:center;gap:10px;background:var(--muted);padding:12px;border-radius:8px;font-size:10px;margin-bottom:22px}.privacy-bar span{flex:1}.privacy-bar svg{flex-shrink:0}.privacy-bar button{font-size:10px;height:auto;min-height:30px;white-space:normal}.form-sections{display:grid;grid-template-columns:1fr 1fr;gap:16px}.readonly-form{border:1px solid var(--border);border-radius:9px;padding:16px}.readonly-form h3{display:flex;gap:7px;align-items:center;margin-bottom:12px;font-size:12px}.readonly-form dl{display:grid;grid-template-columns:1fr 1fr;gap:11px;font-size:10px}.readonly-form dt{color:var(--muted-foreground)}.readonly-form dd{margin:0;text-align:right;overflow-wrap:anywhere}.customer-quote{border-left:3px solid var(--ai-text);background:var(--ai-bg);padding:15px;font-size:12px;margin-top:15px}.document-grid{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:14px}.document-tile{min-width:0}.paper-preview{height:185px;width:100%;overflow:hidden;position:relative;background:var(--card);border:1px solid var(--border);box-shadow:var(--paper-shadow);padding:14px;display:block;white-space:normal;border-radius:3px;text-align:left;align-items:flex-start}.paper-preview::after{content:'';position:absolute;inset:auto 0 0;height:60px;background:linear-gradient(transparent,var(--card));pointer-events:none}.paper-content{font-family:var(--font-mono);font-size:9px;white-space:pre-wrap;overflow-wrap:anywhere}.paper-content table{width:100%;font-size:inherit;border-collapse:collapse}.paper-content td{padding:7px 3px;border-bottom:1px solid var(--border)}.document-title{display:flex;gap:7px;align-items:center;font-size:10px;margin:12px 0 3px}.document-tile>.enlarge{font-size:10px;padding:0;height:26px;color:var(--muted-foreground)}.document-lightbox{max-width:800px;max-height:88vh;overflow:auto;background:var(--card)}.document-lightbox .paper-content{font-size:12px;line-height:1.9;margin-top:12px}.document-note{margin-top:20px;font-size:10px;color:var(--muted-foreground)}.checkbox-line{display:flex;align-items:center;gap:8px;font-size:12px;font-weight:400}.timeline{margin-top:20px}.timeline-group{border:1px solid var(--border);border-radius:9px;overflow:hidden;margin-bottom:14px}.timeline-group h3{font-size:11px;padding:12px 15px;background:var(--muted);display:flex;align-items:center;gap:8px}.timeline-event{display:flex;gap:10px;padding:15px;font-size:11px;border-top:1px solid var(--border)}.timeline-event.flagged-event{background:var(--critical-bg)}.event-icon{width:22px;height:22px;border-radius:50%;display:grid;place-items:center;background:var(--tone-bg);color:var(--tone-text);flex-shrink:0}.timeline-event-content{flex:1;min-width:0}.timeline-event-content p{font-size:10px;color:var(--muted-foreground)}.event-facts{display:grid;grid-template-columns:1fr 1fr;font-size:10px;gap:5px;margin-top:9px}.event-facts dt{color:var(--muted-foreground)}.event-facts dd{margin:0;overflow-wrap:anywhere}.event-meta{text-align:right;font-family:var(--font-mono);font-size:9px;color:var(--muted-foreground)}.event-meta span{display:block}.event-finding{color:var(--critical-text);margin-top:8px;font-size:10px}
+.wizard{max-width:860px;margin:0 auto}.synthetic-banner{display:flex;gap:10px;align-items:center;padding:14px;background:var(--high-bg);color:var(--high-text);border-radius:8px;font-size:11px;margin-bottom:24px}.wizard-steps{display:grid;grid-template-columns:repeat(6,1fr);gap:9px;padding:0 0 25px}.wizard-step{display:flex;flex-direction:column;align-items:center;gap:7px;text-align:center;font-size:10px;color:var(--muted-foreground)}.wizard-step span{height:28px;width:28px;display:grid;place-items:center;background:var(--card);border:1px solid var(--border);border-radius:50%;font-family:var(--font-mono);font-size:10px}.wizard-step.current{color:var(--foreground)}.wizard-step.current span{background:var(--primary);color:var(--primary-foreground);border-color:var(--primary)}.wizard-step.complete span{background:var(--success-bg);color:var(--success-text)}.wizard-fields{border-top:1px solid var(--border);padding:25px 0}.wizard-fields h2{margin-bottom:20px}.fields-grid{display:grid;grid-template-columns:1fr 1fr;gap:20px}.field{display:flex;flex-direction:column;gap:7px;font-size:12px}.field input,.field textarea{background:var(--card);font-size:12px}.field small{font-size:10px;color:var(--muted-foreground);font-weight:400}.field.full-width{grid-column:1/-1}.wizard-footer{display:flex;align-items:center;justify-content:space-between;gap:15px;padding:20px 0;border-top:1px solid var(--border)}.wizard-footer .muted{font-size:11px}.review-form dl{display:grid;grid-template-columns:1fr 1fr;gap:12px;font-size:12px}.review-form dt{color:var(--muted-foreground);text-transform:capitalize}.review-form dd{margin:0;overflow-wrap:anywhere}.gentle-pulse{animation:pulse 2.4s ease-in-out infinite}.spin{animation:spin 1.5s linear infinite}@keyframes pulse{50%{opacity:.55}}@keyframes spin{to{transform:rotate(360deg)}}@media(prefers-reduced-motion:reduce){*,*::before,*::after{animation:none!important;transition:none!important}}
+@media(min-width:1450px){.queue-layout{grid-template-columns:290px minmax(0,1fr)}.stat-card{min-height:196px}.case-body{padding:28px}.case-title{font-size:19px}}
+@media(max-width:1150px){main{padding:27px 24px 35px}.workspace-topbar{padding:0 24px}.stat-card{padding:18px}.stat-held{padding:17px}.stat-grid{gap:12px}.queue-layout{grid-template-columns:235px minmax(0,1fr);gap:16px}.case-header,.case-body{padding:18px}.case-tabs{padding:0 18px;gap:17px}.fact-grid{grid-template-columns:1fr 1fr;gap:13px}.agent-card{padding:17px}.data-table th,.data-table td{padding:13px 10px}.data-table .pill{font-size:9px;white-space:normal}.document-grid{grid-template-columns:1fr}.document-tile{display:grid;grid-template-columns:120px 1fr;column-gap:12px}.paper-preview{grid-row:1/3;height:150px}.document-title{align-self:end}.document-tile>.enlarge{justify-content:flex-start}.improvement-strip{gap:12px}}
+@media(max-width:999px){.sidebar{display:none;top:65px;bottom:0;box-shadow:var(--paper-shadow);overflow:auto}.sidebar.sidebar-open{display:flex}.sidebar>.brand,.sidebar>.prototype{display:none}.sidebar{padding-top:20px}.workspace{margin-left:0}.mobile-header{display:flex;align-items:center;justify-content:space-between;height:65px;background:var(--card);padding:0 24px;border-bottom:1px solid var(--border)}.mobile-header .brand strong{font-size:20px}.mobile-header .brand-symbol{height:32px;width:32px}.workspace-topbar{height:42px}.sidebar-bottom{padding-top:30px}.main-footer{margin:0 24px}.queue-layout{grid-template-columns:270px minmax(0,1fr)}.stat-card{min-height:181px}}
+@media(max-width:700px){main{padding:23px 17px 30px}.mobile-header{padding:0 17px}.workspace-topbar{padding:0 17px;font-size:9px}.workspace-topbar>span{display:none}.workspace-topbar>div{width:100%;justify-content:flex-start}.topbar-divider{margin-left:auto}.page-header{align-items:flex-start;gap:10px}.page-header .eyebrow{font-size:8px;letter-spacing:1px}.page-header p{font-size:11px}.reviewer-label{display:none}.page-header>button{font-size:9px;white-space:normal;height:auto;min-height:36px;padding:8px;max-width:140px}.job-banner{flex-wrap:wrap;font-size:10px;padding:10px;margin-bottom:18px}.job-count{font-size:9px}.stat-grid{grid-template-columns:1fr 1fr;gap:10px;margin-bottom:23px}.stat-card{padding:15px;min-height:155px}.stat-held{padding:14px}.stat-heading{font-size:10px;margin-bottom:12px}.stat-heading svg{width:14px}.stat-value{font-size:32px}.stat-value span{font-size:9px;margin-left:5px}.stat-card .caption{font-size:9px}.stat-card>.progress-track{margin:14px 0 8px}.severity-chips{margin:12px 0 7px}.stat-agents{grid-column:1/-1;min-height:0;display:grid;grid-template-columns:1fr 2fr;column-gap:20px}.stat-agents .stat-heading{grid-column:1;margin:0;align-items:flex-start}.stat-agents .stat-heading svg{display:none}.stat-agents .stat-value{grid-column:1}.agent-mini-list{grid-column:2;grid-row:1/3;margin:0}.agent-mini{font-size:10px}.queue-layout{grid-template-columns:1fr;gap:22px}.held-case-list{display:grid;grid-template-columns:1fr 1fr}.queue-card{min-height:120px;padding:13px}.queue-card.selected{padding:12px}.queue-card-bottom{align-items:flex-start;flex-direction:column;gap:5px}.queue-note{padding:10px 2px}.case-header,.case-body{padding:17px}.case-title{font-size:16px}.case-tabs{gap:18px;padding:0 17px}.case-tab{font-size:10px}.case-id-line{gap:6px}.case-id-line>.mono{flex-basis:100%}.compare-values{gap:6px;grid-template-columns:1fr 15px 1fr}.compare-box{padding:11px;min-height:125px}.compare-box label{font-size:9px}.compare-box span{font-size:9px}.review-actions{display:grid;grid-template-columns:1fr 1fr}.review-actions button:first-child{grid-column:1/-1}.comparison-text{grid-template-columns:1fr}.main-footer{margin:0 17px;flex-wrap:wrap;font-size:8px}.main-footer span{width:100%;margin-left:19px}.connection-state{padding:26px 0;align-items:flex-start;gap:14px}.connection-icon{height:42px;width:42px;border-radius:10px}.connection-icon svg{width:19px}.connection-state h2{font-size:16px}.connection-state p{font-size:11px}.connection-state .eyebrow{font-size:8px;letter-spacing:.8px}.connection-actions{gap:7px}.connection-actions button{font-size:10px;padding:0 10px}.agent-grid{grid-template-columns:1fr}.agent-detail-columns{grid-template-columns:1fr}.improvement-strip{grid-template-columns:1fr 1fr;gap:18px}.suggestion-card{padding:17px}.definition-list{grid-template-columns:80px 1fr;font-size:11px;gap:10px}.suggestion-header>.muted{margin:0;width:100%;font-size:10px}.fields-grid{grid-template-columns:1fr}.field.full-width{grid-column:auto}.wizard-steps{gap:4px}.wizard-step{font-size:8px}.wizard-step span{width:24px;height:24px}.synthetic-banner{align-items:flex-start;font-size:10px}.synthetic-banner svg{flex-shrink:0}.form-sections{grid-template-columns:1fr}.privacy-bar{flex-wrap:wrap}.privacy-bar span{min-width:180px}.privacy-bar button{margin-left:24px}.data-table{display:block}.data-table thead{display:none}.data-table tbody{display:block}.data-table tr{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:17px;border-top:1px solid var(--border)}.data-table tr:first-child{border-top:0}.data-table td{display:block;border:0;padding:0;font-size:10px}.data-table td::before{content:attr(data-label);display:block;font-size:9px;color:var(--muted-foreground);margin-bottom:5px}.table-controls{gap:15px}.search-box{max-width:none}.filter-list{gap:4px}.filter-list button{font-size:9px;padding:0 9px}.data-table .pill{font-size:9px}.event-meta{font-size:8px}.event-facts{grid-template-columns:1fr 1fr}.document-lightbox{width:calc(100% - 24px)}.document-lightbox .paper-content{font-size:10px}}
+.demo-controls a[data-slot="button"],.demo-controls a.w-full{color:var(--primary-foreground)}
 
-  .runbar { display:flex; align-items:center; gap:12px; background:var(--card); border:1px solid var(--line); border-radius:14px; padding:12px 16px; margin-bottom:18px; flex-wrap:wrap; }
-  .runbar select { font:inherit; padding:6px 8px; border-radius:8px; border:1px solid var(--line); background:#fff; }
-  .btn { border:1px solid var(--line); background:#fff; color:var(--ink); padding:8px 14px; border-radius:10px; font-weight:600; }
-  .btn.dark { background:var(--dark); color:#fff; border-color:var(--dark); }
-  .btn.danger { color:var(--red); border-color:var(--red-line); }
-  .btn:disabled { opacity:.45; cursor:not-allowed; }
-  .runmsg { color:var(--muted); font-size:13px; flex:1; min-width:200px; }
-  .runmsg b { color:var(--ink); }
-  .runmsg .err { color:var(--red); }
-  .track { height:6px; border-radius:99px; background:#e9ebef; overflow:hidden; }
-  .track > i { display:block; height:100%; background:var(--green); border-radius:99px; transition:width .4s; }
-  .runbar .track { width:180px; }
-  a.link { color:var(--violet); text-decoration:none; font-weight:500; font-size:13px; }
+/* Agent avatars */
+.agent-avatar{display:inline-flex;align-items:center;gap:.4rem}
+.agent-avatar svg{overflow:visible}
+.agent-avatar .head{fill:var(--card);stroke:currentColor;stroke-width:2}
+.agent-avatar .stroke{stroke:currentColor;stroke-width:2;stroke-linecap:round;fill:none}
+.agent-avatar .eyes circle,.agent-avatar .antenna{fill:currentColor}
+.agent-avatar .crown{fill:oklch(0.8 0.15 85)}
+.agent-avatar .cap{fill:oklch(0.65 0.18 30)}
+.agent-avatar .bot{transform-origin:20px 30px;animation:bob 2.4s ease-in-out infinite}
+.agent-avatar .eyes{transform-origin:20px 22px;animation:blink 4s infinite}
+.lvl-L{color:oklch(0.6 0.15 60)}.lvl-L .bot{animation:wobble 1.6s ease-in-out infinite}
+.lvl-P1{color:oklch(0.6 0.18 25)}
+.lvl-P2{color:oklch(0.55 0.13 160)}.lvl-P2 .bot{animation-duration:1.8s}
+.lvl-FULL{color:oklch(0.5 0.14 250)}.lvl-FULL .antenna{animation:glow 1.5s ease-in-out infinite}
+@keyframes bob{50%{transform:translateY(-2px)}}
+@keyframes wobble{25%{transform:rotate(-6deg)}75%{transform:rotate(6deg)}}
+@keyframes blink{0%,92%,100%{transform:scaleY(1)}96%{transform:scaleY(.1)}}
+@keyframes glow{50%{opacity:.3}}
+@media (prefers-reduced-motion:reduce){.agent-avatar *{animation:none!important}}
 
-  .stats { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px; }
-  .stat { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px 22px; min-height:122px; }
-  .stat.hot { border:2px solid var(--orange-line); }
-  .stat h3 { margin:0 0 6px; font-size:13px; font-weight:600; color:#374151; }
-  .stat.hot h3 { color:var(--amber-ink); }
-  .big { font-size:34px; font-weight:700; letter-spacing:-.02em; line-height:1.1; }
-  .stat.hot .big { color:var(--amber-ink); }
-  .big small { font-size:13px; color:var(--muted); font-weight:500; margin-left:6px; }
-  .stat .track { margin-top:14px; }
-  .chips { display:flex; gap:6px; flex-wrap:wrap; margin-top:12px; }
-  .sev { font-size:12px; padding:2px 10px; border-radius:999px; font-weight:500; white-space:nowrap; }
-  .sev.Critical { background:var(--red-bg); color:var(--red); }
-  .sev.High { background:var(--orange-bg); color:var(--orange); }
-  .sev.Medium { background:var(--blue-bg); color:var(--blue); }
-  .down { color:var(--red); font-size:13px; font-weight:600; margin-top:8px; }
-  .down div + div { margin-top:2px; }
+/* ---- The shadcn/ui pieces the Lovable app used (Button, Input, Dialog, Toaster), as plain CSS ---- */
+*,*::before,*::after{box-sizing:border-box}
+[hidden]{display:none!important}
+.btn{display:inline-flex;align-items:center;justify-content:center;gap:8px;white-space:nowrap;border-radius:6px;font-size:13px;font-weight:500;height:36px;padding:0 16px;border:1px solid transparent;background:var(--primary);color:var(--primary-foreground);cursor:pointer;transition:background .15s,opacity .15s,color .15s;line-height:1;text-decoration:none}
+.btn:hover{opacity:.92}
+.btn:disabled{opacity:.5;pointer-events:none}
+.btn svg{width:16px;height:16px;flex-shrink:0}
+.btn-outline{background:var(--card);border-color:var(--border);color:var(--foreground)}
+.btn-outline:hover{background:var(--accent);opacity:1}
+.btn-ghost{background:transparent;color:inherit}
+.btn-ghost:hover{background:var(--accent);opacity:1}
+.nav-link.nav-active:hover{background:var(--primary)}
+.btn-sm{height:32px;padding:0 12px;font-size:12px}
+.btn-icon{width:36px;padding:0}
+.danger-outline:hover{background:var(--critical-bg)}
+.w-full{width:100%}.mt-2{margin-top:8px}
+.input{display:block;width:100%;height:36px;border:1px solid var(--border);border-radius:6px;padding:4px 12px;font:inherit;font-size:13px;color:var(--foreground);background:var(--card)}
+textarea.input{height:auto;min-height:96px;padding:8px 12px;resize:vertical;line-height:1.5}
+.btn:focus-visible,.input:focus-visible,select:focus-visible,.case-tab:focus-visible,.queue-card:focus-visible,.paper-preview:focus-visible{outline:2px solid var(--ring);outline-offset:2px}
+.dialog-overlay{position:fixed;inset:0;background:var(--overlay);display:grid;place-items:center;z-index:50;padding:16px}
+.dialog-content{background:var(--card);color:var(--foreground);border:1px solid var(--border);border-radius:12px;padding:24px;width:100%;max-width:480px;display:grid;gap:16px;box-shadow:0 20px 50px oklch(.2 .02 264 / .25)}
+.dialog-content h2{font-size:17px}
+.dialog-desc{font-size:13px;color:var(--muted-foreground)}
+.dialog-footer{display:flex;justify-content:flex-end;gap:8px;flex-wrap:wrap}
+.dialog-content.document-lightbox{max-width:800px;display:block}
+.lightbox-head{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.lightbox-head .muted{font-size:11px}
+.lightbox-head .btn{margin-left:auto}
+.toaster{position:fixed;right:16px;bottom:16px;display:grid;gap:8px;z-index:60}
+.toast{background:var(--card);border:1px solid var(--border);border-radius:8px;padding:12px 14px;font-size:12px;box-shadow:0 8px 24px oklch(.2 .01 264 / .12);display:flex;gap:8px;align-items:center;max-width:360px}
+.toast.err{color:var(--critical-text)}
+.toast.ok svg{color:var(--success-text)}
 
-  .review { display:grid; grid-template-columns:300px 1fr; gap:22px; align-items:start; }
-  .review h2, .section h2 { font-size:15px; margin:0 0 12px; }
-  .qitem { width:100%; text-align:left; background:var(--card); border:1px solid var(--line); border-radius:12px; padding:14px 14px 14px 22px; margin-bottom:10px; position:relative; display:flex; align-items:center; gap:10px; }
-  .qitem::before { content:""; position:absolute; left:10px; top:12px; bottom:12px; width:4px; border-radius:4px; background:var(--blue-line); }
-  .qitem.High::before { background:var(--orange-line); }
-  .qitem.Critical::before { background:#ef4444; }
-  .qitem.on { border:2px solid var(--ink); padding:13px 13px 13px 21px; }
-  .qitem .t { font-weight:600; }
-  .qitem .s { font-size:12px; color:var(--muted); }
-  .qitem .sev { margin-left:auto; }
-  .empty { color:var(--muted); background:var(--card); border:1px dashed var(--line); border-radius:12px; padding:20px; text-align:center; }
-
-  .detail { background:var(--card); border:1px solid var(--line); border-radius:18px; padding:26px 26px 22px; min-height:420px; }
-  .dhead { display:flex; align-items:flex-start; gap:12px; }
-  .meta { font-size:12px; color:var(--muted); }
-  .detail h2.title { font-size:22px; margin:6px 0 20px; letter-spacing:-.01em; }
-  .compare { display:grid; grid-template-columns:1fr 32px 1fr; align-items:center; gap:10px; margin-bottom:16px; }
-  .box { border:1px solid var(--line); background:var(--soft); border-radius:14px; padding:16px 18px; }
-  .box.bad { background:var(--red-bg); border-color:var(--red-line); }
-  .box .l { font-size:12.5px; color:#374151; }
-  .box.bad .l, .box.bad .v, .box.bad .x { color:var(--red); }
-  .box .v { font-size:30px; font-weight:700; margin:2px 0; letter-spacing:-.02em; overflow-wrap:anywhere; }
-  .box .x { font-size:12.5px; color:var(--muted); }
-  .arrow { color:#9ca3af; text-align:center; font-size:18px; }
-  .ai { background:var(--violet-bg); border-radius:12px; padding:14px 16px; display:flex; gap:12px; margin-bottom:18px; }
-  .ai .spark { color:var(--violet); font-size:16px; line-height:1.3; }
-  .ai p { margin:0 0 4px; }
-  .ai .act { color:#3730a3; font-weight:600; font-size:13px; }
-  .ai .by { color:var(--muted); font-size:11px; margin-left:6px; font-weight:400; }
-  .where { font-size:12.5px; color:var(--muted); margin-bottom:8px; }
-  .flow { display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:20px; }
-  .step { font-size:12.5px; padding:5px 10px; border-radius:8px; border:1px solid var(--green-line); background:var(--green-bg); color:#15803d; font-weight:500; }
-  .step.bad { border-color:var(--red-line); background:var(--red-bg); color:var(--red); }
-  .step.skip { border-color:var(--line); background:var(--soft); color:#9ca3af; }
-  .step.end { background:var(--dark); color:#fff; border-color:var(--dark); }
-  .step.end.ok { background:var(--green); border-color:var(--green); }
-  .sep { color:#c0c4cc; font-size:12px; }
-  .actions { display:grid; grid-template-columns:1.4fr 1fr 1fr; gap:12px; border-top:1px solid var(--line); padding-top:18px; }
-  .actions .btn { padding:12px; border-radius:12px; }
-  details { margin-top:16px; border-top:1px solid var(--line); padding-top:12px; }
-  summary { cursor:pointer; color:#374151; font-weight:600; font-size:13px; }
-  .vs { display:grid; grid-template-columns:1fr 1fr; gap:12px; margin-top:10px; }
-  .vs div { background:var(--soft); border:1px solid var(--line); border-radius:10px; padding:10px 12px; font-size:13px; }
-  .vs b { display:block; font-size:11.5px; color:var(--muted); text-transform:uppercase; letter-spacing:.04em; margin-bottom:4px; }
-  table.ev { width:100%; border-collapse:collapse; margin-top:10px; font-size:12.5px; }
-  table.ev td { padding:6px 8px; border-top:1px solid var(--line); vertical-align:top; }
-  table.ev td.r { font-weight:600; }
-  .r.fail { color:var(--red); } .r.flag { color:var(--orange); } .r.pass { color:var(--green); }
-
-  .agents { display:grid; grid-template-columns:repeat(3, 1fr); gap:16px; margin-bottom:24px; }
-  .agent { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; }
-  .agent.sel { border:2px solid var(--ink); padding:19px; }
-  .agent h3 { margin:0 0 10px; font-size:15px; display:flex; align-items:center; gap:8px; }
-  .lvl { font-size:12px; font-weight:600; padding:3px 10px; border-radius:999px; margin-left:auto; }
-  .lvl.FULL { background:var(--green-bg); color:#15803d; } .lvl.P2 { background:#ecfccb; color:#3f6212; }
-  .lvl.P1 { background:var(--red-bg); color:var(--red); } .lvl.L { background:#fef9c3; color:#854d0e; }
-  .lvl.SUSPENDED { background:var(--dark); color:#fff; }
-  .kv { display:grid; grid-template-columns:1fr auto; gap:4px 10px; font-size:13px; color:#374151; margin-top:10px; }
-  .kv span:nth-child(even) { font-weight:600; text-align:right; }
-  .agent .row { display:flex; gap:8px; margin-top:14px; }
-  .section { background:var(--card); border:1px solid var(--line); border-radius:16px; padding:20px; margin-bottom:18px; }
-  .sug { border:1px solid var(--line); border-radius:12px; padding:14px 16px; margin-top:10px; }
-  .sug .top { display:flex; gap:8px; align-items:center; flex-wrap:wrap; }
-  .st { font-size:12px; padding:2px 9px; border-radius:999px; font-weight:600; background:#eef0f3; }
-  .st.proposed { background:var(--blue-bg); color:var(--blue); } .st.testing { background:#fef9c3; color:#854d0e; }
-  .st.applied { background:var(--orange-bg); color:var(--orange); } .st.resolved { background:var(--green-bg); color:#15803d; }
-  .st.rejected { background:#f3f4f6; color:var(--muted); }
-  .sug p { margin:6px 0 0; font-size:13px; color:#374151; }
-  .sug .fix { font-weight:600; color:var(--ink); }
-  .sug .res { font-size:12.5px; color:var(--muted); margin-top:6px; }
-  .hist { font-size:13px; }
-  .hist div { display:grid; grid-template-columns:150px 70px 1fr; gap:10px; padding:7px 0; border-top:1px solid var(--line); }
-  .neg { color:var(--red); font-weight:600; } .zero { color:var(--muted); }
-  .twocol { display:grid; grid-template-columns:1.2fr 1fr; gap:18px; }
-  .minis { margin-top:10px; display:grid; gap:6px; }
-  .mini { display:flex; align-items:center; gap:8px; font-size:13px; }
-  .mini .nm { color:#374151; }
-  .mini .sc { margin-left:auto; font-weight:700; }
-  .mini .lvl { margin-left:0; font-size:11px; padding:1px 8px; }
-  .apps { display:grid; grid-template-columns:repeat(auto-fill, minmax(210px, 1fr)); gap:8px; }
-  .app { text-align:left; border:1px solid var(--line); background:#fff; border-radius:10px; padding:10px 12px; display:grid; grid-template-columns:1fr auto; gap:2px 8px; }
-  .app.on { border-color:var(--ink); }
-  .app .id { font-weight:600; font-size:13px; }
-  .app .sub { font-size:12px; color:var(--muted); grid-column:1 / -1; }
-  .stp { font-size:11.5px; padding:1px 8px; border-radius:999px; font-weight:600; align-self:start; white-space:nowrap; }
-  .stp.approved { background:var(--green-bg); color:#15803d; } .stp.declined { background:#f3f4f6; color:#374151; }
-  .stp.referred { background:var(--blue-bg); color:var(--blue); } .stp.held { background:var(--orange-bg); color:var(--orange); }
-  .stp.submitted { background:#f3f4f6; color:var(--muted); } .stp.verifying, .stp.deciding { background:var(--violet-bg); color:var(--violet); }
-  .stp.error { background:var(--red-bg); color:var(--red); }
-  .pulse { animation:pulse 1.2s ease-in-out infinite; } @keyframes pulse { 50% { opacity:.45; } }
-  .okbox { background:var(--green-bg); border:1px solid var(--green-line); border-radius:12px; padding:14px 16px; color:#15803d; margin-bottom:18px; }
-  .okbox b { color:#14532d; }
-  @media (max-width: 900px) {
-    .stats, .agents { grid-template-columns:1fr; } .review, .twocol { grid-template-columns:1fr; }
-    .actions { grid-template-columns:1fr; } .compare { grid-template-columns:1fr; } .arrow { transform:rotate(90deg); }
-  }
+/* ---- small additions for the live data ---- */
+.case-tab{border:0;border-bottom:2px solid transparent;cursor:pointer;font:inherit;font-size:11px;font-weight:500;white-space:nowrap}
+.queue-card{cursor:pointer;font:inherit;color:inherit}
+.data-table tbody tr.click{cursor:pointer}
+.paper-preview{cursor:zoom-in;font:inherit;color:inherit}
+.mc-top{display:flex;flex-wrap:wrap;align-items:center;gap:8px}
+.agent-card{cursor:pointer}
+.case-link{cursor:pointer;background:none;border:0;padding:0;color:inherit}
+.ai-box p{font-size:11px}
+.ai-box .ai-action{display:block;margin-top:8px;font-weight:600}
+.pill .plate{width:15px;height:15px;font-size:11px;border-radius:2px}
+.agent-mini .agent-avatar{gap:5px}
+.stat-heading svg{width:16px;height:16px}
+.sidebar nav button.nav-link{display:flex}
+.history-item p.muted{font-size:10px}
+.fact-tile .probability{margin-top:2px}
+.event-finding{display:flex;gap:5px;align-items:center}
+.timeline-controls{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.timeline-controls .muted{margin-left:auto;font-size:10px}
+.findings .mistake-card .case-link{margin-left:auto}
+.stat-card .caption{margin-top:6px}
+.page-header .btn{flex-shrink:0}
 </style>
+<script>
+  try { if (localStorage.getItem("agentlens-theme") === "dark") document.documentElement.classList.add("dark"); } catch (e) {}
+</script>
 </head>
 <body>
-<header>
-  <div class="bar">
-    <div class="brand">
-      <div class="logo" aria-hidden="true">
-        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6"/><path d="M15 15l5 5"/><circle cx="10.5" cy="10.5" r="1.6" fill="#fff" stroke="none"/></svg>
-      </div>
-      <h1>AgentLens</h1>
-      <span class="pill proto">Prototype · synthetic data</span>
-      <div class="who">Credit reviewer <div class="avatar">CR</div></div>
-    </div>
-    <nav class="tabs">
-      <button class="tab on" data-tab="review">Review <span class="count" id="reviewCount">0</span></button>
-      <button class="tab" data-tab="agents">Agents <span class="count" id="agentCount">3</span></button>
+<div class="app-shell">
+  <header class="mobile-header">
+    <a href="?view=review" class="brand" data-home><span class="brand-symbol" data-icon="search" data-size="20"></span><strong>AgentLens<span class="brand-period">.</span></strong></a>
+    <button class="btn btn-ghost btn-icon" id="menuBtn" aria-label="Open navigation"><span data-icon="menu"></span></button>
+  </header>
+
+  <aside class="sidebar" id="sidebar">
+    <a href="?view=review" class="brand" data-home><span class="brand-symbol" data-icon="search" data-size="23"></span><strong>AgentLens<span class="brand-period">.</span></strong></a>
+    <div class="prototype"><span></span>Prototype · synthetic data</div>
+    <nav aria-label="Main navigation">
+      <div><p class="nav-group">Applications</p><button class="btn btn-ghost nav-link" data-view="review"><span data-icon="list-filter" data-size="18"></span><span>Review queue</span><span class="nav-count queue-count" id="nReview">—</span></button></div>
+      <div><button class="btn btn-ghost nav-link" data-view="applications"><span data-icon="layout-list" data-size="18"></span><span>All applications</span><span class="nav-count" id="nApps">—</span></button></div>
+      <div><button class="btn btn-ghost nav-link" data-view="reviewed"><span data-icon="check-check" data-size="18"></span><span>Reviewed</span><span class="nav-count" id="nReviewed">—</span></button></div>
+      <div><p class="nav-group">Agents</p><button class="btn btn-ghost nav-link" data-view="agents"><span data-icon="bot" data-size="18"></span><span>Agents &amp; licences</span><span class="nav-count" id="nAgents">—</span></button></div>
+      <div><button class="btn btn-ghost nav-link" data-view="improve"><span data-icon="lightbulb" data-size="18"></span><span>Improvements</span><span class="nav-count" id="nSug">—</span></button></div>
     </nav>
+    <div class="sidebar-bottom">
+      <div class="demo-controls">
+        <div class="demo-caption"><span data-icon="radio" data-size="13"></span> DEMO WORKSPACE</div>
+        <a class="btn w-full" href="/bank/form"><span data-icon="plus"></span>New application</a>
+        <div class="batch-selector"><label for="count">Applications</label>
+          <select id="count" data-idle><option value="22">22</option><option value="30" selected>30</option><option value="45">45</option><option value="60">60</option></select><span data-icon="chevron-down" data-size="13"></span></div>
+        <button class="btn btn-outline w-full" id="runBtn" data-idle><span data-icon="play" data-size="14"></span>Run demo batch</button>
+        <button class="btn btn-outline w-full mt-2" id="waitBtn" hidden data-idle>Process waiting</button>
+      </div>
+      <div class="reviewer"><div class="avatar">CR</div><div><strong>Credit reviewer</strong><span>Human oversight</span></div><span data-icon="shield-check"></span></div>
+      <div class="sidebar-footer">
+        <span class="storage-label"><span class="offline-dot" id="dot"></span><span id="storage">Connecting…</span></span>
+        <button class="btn btn-ghost btn-sm" id="themeBtn"><span data-icon="moon" data-size="13"></span><span id="themeLabel">Dark</span></button>
+      </div>
+    </div>
+  </aside>
+
+  <div class="workspace">
+    <div class="workspace-topbar">
+      <span>Credit operations <span class="breadcrumb-slash">/</span> Agent oversight</span>
+      <div><span class="offline-dot" id="topDot"></span><span id="topState">Awaiting connection</span><span class="topbar-divider"></span><span>AU</span><span class="mini-avatar">CR</span></div>
+    </div>
+    <main>
+      <div id="pageHead"></div>
+      <div class="job-banner" id="jobBanner" role="status" aria-live="polite"></div>
+      <div id="view"></div>
+    </main>
+    <footer class="main-footer"><span data-icon="shield-check" data-size="13"></span>AI agents earn the right to work alone<span>AgentLens · Human accountability, by design</span></footer>
   </div>
-</header>
+</div>
 
-<main>
-  <div class="runbar">
-    <button class="btn dark" id="runBtn">Run demo batch</button>
-    <select id="count" aria-label="Number of applications">
-      <option value="23">23 applications</option><option value="30" selected>30 applications</option>
-      <option value="45">45 applications</option><option value="60">60 applications</option>
-    </select>
-    <div class="track" id="runTrack" hidden><i id="runFill" style="width:0"></i></div>
-    <button class="btn" id="waitBtn" hidden data-needs-idle>Process waiting</button>
-    <div class="runmsg" id="runMsg">Submits synthetic loan applications; the bank's agents process them one by one while AgentLens watches.</div>
-    <a class="btn" href="/bank/form">+ New application</a>
+<div class="dialog-overlay" id="modal" hidden>
+  <div class="dialog-content document-lightbox" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="lightbox-head"><span data-icon="file-text"></span><h2 id="modalTitle"></h2><span class="muted" id="modalSub"></span>
+      <button class="btn btn-outline btn-sm" id="modalClose"><span data-icon="x" data-size="14"></span>Close</button></div>
+    <div id="modalBody"></div>
   </div>
-
-  <section id="tab-review">
-    <div class="stats">
-      <div class="stat">
-        <h3>Cleared automatically</h3>
-        <div class="big"><span id="sCleared">0</span><small id="sOf">of 0</small></div>
-        <div class="track"><i id="sClearedBar" style="width:0"></i></div>
-      </div>
-      <div class="stat hot">
-        <h3>Held for you</h3>
-        <div class="big" id="sHeld">0</div>
-        <div class="chips" id="sHeldChips"></div>
-      </div>
-      <div class="stat">
-        <h3>Agents restricted</h3>
-        <div class="big" id="sRestricted">0</div>
-        <div class="minis" id="sAgents"></div>
-      </div>
-    </div>
-
-    <div class="review">
-      <div>
-        <h2>Review queue</h2>
-        <div id="queue"></div>
-      </div>
-      <div class="detail" id="detail">
-        <div class="empty" style="border:0">Select a case from the queue, or submit a <a class="link" href="/bank/form">new application</a>.</div>
-      </div>
-    </div>
-
-    <div class="section" style="margin-top:24px">
-      <h2>All applications <span class="meta" id="appsMeta"></span></h2>
-      <div class="apps" id="apps"></div>
-    </div>
-  </section>
-
-  <section id="tab-agents" hidden>
-    <div class="agents" id="agentCards"></div>
-    <div class="twocol">
-      <div class="section">
-        <h2>Improvement suggestions</h2>
-        <div id="suggestions"></div>
-      </div>
-      <div class="section">
-        <h2>Licence history</h2>
-        <div class="hist" id="history"></div>
-      </div>
-    </div>
-    <div class="section">
-      <h2 id="mistakeTitle">Mistake log</h2>
-      <div id="mistakeLog"></div>
-    </div>
-  </section>
-</main>
+</div>
+<div class="dialog-overlay" id="dlg" hidden></div>
+<div class="toaster" id="toasts" aria-live="polite"></div>
 
 <script>
+// ---------------------------------------------------------------- helpers
 const $ = (id) => document.getElementById(id);
 const esc = (s) => String(s ?? "").replace(/[&<>"']/g, c => ({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c]));
-const money = (n) => n == null ? "" : (n >= 1000 ? `$${(n/1000).toFixed(n % 1000 ? 1 : 0)}k` : `$${n}`);
-const LEVEL = {SUSPENDED:"Suspended", L:"L-plates", P1:"Red P", P2:"Green P", FULL:"Full licence"};
-const AGENT = {intake_agent:"Intake agent", verification_agent:"Verification agent", decision_agent:"Decision agent"};
-let state = {tab:"review", selected:null, overview:null, detailStatus:null, selectedAgent:"verification_agent", explain:{}};
+const money = (n) => n == null ? "" : new Intl.NumberFormat("en-AU", {style:"currency", currency:"AUD", maximumFractionDigits:0}).format(n);
+const kmoney = (n) => n == null ? "" : n >= 1000 ? `$${Number((n / 1000).toFixed(1))}k` : money(n);
+const when = (s) => { if (!s) return "—"; const d = new Date(s); return isNaN(d) ? s : new Intl.DateTimeFormat("en-AU", {day:"numeric", month:"short", hour:"numeric", minute:"2-digit"}).format(d); };
 
-async function api(path, opts={}) {
-  const r = await fetch(path, {headers:{"Content-Type":"application/json"}, ...opts});
+// lucide icons (same set the Lovable app used), inlined so the page works offline
+const ICONS = {
+  "search":'<circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/>',
+  "list-filter":'<path d="M3 6h18"/><path d="M7 12h10"/><path d="M10 18h4"/>',
+  "layout-list":'<rect width="7" height="7" x="3" y="3" rx="1"/><rect width="7" height="7" x="3" y="14" rx="1"/><path d="M14 4h7"/><path d="M14 9h7"/><path d="M14 15h7"/><path d="M14 20h7"/>',
+  "check-check":'<path d="M18 6 7 17l-5-5"/><path d="m22 10-7.5 7.5L13 16"/>',
+  "bot":'<path d="M12 8V4H8"/><rect width="16" height="12" x="4" y="8" rx="2"/><path d="M2 14h2"/><path d="M20 14h2"/><path d="M15 13v2"/><path d="M9 13v2"/>',
+  "lightbulb":'<path d="M15 14c.2-1 .7-1.7 1.5-2.5 1-.9 1.5-2.2 1.5-3.5A6 6 0 0 0 6 8c0 1 .2 2.2 1.5 3.5.7.7 1.3 1.5 1.5 2.5"/><path d="M9 18h6"/><path d="M10 22h4"/>',
+  "plus":'<path d="M5 12h14"/><path d="M12 5v14"/>',
+  "play":'<polygon points="6 3 20 12 6 21 6 3"/>',
+  "chevron-down":'<path d="m6 9 6 6 6-6"/>',
+  "menu":'<line x1="4" x2="20" y1="12" y2="12"/><line x1="4" x2="20" y1="6" y2="6"/><line x1="4" x2="20" y1="18" y2="18"/>',
+  "x":'<path d="M18 6 6 18"/><path d="m6 6 12 12"/>',
+  "radio":'<path d="M4.9 19.1C1 15.2 1 8.8 4.9 4.9"/><path d="M7.8 16.2c-2.3-2.3-2.3-6.1 0-8.5"/><circle cx="12" cy="12" r="2"/><path d="M16.2 7.8c2.3 2.3 2.3 6.1 0 8.5"/><path d="M19.1 4.9C23 8.8 23 15.1 19.1 19"/>',
+  "shield-check":'<path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12 2 2 4-4"/>',
+  "loader":'<path d="M21 12a9 9 0 1 1-6.219-8.56"/>',
+  "check":'<path d="M20 6 9 17l-5-5"/>',
+  "dot":'<circle cx="12" cy="12" r="9" fill="currentColor" stroke="none"/>',
+  "alert":'<path d="m21.73 18-8-14a2 2 0 0 0-3.48 0l-8 14A2 2 0 0 0 4 21h16a2 2 0 0 0 1.73-3"/><path d="M12 9v4"/><path d="M12 17h.01"/>',
+  "sparkles":'<path d="M9.937 15.5A2 2 0 0 0 8.5 14.063l-6.135-1.582a.5.5 0 0 1 0-.962L8.5 9.936A2 2 0 0 0 9.937 8.5l1.582-6.135a.5.5 0 0 1 .963 0L14.063 8.5A2 2 0 0 0 15.5 9.937l6.135 1.581a.5.5 0 0 1 0 .964L15.5 14.063a2 2 0 0 0-1.437 1.437l-1.582 6.135a.5.5 0 0 1-.963 0z"/>',
+  "arrow-left":'<path d="m12 19-7-7 7-7"/><path d="M19 12H5"/>',
+  "arrow-right":'<path d="M5 12h14"/><path d="m12 5 7 7-7 7"/>',
+  "eye":'<path d="M2.062 12.348a1 1 0 0 1 0-.696 10.75 10.75 0 0 1 19.876 0 1 1 0 0 1 0 .696 10.75 10.75 0 0 1-19.876 0"/><circle cx="12" cy="12" r="3"/>',
+  "eye-off":'<path d="M10.733 5.076a10.744 10.744 0 0 1 11.205 6.575 1 1 0 0 1 0 .696 10.747 10.747 0 0 1-1.444 2.49"/><path d="M14.084 14.158a3 3 0 0 1-4.242-4.242"/><path d="M17.479 17.499a10.75 10.75 0 0 1-15.417-5.151 1 1 0 0 1 0-.696 10.75 10.75 0 0 1 4.446-5.143"/><path d="m2 2 20 20"/>',
+  "lock":'<rect width="18" height="11" x="3" y="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/>',
+  "file-text":'<path d="M15 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V7Z"/><path d="M14 2v4a2 2 0 0 0 2 2h4"/><path d="M10 9H8"/><path d="M16 13H8"/><path d="M16 17H8"/>',
+  "maximize":'<polyline points="15 3 21 3 21 9"/><polyline points="9 21 3 21 3 15"/><line x1="21" x2="14" y1="3" y2="10"/><line x1="3" x2="10" y1="21" y2="14"/>',
+  "flag":'<path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" x2="4" y1="22" y2="15"/>',
+  "info":'<circle cx="12" cy="12" r="10"/><path d="M12 16v-4"/><path d="M12 8h.01"/>',
+  "zap":'<path d="M4 14a1 1 0 0 1-.78-1.63l9.9-10.2a.5.5 0 0 1 .86.46l-1.92 6.02A1 1 0 0 0 13 10h7a1 1 0 0 1 .78 1.63l-9.9 10.2a.5.5 0 0 1-.86-.46l1.92-6.02A1 1 0 0 0 11 14z"/>',
+  "rotate":'<path d="M3 12a9 9 0 0 1 9-9 9.75 9.75 0 0 1 6.74 2.74L21 8"/><path d="M21 3v5h-5"/><path d="M21 12a9 9 0 0 1-9 9 9.75 9.75 0 0 1-6.74-2.74L3 16"/><path d="M8 16H3v5"/>',
+  "moon":'<path d="M12 3a6 6 0 0 0 9 9 9 9 0 1 1-9-9Z"/>',
+  "sun":'<circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/>',
+  "circle":'<circle cx="12" cy="12" r="10"/>',
+  "user":'<circle cx="12" cy="8" r="5"/><path d="M20 21a8 8 0 0 0-16 0"/>',
+};
+const icon = (name, size = 16, cls = "") => `<svg class="${cls}" width="${size}" height="${size}" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONS[name] || ""}</svg>`;
+function paintIcons(root = document) { root.querySelectorAll("[data-icon]").forEach(el => { el.outerHTML = icon(el.dataset.icon, Number(el.dataset.size || 16)); }); }
+paintIcons();
+
+// ---------------------------------------------------------------- vocabulary
+const STATUS = {submitted:"Waiting", verifying:"Verifying…", deciding:"Deciding…", approved:"Approved", declined:"Declined",
+                referred:"Referred to a person", held:"Held for review", error:"Error"};
+const STATUS_TONE = {submitted:"neutral", verifying:"ai", deciding:"ai", approved:"success", declined:"neutral", referred:"medium", held:"high", error:"critical"};
+const AGENT = {intake_agent:"Intake agent", verification_agent:"Verification agent", decision_agent:"Decision agent"};
+const WORKING = ["submitted","verifying","deciding"];
+// Licences: L-plates -> Red P -> Green P -> Full licence (there is no suspended level)
+const LEVELS = ["L","P1","P2","FULL"];
+const LV = {L:{name:"L-plates", tone:"medium", plate:"l", letter:"L"}, P1:{name:"Red P", tone:"high", plate:"P1", letter:"P"},
+            P2:{name:"Green P", tone:"ai", plate:"P2", letter:"P"}, FULL:{name:"Full licence", tone:"success"}};
+const LADDER_TONE = {L:"critical", P1:"high", P2:"success", FULL:"success"};
+
+// ---------------------------------------------------------------- primitives (ported from components/agentlens/primitives.tsx)
+const pill = (html, tone = "neutral", extra = "") => `<span class="pill tone-${tone} ${extra}">${html}</span>`;
+const statusPill = (s) => pill(`${s === "approved" ? icon("check", 12) : icon("dot", 7)}${esc(STATUS[s] || s)}`, STATUS_TONE[s] || "neutral",
+                                (s === "verifying" || s === "deciding") ? "gentle-pulse" : "");
+const sevPill = (sev) => pill(esc(sev), String(sev || "").toLowerCase());
+const typeTone = (t) => t === "CRITICAL" ? "critical" : t === "MAJOR" ? "high" : "medium";
+function licence(level, size = 46) {
+  const i = LV[level] || LV.L, eye = level === "L" ? 2.4 : 2;
+  const plate = i.plate ? `<span class="plate plate-${i.plate}">${i.letter}</span>` : icon("check", 11);
+  return `<span class="agent-avatar lvl-${level}" title="${i.name}"><svg viewBox="0 0 40 40" width="${size}" height="${size}" aria-hidden="true"><g class="bot">`
+    + (level === "FULL" ? `<path class="crown" d="M12 9l4 4 4-6 4 6 4-4-1 6H13z"/>` : "")
+    + (level === "L" ? `<rect class="cap" x="13" y="7" width="14" height="6" rx="2"/>` : "")
+    + `<line x1="20" y1="14" x2="20" y2="10" class="stroke"/><circle cx="20" cy="9" r="1.6" class="antenna"/><rect x="9" y="14" width="22" height="17" rx="6" class="head"/>`
+    + `<g class="eyes"><circle cx="16" cy="22" r="${eye}"/><circle cx="24" cy="22" r="${eye}"/></g>`
+    + `<path d="${level === "FULL" || level === "P2" ? "M15.5 26.5q4.5 3 9 0" : "M17 27h6"}" class="stroke"/></g></svg>${pill(plate + i.name, i.tone)}</span>`;
+}
+const bar = (value, tone = "success") => `<div class="progress-track tone-${tone}"><progress max="100" value="${Math.max(0, Math.min(100, value || 0))}"></progress></div>`;
+const probTone = (p) => p >= .7 ? "success" : p >= .4 ? "high" : "critical";
+function probability(p) {
+  if (p == null) return `<span class="muted">n/a</span>`;
+  const v = p > 1 ? p / 100 : p;
+  return `<div class="probability">${bar(v * 100, probTone(v))}<strong>${Math.round(v * 100)}%</strong></div>`;
+}
+const empty = (title, desc = "", action = "") => `<div class="empty-state"><div class="empty-icon">${icon("shield-check", 27)}</div><h3>${title}</h3>${desc ? `<p>${desc}</p>` : ""}${action}</div>`;
+const skeleton = (rows = 3) => `<div class="loading-lines" aria-label="Loading" aria-busy="true">${Array.from({length: rows}, () => `<div class="skeleton-line"></div>`).join("")}</div>`;
+const errorNote = (msg) => `<div class="error-note">${icon("alert", 18)}<span>${esc(msg)}</span></div>`;
+function mistakeCard(m, caseLink = "") {
+  return `<article class="mistake-card"><div class="mc-top">${pill(esc(m.mistake_type), typeTone(m.mistake_type))}<strong>${esc(m.title)}</strong>${caseLink}</div>
+    <p class="muted small">${esc(m.agent_label || AGENT[m.agent_name] || "")} · rule ${esc(m.rule)}${m.earlier_run ? " · earlier run" : ""}${m.resolved ? " · fixed" : ""}</p>
+    <div class="comparison-text"><div class="tinted tone-critical"><label>What the agent concluded</label><p>${esc(m.agent_stated_reasoning)}</p></div>
+      <div class="tinted tone-success"><label>What should have happened</label><p>${esc(m.what_should_have_happened)}</p></div></div>
+    ${m.mistake_reason ? `<p><strong>Why it’s wrong: </strong>${esc(m.mistake_reason)}</p>` : ""}</article>`;
+}
+
+// ---------------------------------------------------------------- toasts + dialogs (replace window.alert / confirm / prompt)
+function toast(msg, kind = "ok") {
+  const el = document.createElement("div");
+  el.className = `toast ${kind}`;
+  el.innerHTML = `${icon(kind === "ok" ? "check" : "alert", 15)}<span>${esc(msg)}</span>`;
+  $("toasts").appendChild(el);
+  setTimeout(() => el.remove(), kind === "ok" ? 3500 : 6000);
+}
+let dlgPending = false;
+function dialog({title, description = "", fields = [], label = "Confirm", danger = false, onConfirm}) {
+  const box = $("dlg");
+  box.innerHTML = `<div class="dialog-content" role="dialog" aria-modal="true" aria-labelledby="dlgTitle">
+    <div><h2 id="dlgTitle">${esc(title)}</h2>${description ? `<p class="dialog-desc" style="margin-top:6px">${esc(description)}</p>` : ""}</div>
+    ${fields.map(f => `<label class="field">${esc(f.label)}${f.textarea
+        ? `<textarea class="input" id="f_${f.id}" rows="4">${esc(f.value || "")}</textarea>`
+        : `<input class="input" id="f_${f.id}" value="${esc(f.value || "")}" placeholder="${esc(f.placeholder || "")}" autocomplete="off">`}${f.help ? `<small>${esc(f.help)}</small>` : ""}</label>`).join("")}
+    <p class="text-destructive small" id="dlgErr" role="alert" style="color:var(--critical-text)" hidden></p>
+    <div class="dialog-footer"><button class="btn btn-outline" id="dlgCancel">Cancel</button>
+      <button class="btn ${danger ? "btn-outline danger-outline" : ""}" id="dlgOk">${esc(label)}</button></div></div>`;
+  box.hidden = false;
+  const ok = $("dlgOk"), inputs = fields.map(f => $(`f_${f.id}`));
+  const check = () => { ok.disabled = dlgPending || fields.some((f, i) => f.required !== false && !inputs[i].value.trim()); };
+  inputs.forEach(i => i.oninput = check); check();
+  (inputs[0] || ok).focus();
+  const close = () => { if (!dlgPending) { box.hidden = true; box.innerHTML = ""; } };
+  $("dlgCancel").onclick = close;
+  box.onclick = (e) => { if (e.target === box) close(); };
+  box.onkeydown = (e) => { if (e.key === "Escape") close(); if (e.key === "Enter" && e.target.tagName === "INPUT" && !ok.disabled) ok.click(); };
+  ok.onclick = async () => {
+    const values = Object.fromEntries(fields.map((f, i) => [f.id, inputs[i].value.trim()]));
+    dlgPending = true; check(); ok.textContent = "Working…"; $("dlgCancel").disabled = true;
+    try { await onConfirm(values); dlgPending = false; close(); toast("Request completed"); }
+    catch (e) { dlgPending = false; $("dlgCancel").disabled = false; ok.textContent = label; check(); $("dlgErr").hidden = false; $("dlgErr").textContent = e.message; }
+    refresh();
+  };
+}
+const dialogOpen = () => !$("dlg").hidden || !$("modal").hidden;
+const lastName = () => { try { return localStorage.getItem("agentlens-reviewer") || ""; } catch (e) { return ""; } };
+const rememberName = (n) => { try { localStorage.setItem("agentlens-reviewer", n); } catch (e) {} };
+
+// ---------------------------------------------------------------- state + api
+const S = {view:"review", o:null, caseId:null, caseTab:"summary", caseStatus:null, caseData:null, appsFilter:"all",
+           search:"", agent:"verification_agent", reveal:{}, explain:{}, showSystem:false, back:null, head:null, sig:null, offline:false};
+
+async function api(path, opts = {}) {
+  let r;
+  try { r = await fetch(path, {headers:{"Content-Type":"application/json"}, cache:"no-store", ...opts}); }
+  catch (e) { throw new Error("Cannot reach the AgentLens API. Check that it is running."); }
   const out = await r.json().catch(() => ({}));
-  if (!r.ok) throw new Error(typeof out.detail === "string" ? out.detail : JSON.stringify(out.detail || out));
+  if (!r.ok) throw new Error(r.status === 409 ? "Busy: wait for the current job to finish" : typeof out.detail === "string" ? out.detail : `The API could not complete this request (${r.status}).`);
   return out;
 }
+const post = (path, body = {}) => api(path, {method:"POST", body:JSON.stringify(body)});
 
-// ---- tabs
-document.querySelectorAll(".tab").forEach(b => b.onclick = () => {
-  state.tab = b.dataset.tab;
-  document.querySelectorAll(".tab").forEach(x => x.classList.toggle("on", x === b));
-  $("tab-review").hidden = state.tab !== "review";
-  $("tab-agents").hidden = state.tab !== "agents";
-  if (state.tab === "agents") loadAgent(state.selectedAgent);
-});
+// ---------------------------------------------------------------- navigation
+function markNav() {
+  const v = S.view === "case" ? (S.back || "applications") : S.view;
+  document.querySelectorAll(".nav-link").forEach(b => b.classList.toggle("nav-active", b.dataset.view === v));
+}
+function go(view) {
+  S.view = view;
+  if (view !== "case") S.back = null;
+  markNav();
+  history.replaceState(null, "", view === "case" ? `?case=${encodeURIComponent(S.caseId)}` : `?view=${view}`);
+  $("sidebar").classList.remove("sidebar-open");
+  S.sig = null; S.head = null;
+  render();
+  window.scrollTo(0, 0);
+}
+document.querySelectorAll(".nav-link").forEach(b => b.onclick = () => go(b.dataset.view));
+document.querySelectorAll("[data-home]").forEach(a => a.onclick = (e) => { e.preventDefault(); go("review"); });
+$("menuBtn").onclick = () => $("sidebar").classList.toggle("sidebar-open");
+function openCase(caseId, from) { S.caseId = caseId; S.caseTab = "summary"; S.caseStatus = null; S.back = from || S.view; go("case"); }
 
-// ---- run bar
-$("runBtn").onclick = async () => {
-  if (!confirm("This clears the demo data in the database and submits a fresh batch of synthetic applications. Continue?")) return;
-  state.selected = null; state.explain = {};
-  try { await api("/api/jobs/batch", {method:"POST", body:JSON.stringify({count:Number($("count").value)})}); }
-  catch (e) { alert(e.message); }
-  refresh();
+// theme
+function paintTheme() { const dark = document.documentElement.classList.contains("dark"); $("themeLabel").textContent = dark ? "Light" : "Dark"; }
+$("themeBtn").onclick = () => {
+  const dark = document.documentElement.classList.toggle("dark");
+  try { localStorage.setItem("agentlens-theme", dark ? "dark" : "light"); } catch (e) {}
+  paintTheme();
 };
+paintTheme();
 
-function renderJob(job) {
-  const busy = job.running;
-  $("runBtn").disabled = busy;
-  document.querySelectorAll("[data-needs-idle]").forEach(b => b.disabled = busy);
-  $("runTrack").hidden = !(busy && job.total);
-  if (job.total) $("runFill").style.width = `${Math.round(100 * job.done / job.total)}%`;
-  if (job.error) $("runMsg").innerHTML = `<span class="err">${esc(job.error)}</span>`;
-  else if (job.message) $("runMsg").innerHTML = busy ? `<b>${esc(job.message)}</b>` : esc(job.message);
+// ---------------------------------------------------------------- shell
+function setHead(title, description, action = "") {
+  const key = title + "|" + description + "|" + action;
+  if (S.head === key) return;
+  S.head = key;
+  $("pageHead").innerHTML = `<div class="page-header"><div><div class="eyebrow">HUMAN OVERSIGHT, BUILT IN</div><h1>${title}</h1><p>${description}</p></div>
+    ${action || `<div class="reviewer-label">${icon("shield-check", 15)}Credit reviewer</div>`}</div>`;
+  wireHeadActions();
+}
+function wireHeadActions() {
+  const inc = $("incident");
+  if (inc) inc.onclick = () => dialog({title:"Simulate a critical incident?",
+    description:"The decision agent approves a loan despite a failed credit check (LOAN-0047). AgentLens should catch it, hold the case and send the agent straight back to L-plates.",
+    label:"Run the incident", danger:true, onConfirm:() => post("/api/jobs/incident")});
+  idle(S.o?.job.running);
+}
+function idle(busy) { document.querySelectorAll("[data-idle]").forEach(b => b.disabled = !!busy); }
+
+function renderChrome(o) {
+  const s = o.stats, j = o.job;
+  $("nReview").textContent = s.held; $("nApps").textContent = s.total; $("nReviewed").textContent = s.reviewed;
+  $("nAgents").textContent = o.agents.length;
+  $("nSug").textContent = o.suggestions.filter(x => ["proposed","testing"].includes(x.status)).length;
+  $("storage").textContent = o.storage === "supabase" ? "Supabase" : "Local storage";
+  $("dot").className = $("topDot").className = "online-dot";
+  $("topState").textContent = "Live monitoring";
+  $("waitBtn").hidden = !s.waiting; $("waitBtn").textContent = `Process waiting (${s.waiting})`;
+  let html;
+  if (j.running) html = `${icon("loader", 15, "spin")}<span>${esc(j.message || "Processing applications…")}</span><span class="job-count">${j.done} / ${j.total}</span>${bar(j.total ? j.done / j.total * 100 : 0)}`;
+  else if (j.error) html = `${pill("Error", "critical")}<span>${esc(j.message || j.error)}</span>`;
+  else if (s.in_progress) html = `${icon("loader", 15, "spin")}<span>The agents are working</span><span class="job-count">${s.in_progress} application${s.in_progress === 1 ? "" : "s"} being processed</span>`;
+  else if (j.message) html = `${icon("check-check", 16, "success-text")}<span>${esc(j.message)}</span>`;
+  else html = `<span class="online-dot"></span><span>AgentLens is monitoring every decision.</span><span class="job-count">Human review stays in control</span>`;
+  $("jobBanner").innerHTML = html;
+  idle(j.running);
+}
+function renderOffline(msg) {
+  $("dot").className = $("topDot").className = "offline-dot";
+  $("storage").textContent = "Not connected"; $("topState").textContent = "Awaiting connection";
+  $("jobBanner").innerHTML = `<span class="offline-dot"></span><span>${esc(msg)}</span>`;
+  if (!S.o) { setHead("AgentLens", "Connecting to your AgentLens API…"); $("view").innerHTML = errorNote(msg); }
 }
 
-// ---- overview
-function renderOverview(o) {
+// ---------------------------------------------------------------- render dispatch
+function render() {
+  if (!S.o) return;
+  ({review:renderReview, applications:renderApplications, reviewed:renderReviewed, agents:renderAgents,
+    improve:renderImprove, case:renderCasePage}[S.view] || renderReview)();
+  idle(S.o.job.running);
+}
+
+// ---------------------------------------------------------------- Review queue
+function statCards(o) {
   const s = o.stats;
-  $("reviewCount").textContent = s.held;
-  $("sCleared").textContent = s.cleared;
-  $("sOf").textContent = `of ${s.total}`;
-  $("sClearedBar").style.width = s.total ? `${Math.round(100 * s.cleared / s.total)}%` : "0";
-  $("sHeld").textContent = s.held;
-  $("sHeldChips").innerHTML = ["Critical","High","Medium"].filter(k => s.held_by_severity[k])
-    .map(k => `<span class="sev ${k}">${s.held_by_severity[k]} ${k.toLowerCase()}</span>`).join("");
-  const restricted = o.agents.filter(a => a.level !== "FULL");
-  $("sRestricted").textContent = restricted.length;
-  $("sAgents").innerHTML = o.agents.map(a => `<div class="mini"><span class="nm">${esc(a.label)}</span>
-      <span class="lvl ${a.level}">${a.level === "FULL" ? "" : "↓ "}${esc(LEVEL[a.level])}</span><span class="sc">${a.trust_score}</span></div>`).join("");
-
-  const waiting = s.waiting;
-  $("waitBtn").hidden = !waiting;
-  $("waitBtn").textContent = `Process waiting (${waiting})`;
-  $("appsMeta").textContent = s.total ? `· ${s.total} total · ${s.processed} processed` : "";
-  const STATUS = {submitted:"Waiting", verifying:"Verifying…", deciding:"Deciding…", approved:"Approved",
-                  declined:"Declined", referred:"Referred", held:"Held", error:"Error"};
-  $("apps").innerHTML = o.applications.length ? o.applications.map(a => `
-    <button class="app ${a.case_id === state.selected ? "on" : ""}" data-case="${esc(a.case_id)}">
-      <span class="id mono">${esc(a.case_id)}</span>
-      <span class="stp ${esc(a.status)} ${["verifying","deciding"].includes(a.status) || a.live === "running" ? "pulse" : ""}">${esc(STATUS[a.status] || a.status)}</span>
-      <span class="sub">${money(a.amount)} ${esc(a.purpose)}${a.flagged ? " · ⚑ AgentLens flagged" : a.status !== "submitted" && !["verifying","deciding"].includes(a.status) ? " · ✓ no problems" : ""}</span>
-    </button>`).join("") : `<div class="empty">No applications yet.</div>`;
-  $("apps").querySelectorAll(".app").forEach(b => b.onclick = () => { selectCase(b.dataset.case); window.scrollTo({top:0, behavior:"smooth"}); });
-
-  const q = $("queue");
-  if (!o.queue.length) {
-    q.innerHTML = `<div class="empty">${s.total ? "Nothing held. Every case cleared." : "No applications yet. Click <b>Run demo batch</b>."}</div>`;
-  } else {
-    q.innerHTML = o.queue.map(c => `
-      <button class="qitem ${c.severity} ${c.case_id === state.selected ? "on" : ""}" data-case="${esc(c.case_id)}">
-        <div><div class="t">${esc(c.title)}</div><div class="s mono">${esc(c.case_id)} · ${money(c.amount)}</div></div>
-        <span class="sev ${c.severity}">${c.severity}</span>
-      </button>`).join("");
-    q.querySelectorAll(".qitem").forEach(b => b.onclick = () => selectCase(b.dataset.case));
-    if (!state.selected && !o.job.running) selectCase(o.queue[0].case_id);
+  return `<div class="stat-grid">
+    <div class="stat-card"><div class="stat-heading">Processed ${icon("layout-list")}</div>
+      <div class="stat-value">${s.processed}<span>of ${s.total}</span></div>${bar(s.total ? s.processed / s.total * 100 : 0)}
+      <p class="caption">${s.cleared} cleared automatically · ${s.reviewed} reviewed by a person</p></div>
+    <div class="stat-card stat-held"><div class="stat-heading">Held for review ${icon("alert")}</div>
+      <div class="stat-value">${s.held}</div>
+      <div class="severity-chips">${["Critical","High","Medium"].filter(k => s.held_by_severity[k]).map(k => pill(`${s.held_by_severity[k]} ${k.toLowerCase()}`, k.toLowerCase())).join("") || pill("Nothing held", "success")}</div>
+      <p class="caption">Nothing has been sent to these customers yet.</p></div>
+    <div class="stat-card stat-agents"><div class="stat-heading">Agents ${icon("bot")}</div>
+      <div class="stat-value">${o.agents.length}<span>${o.agents.filter(a => a.level !== "FULL").length} learning</span></div>
+      <div class="agent-mini-list">${o.agents.map(a => `<div class="agent-mini">${licence(a.level, 24)}<span class="agent-mini-name">${esc(a.label)}</span><strong>${Math.round(a.trust_score)}</strong></div>`).join("")}</div></div>
+  </div>`;
+}
+function renderReview() {
+  const o = S.o, q = o.queue;
+  setHead("Review queue", "Applications the agents held for a person to check. Nothing was sent to these customers yet.");
+  if (!S.caseId || !q.some(x => x.case_id === S.caseId)) { S.caseId = q[0]?.case_id || null; S.caseStatus = null; }
+  if (!$("reviewLayout")) {
+    $("view").innerHTML = `<div id="reviewStats"></div>
+      <div class="section-heading"><h2>Waiting for you</h2><span id="queueCount"></span></div>
+      <div id="reviewLayout"></div>`;
   }
-  if (state.selected) {
-    const st = o.statuses[state.selected];
-    if (st !== state.detailStatus) selectCase(state.selected, true);
+  $("reviewStats").innerHTML = statCards(o);
+  $("queueCount").textContent = q.length ? `${q.length} held · most serious first` : "";
+  const layout = $("reviewLayout");
+  if (!q.length) {
+    layout.className = ""; layout.innerHTML = o.stats.total
+      ? empty("Nothing to review", "Every decision so far passed the checks.")
+      : empty("No applications yet", "Use Run demo batch or New application in the sidebar to start.");
+    return;
   }
-  renderAgents(o);
+  if (!$("caseHost")) {
+    layout.className = "queue-layout";
+    layout.innerHTML = `<div><div class="held-case-list" id="queueList"></div>
+        <p class="queue-note">${icon("info", 13)}AgentLens holds a case the moment an agent makes a mistake, before the customer is told anything.</p></div>
+      <section class="case-panel" id="caseHost" data-case="" aria-live="polite"></section>`;
+  }
+  $("queueList").innerHTML = q.map(c => `<button class="queue-card tone-${esc(c.severity.toLowerCase())} ${c.case_id === S.caseId ? "selected" : ""}" data-case="${esc(c.case_id)}">
+      <strong>${esc(c.title)}</strong>
+      <div class="queue-card-bottom"><span class="mono">${esc(c.case_id)} · ${kmoney(c.amount)}</span>${sevPill(c.severity)}</div></button>`).join("");
+  document.querySelectorAll(".queue-card").forEach(b => b.onclick = () => { S.caseId = b.dataset.case; S.caseTab = "summary"; S.caseStatus = null; renderReview(); });
+  const host = $("caseHost");
+  if (host.dataset.case !== S.caseId || o.statuses[S.caseId] !== S.caseStatus) { host.dataset.case = S.caseId; loadCase(host); }
 }
 
-// ---- case detail
-async function selectCase(caseId, keep=false) {
-  state.selected = caseId;
-  document.querySelectorAll(".qitem, .app").forEach(b => b.classList.toggle("on", b.dataset.case === caseId));
-  if (!keep) history.replaceState(null, "", `?case=${encodeURIComponent(caseId)}`);
+// ---------------------------------------------------------------- All applications
+const FILTERS = [["all","All", () => true], ["progress","In progress", a => WORKING.includes(a.status)], ["approved","Approved", a => a.status === "approved"],
+                 ["declined","Declined", a => a.status === "declined"], ["referred","Referred", a => a.status === "referred"], ["held","Held", a => a.status === "held"]];
+function renderApplications() {
+  const o = S.o, q = S.search.trim().toUpperCase(), test = FILTERS.find(f => f[0] === S.appsFilter)[2];
+  setHead("All applications", "Every loan application, newest first. Open one to see the form, documents and what the agents did.",
+          `<a class="btn" href="/bank/form">${icon("plus")}New application</a>`);
+  const rows = o.applications.filter(test).filter(a => !q || a.case_id.includes(q));
+  const focused = document.activeElement && document.activeElement.id === "search";
+  $("view").innerHTML = `<div class="table-controls">
+      <div class="filter-list" role="group" aria-label="Filter by status">${FILTERS.map(([k, l, f]) =>
+        `<button class="btn btn-sm ${S.appsFilter === k ? "" : "btn-outline"}" data-f="${k}" aria-pressed="${S.appsFilter === k}">${l} <span>${o.applications.filter(f).length}</span></button>`).join("")}</div>
+      <div class="search-box">${icon("search")}<input class="input" id="search" placeholder="Search case ID…" value="${esc(S.search)}" aria-label="Search case ID"></div></div>
+    ${rows.length ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Loan</th><th>Status</th><th>Approval chance</th><th>Estimated result</th><th>AgentLens</th></tr></thead><tbody>
+      ${rows.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
+        <td data-label="Case"><span class="case-link">${esc(a.case_id)}</span></td>
+        <td data-label="Loan" class="loan-details"><strong>${money(a.amount)}</strong><span>${esc(a.purpose)}${a.term_years ? ` · ${a.term_years} yrs` : ""}</span></td>
+        <td data-label="Status">${statusPill(a.status)}</td>
+        <td data-label="Approval chance">${probability(a.approval_probability)}</td>
+        <td data-label="Estimated result" class="small muted">${esc(a.estimated_timeframe || "—")}</td>
+        <td data-label="AgentLens">${a.flagged ? `<span class="finding-note">${icon("flag", 12)}${esc(a.finding || "Flagged")}</span>`
+          : WORKING.includes(a.status) ? `<span class="muted small">Watching…</span>` : `<span class="small success-text">${icon("check", 12)} No problems</span>`}</td>
+      </tr>`).join("")}</tbody></table><div class="table-foot">Showing ${rows.length} of ${o.applications.length} applications</div></div>`
+      : `<div class="data-table-wrap">${empty(o.applications.length ? "No applications match" : "No applications yet", o.applications.length ? "Try another filter or search." : "They will appear here as the agents process them.")}</div>`}`;
+  document.querySelectorAll("[data-f]").forEach(b => b.onclick = () => { S.appsFilter = b.dataset.f; renderApplications(); });
+  const s = $("search"); s.oninput = () => { S.search = s.value; renderApplications(); };
+  if (focused) { s.focus(); s.setSelectionRange(s.value.length, s.value.length); }
+  wireRows("applications");
+}
+function wireRows(from) {
+  document.querySelectorAll("tr.click").forEach(r => {
+    r.onclick = () => openCase(r.dataset.case, from);
+    r.onkeydown = (e) => { if (e.key === "Enter") openCase(r.dataset.case, from); };
+  });
+}
+
+// ---------------------------------------------------------------- Reviewed
+function renderReviewed() {
+  const rows = S.o.reviewed;
+  setHead("Reviewed", "Applications a person decided after AgentLens held them.");
+  $("view").innerHTML = rows.length ? `<div class="data-table-wrap"><table class="data-table"><thead><tr><th>Case</th><th>Loan</th><th>What AgentLens found</th><th>Outcome</th><th>Reviewed by</th><th>When</th></tr></thead><tbody>
+      ${rows.map(a => `<tr class="click" data-case="${esc(a.case_id)}" tabindex="0">
+        <td data-label="Case"><span class="case-link">${esc(a.case_id)}</span></td>
+        <td data-label="Loan" class="loan-details"><strong>${money(a.amount)}</strong><span>${esc(a.purpose)}</span></td>
+        <td data-label="What AgentLens found">${a.finding ? `<span class="finding-note">${icon("flag", 12)}${esc(a.finding)}</span>` : "—"}</td>
+        <td data-label="Outcome">${statusPill(a.status)}</td>
+        <td data-label="Reviewed by">${esc(a.reviewed_by || "—")}</td>
+        <td data-label="When" class="small muted">${when(a.reviewed_at)}</td></tr>`).join("")}</tbody></table>
+      <div class="table-foot">${rows.length} reviewed application${rows.length === 1 ? "" : "s"}</div></div>`
+    : `<div class="data-table-wrap">${empty("No reviewed applications yet", "Open a case in the Review queue and choose Recalculate, Approve or Decline.")}</div>`;
+  wireRows("reviewed");
+}
+
+// ---------------------------------------------------------------- Case (page + panel)
+function renderCasePage() {
+  const backName = {applications:"All applications", reviewed:"Reviewed", review:"Review queue", agents:"Agents & licences", improve:"Improvements"}[S.back] || "All applications";
+  setHead(`Case ${esc(S.caseId)}`, "The application, its documents and every step the agents took, checked by AgentLens.");
+  if (!$("casePage") || $("caseHost").dataset.case !== S.caseId) {
+    $("view").innerHTML = `<div id="casePage"><a href="#" class="back-link" id="back">${icon("arrow-left", 14)}${esc(backName)}</a>
+      <section class="case-panel" id="caseHost" data-case="${esc(S.caseId)}" aria-live="polite"></section></div>`;
+    $("back").onclick = (e) => { e.preventDefault(); go(S.back || "applications"); };
+    loadCase($("caseHost"));
+  } else if (S.o.statuses[S.caseId] !== S.caseStatus) loadCase($("caseHost"));
+}
+async function loadCase(host) {
+  const id = S.caseId;
+  if (!host.innerHTML.trim()) host.innerHTML = `<div class="case-body">${skeleton(6)}</div>`;
   let d;
-  try { d = await api(`/api/case/${caseId}`); } catch (e) { $("detail").innerHTML = `<div class="empty">${esc(e.message)}</div>`; return; }
-  state.detailStatus = d.status;
-  const m = d.primary;
-  const det = (m && m.details) || {};
-  const held = d.status === "held";
-  const working = ["submitted","verifying","deciding"].includes(d.status);
-  const endLabel = held ? "Held" : working ? "In progress" : (d.status.charAt(0).toUpperCase() + d.status.slice(1));
-  const flow = d.chips.map(c => `<span class="step ${c.state}" title="${esc(c.result || "not reached")}">${c.state === "bad" ? "✕" : c.state === "ok" ? "✓" : "·"} ${esc(c.label)}</span>`)
-    .join('<span class="sep">→</span>') + `<span class="sep">→</span><span class="step end ${held ? "" : "ok"}">${held ? "■" : "✓"} ${esc(endLabel)}</span>`;
-  $("detail").innerHTML = `
-    <div class="dhead">
-      <div class="meta mono">${esc(d.case_id)} · ${esc(d.token)}${m ? " · " + esc(m.agent_label) : ""}</div>
-      ${m ? `<span class="sev ${det.severity}" style="margin-left:auto">${esc(det.severity)}</span>` : ""}
-    </div>
-    <h2 class="title">${m ? esc(det.title) : ["submitted","verifying","deciding"].includes(d.status) ? "Agents are working on this case" : "No problems found"}</h2>
-    ${!m ? (["submitted","verifying","deciding"].includes(d.status)
-        ? `<div class="ai"><div class="spark pulse">✦</div><div><p><b>${d.status === "submitted" ? "Waiting for its turn" : d.status === "verifying" ? "Verification agent is checking the documents" : "Decision agent is deciding"}</b></p><p style="color:var(--muted)">AgentLens checks the event log after each agent, before the customer hears anything.</p></div></div>`
-        : `<div class="okbox"><b>✓ AgentLens checked every step and found nothing wrong.</b><br>${esc(money(d.amount))} ${esc(d.purpose)} loan · outcome <b>${esc(d.decision || d.status)}</b>. This case counts towards the agents' clean record.</div>`) : ""}
-    ${m ? `
-    <div class="compare">
-      <div class="box"><div class="l">${esc(det.left?.label)}</div><div class="v">${esc(det.left?.value)}</div><div class="x">${esc(det.left?.sub)}</div></div>
-      <div class="arrow">→</div>
-      <div class="box bad"><div class="l">${esc(det.right?.label)}</div><div class="v">${esc(det.right?.value)}</div><div class="x">${esc(det.right?.sub)}</div></div>
-    </div>
-    <div class="ai"><div class="spark">✦</div><div id="aiText"><p style="color:var(--muted)">Explaining…</p></div></div>` : ""}
-    <div class="where">${m ? "Where it went wrong" : "Steps"}</div>
-    <div class="flow">${flow}</div>
-    ${held ? `
-    <div class="actions">
-      <button class="btn dark" data-act="recalculate" data-needs-idle>Send back to recalculate</button>
-      <button class="btn" data-act="approve" data-needs-idle>Approve anyway</button>
-      <button class="btn danger" data-act="decline" data-needs-idle>Decline</button>
-    </div>` : ""}
-    ${d.mistakes.length ? `<details ${keep ? "" : ""}><summary>Agent's reasoning vs what should have happened (${d.mistakes.length})</summary>
-      ${d.mistakes.map(x => `<div style="margin-top:12px"><div class="meta">${esc(x.mistake_type)} · ${esc(AGENT[x.agent_name] || x.agent_name)} · rule ${esc(x.rule)}${x.resolved ? " · resolved" : ""}${d.events.some(e => e.event_id === x.event_id) ? "" : " · earlier run"}</div>
-        <div class="vs"><div><b>Agent said</b>${esc(x.agent_stated_reasoning)}</div><div><b>Should have</b>${esc(x.what_should_have_happened)}</div></div>
-        <p style="margin:8px 0 0;font-size:13px">${esc(x.mistake_reason)}</p></div>`).join("")}
-    </details>` : ""}
-    <details><summary>Event log (${d.events.length} steps)</summary>
-      <table class="ev">${d.events.map(e => `<tr><td class="mono">#${e.event_id}</td><td>${esc(AGENT[e.agent_name] || e.agent_name)}</td><td class="mono">${esc(e.step_name)}</td><td class="r ${esc(e.result)}">${esc(e.result)}</td><td>${esc(e.notes)}</td></tr>`).join("")}</table>
-    </details>`;
-  $("detail").querySelectorAll("[data-act]").forEach(b => b.onclick = () => review(d.case_id, b.dataset.act));
-  renderJob(state.overview?.job || {});
+  try { d = await api(`/api/case/${id}`); } catch (e) { host.innerHTML = `<div class="case-body">${errorNote(e.message)}</div>`; return; }
+  if (S.caseId !== id) return;
+  S.caseData = d; S.caseStatus = d.status;
+  renderCase(host, d);
+}
+function renderCase(host, d) {
+  const m = d.primary, det = (m && m.details) || {}, p = d.approval_probability;
+  const tabs = [["summary","Summary"],["form","Application form"],["docs","Documents"],["activity",`Activity (${d.timeline.length})`]];
+  host.innerHTML = `<div class="case-header">
+      <div class="case-id-line"><span class="mono">${esc(d.case_id)} · ${esc(d.token)}${m ? ` · ${esc(m.agent_label)}` : ""}</span>${statusPill(d.status)}${m ? sevPill(det.severity) : ""}</div>
+      <div class="fact-grid">
+        <div class="fact-tile"><label>Loan</label><strong>${money(d.amount)} · ${esc(d.purpose)}</strong><span>${d.term_years ? d.term_years + " years" : "Term not given"}</span></div>
+        <div class="fact-tile"><label>Chance of approval</label>${probability(p)}</div>
+        <div class="fact-tile"><label>Estimated result</label><strong>${esc(d.estimated_timeframe || "—")}</strong><span>${d.status === "approved" || d.status === "declined" ? "Decided" : "By " + when(d.estimated_decision_by)}</span></div>
+        <div class="fact-tile"><label>Submitted</label><strong>${when(d.submitted_at)}</strong>${d.reviewed_by ? `<span>Reviewed by ${esc(d.reviewed_by)}</span>` : ""}</div>
+      </div></div>
+    <div class="case-tabs" role="tablist">${tabs.map(([k, l]) => `<button class="case-tab ${S.caseTab === k ? "active" : ""}" role="tab" aria-selected="${S.caseTab === k}" data-t="${k}">${l}</button>`).join("")}</div>
+    <div class="case-body" id="ctab"></div>`;
+  host.querySelectorAll(".case-tab").forEach(b => b.onclick = () => { S.caseTab = b.dataset.t; renderCase(host, d); });
+  const t = $("ctab");
+  ({summary:caseSummary, form:caseForm, docs:caseDocs, activity:caseActivity}[S.caseTab] || caseSummary)(t, d);
+  idle(S.o.job.running);
+}
+
+function caseSummary(t, d) {
+  const m = d.primary, det = (m && m.details) || {}, held = d.status === "held", working = WORKING.includes(d.status);
+  const chip = (c) => pill(`${c.state === "bad" ? icon("x", 11) : c.state === "ok" ? icon("check", 11) : icon("circle", 9)}${esc(c.label)}`,
+                           c.state === "bad" ? "critical" : c.state === "ok" ? "success" : "neutral");
+  const end = held ? pill(`${icon("flag", 11)}Held`, "high") : working ? pill(`${icon("loader", 11, "spin")}In progress`, "ai")
+                   : pill(`${icon("check", 11)}${esc(STATUS[d.status] || d.status)}`, "success");
+  const dec = d.agent_decision;
+  t.innerHTML = `${m ? `<h2 class="case-title">${esc(det.title)}</h2>
+      <div class="compare-values">
+        <div class="compare-box"><label>${esc(det.left?.label)}</label><strong>${esc(det.left?.value)}</strong><span>${esc(det.left?.sub)}</span></div>
+        ${icon("arrow-right", 20)}
+        <div class="compare-box tone-critical"><label>${esc(det.right?.label)}</label><strong>${esc(det.right?.value)}</strong><span>${esc(det.right?.sub)}</span></div>
+      </div>
+      <div class="ai-box">${icon("sparkles")}<div id="aiText"><p>Explaining what went wrong…</p></div></div>`
+    : working ? `<h2 class="case-title">The agents are working on this case</h2>
+      <div class="ai-box">${icon("loader", 16, "spin")}<div><p><strong style="margin:0">${d.status === "submitted" ? "Waiting for its turn" : d.status === "verifying" ? "The verification agent is checking the documents" : "The decision agent is deciding"}</strong></p>
+        <p>AgentLens checks every step after each agent, before the customer hears anything.</p></div></div>`
+    : `<h2 class="case-title">No problems found</h2>
+      <div class="clear-box">${icon("check-check", 18)}<div><strong>AgentLens checked every step and found nothing wrong.</strong> Outcome: <strong>${esc(STATUS[d.status] || d.status)}</strong>. This case counts towards the agents’ clean record.</div></div>`}
+    <div class="steps-section"><h3>${m ? "Where it went wrong" : "Steps"}</h3>
+      <div class="step-chips">${d.chips.map(chip).join(`<span class="step-arrow">→</span>`)}<span class="step-arrow">→</span>${end}</div></div>
+    ${held ? `<div class="review-actions">
+      <button class="btn" data-act="recalculate" data-idle>${icon("rotate", 14)}Send back to recalculate</button>
+      <button class="btn btn-outline" data-act="approve" data-idle>${icon("check", 14)}Approve anyway</button>
+      <button class="btn btn-outline danger-outline" data-act="decline" data-idle>${icon("x", 14)}Decline</button></div>` : ""}
+    ${dec ? `<div class="reasoning"><h3>Decision agent’s reasoning</h3>
+      <div class="step-chips">${statusPill(dec.decision === "refer_to_human" ? "referred" : dec.decision)}${pill(dec.confidence == null ? "Rules (AI offline)" : `Confidence ${dec.confidence}%`, "neutral")}${dec.borderline ? pill("Borderline", "medium") : ""}</div>
+      <p>${esc(dec.reasoning)}</p>
+      <p>Hard rules said: <strong>${esc(String(dec.rules_decision || "").replace(/_/g, " "))}</strong>. ${esc(dec.note || "")}</p></div>` : ""}
+    ${d.mistakes.length ? `<div class="findings"><h3>What AgentLens found (${d.mistakes.length})</h3>${d.mistakes.map(x => mistakeCard(x)).join("")}</div>` : ""}`;
+  t.querySelectorAll("[data-act]").forEach(b => b.onclick = () => review(d.case_id, b.dataset.act));
   if (m) loadExplain(d.case_id);
 }
-
-async function loadExplain(caseId) {
-  if (!state.explain[caseId]) state.explain[caseId] = api(`/api/case/${caseId}/explain`).catch(() => null);
-  const x = await state.explain[caseId];
-  if (state.selected !== caseId || !$("aiText")) return;
-  $("aiText").innerHTML = x ? `<p>${esc(x.explanation)}<span class="by">${x.by === "ai" ? "AI explanation" : "rule-based"}</span></p>${x.action ? `<div class="act">→ ${esc(x.action)}</div>` : ""}` : "";
+async function loadExplain(id) {
+  if (!S.explain[id]) S.explain[id] = api(`/api/case/${id}/explain`).catch(() => null);
+  const x = await S.explain[id];
+  if (!$("aiText") || S.caseId !== id) return;
+  $("aiText").innerHTML = x ? `<p>${esc(x.explanation)}</p>${x.action ? `<span class="ai-action">→ ${esc(x.action)}</span>` : ""}<span class="ai-tag">${x.by === "ai" ? "AI explanation" : "Rule-based explanation"}</span>` : "";
+}
+function review(id, action) {
+  const text = {recalculate:["Send back to recalculate?", "The case goes back to the agents with the mistake corrected.", "Send back"],
+                approve:["Approve anyway?", "The loan is approved despite what AgentLens found. Your name is recorded on the case.", "Approve"],
+                decline:["Decline this application?", "The customer is told the application was declined. Your name is recorded on the case.", "Decline"]}[action];
+  dialog({title:`${id}: ${text[0]}`, description:text[1], label:text[2], danger:action === "decline",
+    fields:[{id:"name", label:"Your name", value:lastName(), placeholder:"Full name", help:"Every human decision is recorded with a name."}],
+    onConfirm:async ({name}) => { rememberName(name); await post(`/api/jobs/review/${id}`, {action, reviewer:name}); S.explain[id] = null; S.caseStatus = null; }});
 }
 
-async function review(caseId, action) {
-  const label = {recalculate:"send back to recalculate", approve:"approve anyway", decline:"decline"}[action];
-  if (!confirm(`${caseId}: ${label}?`)) return;
-  try { await api(`/api/jobs/review/${caseId}`, {method:"POST", body:JSON.stringify({action, reviewer:"Credit reviewer"})}); state.explain[caseId] = null; }
-  catch (e) { alert(e.message); }
-  refresh();
+function privacyBar(id) {
+  const on = S.reveal[id];
+  return `<div class="privacy-bar">${icon(on ? "eye" : "lock")}<span>${on ? "Personal details are showing. This view was logged in the audit trail." : "Personal details are hidden. The AI agents never see them either."}</span>
+    <button class="btn btn-outline btn-sm" id="revealBtn">${icon(on ? "eye-off" : "eye", 14)}${on ? "Hide personal details" : "Show personal details"}</button></div>`;
+}
+function wireReveal(id, rerender) {
+  $("revealBtn").onclick = () => {
+    if (S.reveal[id]) { S.reveal[id] = false; rerender(); return; }
+    dialog({title:"Show personal details?", description:`This shows the customer's name, date of birth, address and account for ${id}. Every view is logged in the audit trail.`,
+            label:"Show details", onConfirm:async () => { S.reveal[id] = true; rerender(); }});
+  };
+}
+async function caseForm(t, d) {
+  t.innerHTML = skeleton(5);
+  let f;
+  try { f = await api(`/bank/applications/${d.case_id}/form?reveal=${!!S.reveal[d.case_id]}`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
+  if (S.caseTab !== "form" || S.caseId !== d.case_id) return;
+  t.innerHTML = privacyBar(d.case_id) + `<div class="form-sections">${f.sections.map(s => `<section class="readonly-form"><h3>${s.private ? icon("lock", 13) : ""}${esc(s.title)}</h3>
+      <dl>${s.fields.filter(x => x[1] != null).map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl></section>`).join("")}</div>
+    <div class="steps-section" style="padding-bottom:0"><h3>In the customer’s own words</h3></div><blockquote class="customer-quote" style="margin:0">${esc(f.message)}</blockquote>`;
+  wireReveal(d.case_id, () => caseForm(t, d));
+}
+async function caseDocs(t, d) {
+  t.innerHTML = skeleton(4);
+  let r;
+  try { r = await api(`/bank/applications/${d.case_id}/documents?reveal=${!!S.reveal[d.case_id]}`); } catch (e) { t.innerHTML = errorNote(e.message); return; }
+  if (S.caseTab !== "docs" || S.caseId !== d.case_id) return;
+  const docs = Object.entries(r.documents);
+  const body = (doc) => doc.kind === "table"
+    ? `<div class="paper-content"><strong>${esc(doc.title)}</strong><div class="muted">${esc(doc.source || "")}</div><table>${doc.rows.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join("")}</table></div>`
+    : `<div class="paper-content">${esc(doc.text)}</div>`;
+  t.innerHTML = privacyBar(d.case_id) + `<div class="document-grid">${docs.map(([k, doc]) => `<div class="document-tile">
+      <button class="paper-preview" data-doc="${k}" aria-label="Open ${esc(doc.title)}">${body(doc)}</button>
+      <div class="document-title">${icon("file-text", 14)}<strong>${esc(doc.title)}</strong></div>
+      <button class="btn btn-ghost btn-sm enlarge" data-doc="${k}">${icon("maximize", 13)}Enlarge</button></div>`).join("")}</div>
+    <p class="document-note">These are the documents attached to the application (synthetic). The verification agent’s AI only ever reads them with personal details hidden.</p>`;
+  t.querySelectorAll("[data-doc]").forEach(b => b.onclick = () => {
+    const doc = r.documents[b.dataset.doc];
+    $("modalTitle").textContent = doc.title;
+    $("modalSub").textContent = `${d.case_id} · ${S.reveal[d.case_id] ? "personal details showing" : "personal details hidden"}`;
+    $("modalBody").innerHTML = body(doc);
+    $("modal").hidden = false; $("modalClose").focus();
+  });
+  wireReveal(d.case_id, () => caseDocs(t, d));
+}
+$("modalClose").onclick = () => $("modal").hidden = true;
+$("modal").onclick = (e) => { if (e.target === $("modal")) $("modal").hidden = true; };
+document.addEventListener("keydown", (e) => { if (e.key === "Escape") $("modal").hidden = true; });
+
+function caseActivity(t, d) {
+  const wrong = new Map(d.mistakes.filter(x => !x.earlier_run).map(x => [x.event_id, x]));
+  const evs = d.timeline.filter(e => S.showSystem || !e.system);
+  const groups = [];
+  for (const e of evs) {
+    const last = groups[groups.length - 1];
+    if (last && last.label === e.agent_label) last.items.push(e); else groups.push({label:e.agent_label, items:[e]});
+  }
+  const ev = (e) => {
+    const mk = wrong.get(e.event_id), tone = e.result === "pass" ? "success" : e.result === "fail" ? "critical" : "high";
+    return `<div class="timeline-event ${mk ? "flagged-event" : ""}">
+      <span class="event-icon tone-${tone}">${icon(e.result === "pass" ? "check" : e.result === "fail" ? "x" : "alert", 12)}</span>
+      <div class="timeline-event-content"><strong>${esc(e.title)}</strong>${e.note && e.note !== e.title ? `<p>${esc(e.note)}</p>` : ""}
+        ${e.facts.length ? `<dl class="event-facts">${e.facts.map(([k, v]) => `<dt>${esc(k)}</dt><dd>${esc(v)}</dd>`).join("")}</dl>` : ""}
+        ${mk ? `<div class="event-finding">${icon("flag", 12)}AgentLens: ${esc(mk.title)} (${esc(mk.mistake_type)})</div>` : ""}</div>
+      <div class="event-meta"><span>#${e.event_id}</span><span>${when(e.time)}</span></div></div>`;
+  };
+  t.innerHTML = `<div class="timeline-controls"><label class="checkbox-line"><input type="checkbox" id="sys" ${S.showSystem ? "checked" : ""}> Show system steps (tickets, handoffs)</label>
+      <span class="muted">${d.timeline.length} steps in the event log</span></div>
+    <div class="timeline">${groups.map(g => `<section class="timeline-group"><h3>${icon("bot", 14)}${esc(g.label)}<span class="muted" style="margin-left:auto;font-weight:400">${g.items.length} step${g.items.length === 1 ? "" : "s"}</span></h3>
+      ${g.items.map(ev).join("")}</section>`).join("") || empty("No events yet")}</div>`;
+  $("sys").onchange = (e) => { S.showSystem = e.target.checked; caseActivity(t, d); };
 }
 
-// ---- agents tab
-function renderAgents(o) {
-  $("agentCount").textContent = o.agents.length;
-  $("agentCards").innerHTML = o.agents.map(a => `
-    <div class="agent ${a.agent_name === state.selectedAgent ? "sel" : ""}" data-agent="${esc(a.agent_name)}">
-      <h3>${esc(a.label)} <span class="lvl ${a.level}">${esc(LEVEL[a.level])}</span></h3>
-      <div class="big">${a.trust_score}<small>trust score</small></div>
-      <div class="kv">
-        <span>Mistake rate (last ${a.recent_cases.length} cases)</span><span>${Math.round(a.mistake_rate * 100)}%</span>
-        <span>A person checks</span><span>${Math.round(a.human_review_rate * 100)}% of cases</span>
-        <span>Cases at this level</span><span>${a.cases_at_level}${a.level !== "FULL" ? ` / ${a.cases_needed_to_promote}` : ""}</span>
-        <span>Open mistakes</span><span>${a.open_mistakes}</span>
-        ${a.fast_track ? `<span>Fast-tracked</span><span>yes</span>` : ""}
-      </div>
-      <div class="row">
-        ${a.level !== "FULL" ? `<button class="btn" data-promote="${esc(a.agent_name)}" data-needs-idle>Promote…</button>` : ""}
-        <button class="btn" data-show="${esc(a.agent_name)}">Mistakes</button>
-      </div>
-    </div>`).join("");
-  $("agentCards").querySelectorAll("[data-promote]").forEach(b => b.onclick = (ev) => { ev.stopPropagation(); promote(b.dataset.promote); });
-  $("agentCards").querySelectorAll(".agent").forEach(c => c.onclick = () => { state.selectedAgent = c.dataset.agent; loadAgent(c.dataset.agent); renderAgents(state.overview); });
-
-  $("suggestions").innerHTML = o.suggestions.length ? o.suggestions.map(s => {
-    const vr = s.verify_result;
-    return `<div class="sug">
-      <div class="top"><b>#${s.id}</b><span class="st ${s.status}">${esc(s.status)}</span>
-        <span class="meta">${esc(AGENT[s.agent_name] || s.agent_name)} · iteration ${s.iteration}${s.parent_id ? ` · from #${s.parent_id}` : ""}</span>
-        <span style="margin-left:auto;display:flex;gap:6px">
-          ${s.status === "proposed" ? `<button class="btn" data-apply="${s.id}" data-needs-idle>Apply…</button>` : ""}
-          ${s.status === "testing" ? `<button class="btn dark" data-verify="${s.id}" data-needs-idle>Verify (replay ${s.case_ids.length})</button>` : ""}
-        </span></div>
-      <p><b>Pattern:</b> ${esc(s.pattern_description)}</p>
-      <p><b>Root cause:</b> ${esc(s.root_cause)}</p>
-      <p><b>Fix:</b> <span class="fix">${esc(s.fix_description || s.suggested_fix)}</span>${s.applied_by ? ` <span class="meta">(applied by ${esc(s.applied_by)})</span>` : ""}</p>
-      <div class="res mono">cases: ${esc((s.case_ids || []).join(", "))}${vr ? ` · passed ${vr.passed.length}/${vr.replayed}${vr.failed.length ? ` · still failing: ${esc(vr.failed.join(", "))}` : ""}` : ""}</div>
-    </div>`; }).join("") : `<div class="empty">No patterns yet. A suggestion appears when an agent makes the same mistake on 3 different cases.</div>`;
-  $("suggestions").querySelectorAll("[data-apply]").forEach(b => b.onclick = () => applyFix(b.dataset.apply));
-  $("suggestions").querySelectorAll("[data-verify]").forEach(b => b.onclick = () => verifyFix(b.dataset.verify));
-
-  $("history").innerHTML = o.history.length ? o.history.map(h => `<div>
-      <span>${esc(AGENT[h.agent_name] || h.agent_name)}</span>
-      <span class="${h.score_change < 0 ? "neg" : "zero"}">${h.score_change > 0 ? "+" : ""}${h.score_change} → ${h.new_score}</span>
-      <span>${esc(h.reason)} <span class="meta">${esc(LEVEL[h.new_level] || h.new_level)}${h.case_id ? " · " + esc(h.case_id) : ""}</span></span>
-    </div>`).join("") : `<div class="empty">No changes yet.</div>`;
-  renderJob(o.job);
+// ---------------------------------------------------------------- Agents & licences
+function renderAgents() {
+  const o = S.o;
+  setHead("Agents &amp; licences", "Agents earn more independence as their trust score grows. Demotion is automatic; promotion always needs a named person.");
+  $("view").innerHTML = `<div class="agent-grid">${o.agents.map(a => { const idx = LEVELS.indexOf(a.level); return `
+      <article class="agent-card ${a.agent_name === S.agent ? "selected" : ""}" data-agent="${esc(a.agent_name)}">
+        <div class="agent-card-header"><button class="btn btn-ghost agent-select"><h3>${esc(a.label)}</h3></button>${licence(a.level)}</div>
+        <div class="trust-score">${Math.round(a.trust_score)}</div><div class="trust-label">trust score</div>
+        <div class="licence-ladder tone-${LADDER_TONE[a.level]}">${LEVELS.map((l, i) => `<span class="ladder-step ${i <= idx ? "filled" : ""}">${LV[l].name}</span>`).join("")}</div>
+        <dl class="agent-metrics">
+          <dt>Mistake rate (last ${a.recent_cases.length} cases)</dt><dd>${Math.round(a.mistake_rate * 100)}%</dd>
+          <dt>A person checks</dt><dd>${Math.round(a.human_review_rate * 100)}% of its cases</dd>
+          <dt>Cases at this level</dt><dd>${a.cases_at_level}${a.level !== "FULL" ? ` of ${a.cases_needed_to_promote} needed` : ""}</dd>
+          <dt>Open mistakes</dt><dd>${a.open_mistakes}</dd>
+        </dl>
+        ${a.fast_track ? pill(`${icon("zap", 11)}Fast-tracked after a fix`, "ai") : ""}
+        ${a.level !== "FULL" ? `<button class="btn btn-outline promote-button" data-promote="${esc(a.agent_name)}" data-idle>Promote to ${LV[LEVELS[idx + 1]].name}…</button>` : ""}
+      </article>`; }).join("")}</div>
+    <div class="agent-detail-columns">
+      <section><div class="section-heading"><h2>Mistakes · ${esc(AGENT[S.agent])}</h2></div><div id="mlog">${skeleton(3)}</div></section>
+      <section><div class="section-heading"><h2>Licence history</h2><span>${o.history.length} changes</span></div>
+        <div class="history-list">${o.history.length ? o.history.map(h => `<div class="history-item">
+          <span class="score-change ${h.score_change < 0 ? "" : "unchanged"}">${h.score_change > 0 ? "+" : ""}${h.score_change}</span>
+          <div><strong>${esc(AGENT[h.agent_name] || h.agent_name)}</strong>: ${esc(h.reason)}
+            <p class="muted">Score ${h.new_score} · ${esc((LV[h.new_level] || {}).name || h.new_level)}${h.case_id ? " · " + esc(h.case_id) : ""}</p></div></div>`).join("")
+          : empty("No changes yet")}</div></section>
+    </div>`;
+  document.querySelectorAll(".agent-card").forEach(c => c.onclick = () => { S.agent = c.dataset.agent; S.sig = null; renderAgents(); });
+  document.querySelectorAll("[data-promote]").forEach(b => b.onclick = (e) => { e.stopPropagation(); promote(b.dataset.promote); });
+  loadMistakes();
 }
-
-async function loadAgent(agent) {
-  $("mistakeTitle").textContent = `Mistake log · ${AGENT[agent] || agent}`;
+async function loadMistakes() {
+  const agent = S.agent;
   try {
     const d = await api(`/api/agent/${agent}`);
-    $("mistakeLog").innerHTML = d.mistakes.length ? d.mistakes.slice().reverse().map(x => `
-      <div style="padding:12px 0;border-top:1px solid var(--line)">
-        <div class="meta">${esc(x.mistake_type)} · ${esc(x.case_id)} · ${esc(x.pattern_key)}${x.resolved ? " · resolved" : ""}</div>
-        <p style="margin:4px 0 8px">${esc(x.mistake_reason)}</p>
-        <div class="vs"><div><b>Agent said</b>${esc(x.agent_stated_reasoning)}</div><div><b>Should have</b>${esc(x.what_should_have_happened)}</div></div>
-      </div>`).join("") : `<div class="empty">No mistakes recorded for this agent.</div>`;
-  } catch (e) { $("mistakeLog").innerHTML = `<div class="empty">${esc(e.message)}</div>`; }
+    if (S.view !== "agents" || S.agent !== agent || !$("mlog")) return;
+    $("mlog").innerHTML = d.mistakes.length
+      ? d.mistakes.slice().reverse().map(x => mistakeCard({...x, agent_label:AGENT[agent]}, `<button class="case-link" data-case="${esc(x.case_id)}">${esc(x.case_id)}</button>`)).join("")
+      : `<div class="history-list">${empty("A clean record", "No mistakes recorded for this agent.")}</div>`;
+    $("mlog").querySelectorAll("[data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "agents"));
+  } catch (e) { if ($("mlog")) $("mlog").innerHTML = errorNote(e.message); }
+}
+function promote(agent) {
+  const a = S.o.agents.find(x => x.agent_name === agent), next = LV[LEVELS[LEVELS.indexOf(a.level) + 1]].name;
+  dialog({title:`Promote the ${AGENT[agent]} to ${next}?`, description:"Promotion is never automatic: it always needs a named person, and only after enough clean cases at this level.",
+    label:"Promote", fields:[{id:"name", label:"Your name", value:lastName(), placeholder:"Full name"}],
+    onConfirm:async ({name}) => { rememberName(name); await post(`/licence/${agent}/promote`, {approved_by:name}); }});
 }
 
-async function promote(agent) {
-  const who = prompt(`Promote ${AGENT[agent]}: promotion always needs a named person. Your name:`);
-  if (!who) return;
-  try { await api(`/licence/${agent}/promote`, {method:"POST", body:JSON.stringify({approved_by:who})}); }
-  catch (e) { alert(e.message); }
-  refresh();
+// ---------------------------------------------------------------- Improvements
+function renderImprove() {
+  const o = S.o;
+  setHead("Improvements", "When an agent repeats the same mistake on 3 cases, AgentLens suggests a fix, then proves it by replaying the failed cases.",
+          `<button class="btn btn-outline danger-outline" id="incident" data-idle>${icon("alert", 14)}Simulate a critical incident</button>`);
+  const steps = [["Pattern","The same mistake on 3+ cases becomes a suggested fix."],["Apply","A named person approves it. The agent goes back to L-plates."],
+                 ["Verify","Replay every case it got wrong, with the fix."],["Resolve or iterate","All pass: fast-track. Some fail: a new suggestion."]];
+  $("view").innerHTML = `<div class="improvement-strip">${steps.map(([t, p], i) => `<div class="improvement-step"><span>${i + 1}</span><div><strong>${t}</strong><p>${p}</p></div></div>`).join("")}</div>
+    ${o.suggestions.length ? o.suggestions.map(s => { const vr = s.verify_result; return `<article class="suggestion-card">
+      <div class="suggestion-header">${pill(esc(s.status), s.status)}<strong>#${s.id} · ${esc(AGENT[s.agent_name] || s.agent_name)}</strong>${pill(`Round ${s.iteration}`, "neutral")}
+        <span class="muted">${(s.case_ids || []).length} cases${s.parent_id ? ` · follows #${s.parent_id}` : ""}</span></div>
+      <dl class="definition-list"><dt>Pattern</dt><dd>${esc(s.pattern_description)}</dd><dt>Root cause</dt><dd>${esc(s.root_cause)}</dd>
+        <dt>Fix</dt><dd><strong>${esc(s.fix_description || s.suggested_fix)}</strong>${s.applied_by ? ` <span class="muted">· approved by ${esc(s.applied_by)}</span>` : ""}</dd>
+        <dt>Cases</dt><dd class="case-links">${(s.case_ids || []).map(c => `<button class="case-link" data-case="${esc(c)}">${esc(c)}</button>`).join("")}</dd>
+        ${vr ? `<dt>Replay result</dt><dd>${vr.passed.length} of ${vr.replayed} now pass${vr.failed.length ? `; still failing: <strong>${esc(vr.failed.join(", "))}</strong>` : ` ${icon("check", 12)}`}</dd>` : ""}</dl>
+      ${s.status === "proposed" ? `<button class="btn" data-apply="${s.id}" data-idle>${icon("check", 14)}Apply fix…</button>` : ""}
+      ${s.status === "testing" ? `<button class="btn" data-verify="${s.id}" data-idle>${icon("rotate", 14)}Verify: replay ${(s.case_ids || []).length} cases</button>` : ""}
+    </article>`; }).join("") : `<div class="data-table-wrap">${empty("No improvements suggested yet", "Run the demo batch: the verification agent repeats the same mistake 3 times.")}</div>`}`;
+  document.querySelectorAll("[data-apply]").forEach(b => b.onclick = () => applyFix(b.dataset.apply));
+  document.querySelectorAll("[data-verify]").forEach(b => b.onclick = async () => {
+    b.disabled = true;
+    try { await post(`/api/jobs/verify/${b.dataset.verify}`); toast("Replaying the failed cases with the fix…"); } catch (e) { toast(e.message, "err"); }
+    refresh();
+  });
+  document.querySelectorAll(".case-links [data-case]").forEach(a => a.onclick = () => openCase(a.dataset.case, "improve"));
+  wireHeadActions();
+}
+function applyFix(id) {
+  const s = S.o.suggestions.find(x => String(x.id) === String(id));
+  dialog({title:`Apply fix #${id} to the ${AGENT[s.agent_name]}?`, description:"The agent goes back to L-plates while the fix is re-tested on the cases it got wrong.",
+    label:"Apply fix", fields:[{id:"name", label:"Approved by", value:lastName(), placeholder:"Full name"}, {id:"fix", label:"Fix description", value:s.suggested_fix, textarea:true}],
+    onConfirm:async ({name, fix}) => { rememberName(name); await post(`/improve/${id}/apply`, {approved_by:name, fix_description:fix}); }});
 }
 
-async function applyFix(id) {
-  const s = state.overview.suggestions.find(x => String(x.id) === String(id));
-  const who = prompt(`Apply fix #${id} to ${AGENT[s.agent_name]}.\nThe agent goes back to L-plates for re-testing.\nApproved by (your name):`);
-  if (!who) return;
-  const fix = prompt("Fix description:", s.suggested_fix);
-  if (fix === null) return;
-  try { await api(`/improve/${id}/apply`, {method:"POST", body:JSON.stringify({approved_by:who, fix_description:fix})}); }
-  catch (e) { alert(e.message); }
-  refresh();
-}
-
-async function verifyFix(id) {
-  try { await api(`/api/jobs/verify/${id}`, {method:"POST"}); } catch (e) { alert(e.message); }
-  refresh();
-}
-
-$("waitBtn").onclick = async () => {
-  try { await api("/api/jobs/process_waiting", {method:"POST"}); } catch (e) { alert(e.message); }
-  refresh();
+// ---------------------------------------------------------------- demo controls
+$("runBtn").onclick = () => {
+  const n = Number($("count").value);
+  dialog({title:"Run a fresh demo batch?", description:"This CLEARS the demo data and submits a fresh batch of synthetic applications. The agents process them one by one while AgentLens watches.",
+    label:`Run ${n} applications`, onConfirm:async () => { S.caseId = null; S.explain = {}; S.reveal = {}; await post("/api/jobs/batch", {count:n}); go("review"); }});
 };
-const linked = new URLSearchParams(location.search).get("case");
-if (linked) selectCase(linked, true);
+$("waitBtn").onclick = async () => { try { await post("/api/jobs/process_waiting"); } catch (e) { toast(e.message, "err"); } refresh(); };
 
-// ---- polling
+// ---------------------------------------------------------------- polling
 async function refresh() {
-  try {
-    const o = await api("/api/overview");
-    state.overview = o;
-    renderOverview(o);
-    if (state.tab === "agents" && !o.job.running) {}
-  } catch (e) { $("runMsg").innerHTML = `<span class="err">${esc(e.message)}</span>`; }
+  let o;
+  try { o = await api("/api/overview"); } catch (e) { renderOffline(e.message); return; }
+  S.o = o;
+  renderChrome(o);
+  // redraw only when something on this view changed (keeps open tabs, scroll and dialogs as they are)
+  const sig = JSON.stringify([S.view, S.agent, o.queue, o.stats, o.agents.map(a => [a.level, a.trust_score, a.cases_at_level, a.open_mistakes, a.fast_track]),
+                              o.applications, o.history, o.suggestions, o.job.running, S.caseId && o.statuses[S.caseId]]);
+  if (sig !== S.sig && !dialogOpen()) { S.sig = sig; render(); }
 }
-let lastRunning = false;
-setInterval(async () => {
-  await refresh();
-  const running = state.overview?.job?.running;
-  if (lastRunning && !running && state.tab === "agents") loadAgent(state.selectedAgent);
-  lastRunning = running;
-}, 2000);
+const params = new URLSearchParams(location.search);
+if (params.get("case")) { S.caseId = params.get("case"); S.view = "case"; S.back = "applications"; }
+else if (params.get("view")) S.view = params.get("view");
+markNav();
+$("pageHead").innerHTML = `<div class="page-header"><div><div class="eyebrow">HUMAN OVERSIGHT, BUILT IN</div><h1>AgentLens</h1><p>Connecting to your AgentLens API…</p></div></div>`;
+$("view").innerHTML = skeleton(5);
 refresh();
+setInterval(refresh, 2500);
 </script>
 </body>
 </html>

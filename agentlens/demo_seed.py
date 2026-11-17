@@ -13,8 +13,9 @@ The demo script, mapped onto our agents:
      -> iteration 2, suggestion #2 (self-employed income statements).
   3. Apply #2, verify -> all 3 pass -> resolved, verification agent fast-tracked
      (10 cases instead of 30); after 10 more cases a person promotes it.
-  4. decision_agent approves a loan despite a failed credit check (LOAN-0047)
-     -> CRITICAL -> instantly SUSPENDED.
+  4. (on demand: --incident, or the dashboard's "Simulate a critical incident") decision_agent
+     approves a loan despite a failed credit check (LOAN-0047) -> CRITICAL -> instantly back to L-plates.
+After the batch alone: intake Full licence, verification Red P (P1), decision Green P (P2).
 Also in the batch, for the review queue: debts left out (LOAN-0015), a borderline approval
 (LOAN-0031), an old payslip (LOAN-0042), ignored credit checks (LOAN-0039), plus normal
 declines, a referral for hardship and a customer the intake AI has to ask for the term.
@@ -64,9 +65,11 @@ STORY = [
     ("LOAN-0015", "debts_omitted"), ("LOAN-0031", "borderline"), ("LOAN-0010", "clean"),
     ("LOAN-0042", "old_payslip"), ("LOAN-0013", "clean"), ("LOAN-0012", "hardship"),
     ("LOAN-0039", "many_enquiries"), ("LOAN-0024", "john_control"), ("LOAN-0014", "clean"),
-    ("LOAN-0047", "default_approved"),
 ]
-NOT_IN_BATCH = {"LOAN-0025", "LOAN-0026", "LOAN-0027"}  # Mia + the privacy/access demos (run separately)
+# Not in the batch: Mia, the privacy/access demos, and the critical incident (each runs on its own,
+# because a CRITICAL mistake sends the agent back to L-plates).
+NOT_IN_BATCH = {"LOAN-0025", "LOAN-0026", "LOAN-0027", "LOAN-0047"}
+INCIDENT_CASE = "LOAN-0047"
 
 
 def hem(household: str, dependants: int) -> float:
@@ -238,6 +241,14 @@ def run_batch(count: int = 30, progress=None) -> list[str]:
     return [c["case_id"] for c in cases]
 
 
+def run_incident() -> dict:
+    """Demo step 4, on demand: the decision agent approves a loan despite a failed credit check
+    -> CRITICAL -> the decision agent goes straight back to L-plates."""
+    case = story_case(INCIDENT_CASE, "default_approved", 46)
+    submissions.submit_many([case["submission"]])
+    return monitor.process(INCIDENT_CASE, fresh=True)
+
+
 def run_improvement_loop(approver: str = "Credit risk lead", log=print) -> None:
     """Steps 2-3 of the demo script, done automatically."""
     sug = [s for s in store.suggestions() if s["agent_name"] == "verification_agent" and s["status"] == "proposed"]
@@ -272,6 +283,7 @@ if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--count", type=int, default=30)
     ap.add_argument("--all", action="store_true", help="also run the improvement loop and a promotion")
+    ap.add_argument("--incident", action="store_true", help="also run the critical incident (decision_agent back to L-plates)")
     args = ap.parse_args()
     t0 = time.time()
 
@@ -289,5 +301,8 @@ if __name__ == "__main__":
     _print_rank()
     if args.all:
         run_improvement_loop()
+        _print_rank()
+    if args.incident:
+        print("critical incident:", run_incident()["status"])
         _print_rank()
     sys.exit(0)

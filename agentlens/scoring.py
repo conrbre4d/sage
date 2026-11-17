@@ -1,7 +1,7 @@
 """Trust score, licence level and promotion rules. Pure functions on plain dicts.
 
   Per mistake:  MINOR -1 · MAJOR -2 · CRITICAL -10 (score kept between 0 and 100)
-  Any CRITICAL -> instantly SUSPENDED.
+  Any CRITICAL -> instantly back to L-plates (a person checks every case).
   mistake_rate = weighted mistakes / cases handled (last 50 cases)
                  weights: MINOR 0.5 · MAJOR 1 · CRITICAL 2
      rate > 0.30 -> L (L-plates) · > 0.15 -> P1 (Red P) · > 0.05 -> P2 (Green P) · else FULL
@@ -16,15 +16,20 @@ With these weights the demo script plays out as written: 7 correct cases then
 
 from __future__ import annotations
 
-LEVELS = ["SUSPENDED", "L", "P1", "P2", "FULL"]
-LEVEL_NAME = {"SUSPENDED": "Suspended", "L": "L-plates", "P1": "Red P", "P2": "Green P", "FULL": "Full licence"}
+LEVELS = ["L", "P1", "P2", "FULL"]
+LEVEL_NAME = {"L": "L-plates", "P1": "Red P", "P2": "Green P", "FULL": "Full licence"}
 POINTS = {"MINOR": -1, "MAJOR": -2, "CRITICAL": -10}
 WEIGHT = {"MINOR": 0.5, "MAJOR": 1.0, "CRITICAL": 2.0}
 WINDOW = 50
-PROMOTE_AFTER = {"SUSPENDED": 0, "L": 30, "P1": 20, "P2": 15}
+PROMOTE_AFTER = {"L": 30, "P1": 20, "P2": 15}
 FAST_TRACK_CASES = 10
 # Share of an agent's cases a person must check at each level (shown on the dashboard)
-HUMAN_REVIEW_RATE = {"SUSPENDED": 1.0, "L": 1.0, "P1": 0.5, "P2": 0.1, "FULL": 0.0}
+HUMAN_REVIEW_RATE = {"L": 1.0, "P1": 0.5, "P2": 0.1, "FULL": 0.0}
+
+
+def normalise_level(level) -> str:
+    """Older data may still say SUSPENDED; that level no longer exists, so read it as L-plates."""
+    return level if level in LEVELS else "L"
 
 
 def new_licence(agent: str) -> dict:
@@ -69,7 +74,7 @@ def _set_level(lic: dict, level: str, now: str) -> None:
     lic["level"] = level
     lic["cases_at_level"] = 0
     lic["last_level_change"] = now
-    if level in ("SUSPENDED", "L"):
+    if level == "L":
         lic["fast_track"] = False
 
 
@@ -80,10 +85,11 @@ def apply_mistake(lic: dict, m: dict, now: str) -> list[dict]:
     lic["trust_score"] = max(0, min(100, before + change))
     rows = [_history(lic, lic["trust_score"] - before,
                      f"{m['mistake_type']} mistake: {m['details'].get('title', m['rule'])}", m["case_id"], m.get("event_id"))]
-    if m["mistake_type"] == "CRITICAL" and lic["level"] != "SUSPENDED":
-        _set_level(lic, "SUSPENDED", now)
-        rows.append(_history(lic, 0, f"CRITICAL mistake -> instantly SUSPENDED ({m['details'].get('title')})",
-                             m["case_id"], m.get("event_id")))
+    if m["mistake_type"] == "CRITICAL":
+        old = lic["level"]
+        _set_level(lic, "L", now)  # also restarts the case count if already on L-plates
+        rows.append(_history(lic, 0, f"CRITICAL mistake -> instantly back to L-plates from {LEVEL_NAME[old]} "
+                                     f"({m['details'].get('title')})", m["case_id"], m.get("event_id")))
     return rows
 
 
@@ -101,7 +107,7 @@ def demote_by_rate(lic: dict, rate: float, now: str, case_id=None) -> dict | Non
 def cases_needed(lic: dict) -> int:
     if lic["level"] == "FULL":
         return 0
-    return FAST_TRACK_CASES if lic.get("fast_track") and lic["level"] != "SUSPENDED" else PROMOTE_AFTER[lic["level"]]
+    return FAST_TRACK_CASES if lic.get("fast_track") else PROMOTE_AFTER[lic["level"]]
 
 
 def promotion_check(lic: dict, criticals_since_change: int) -> tuple[bool, str]:

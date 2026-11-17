@@ -18,6 +18,7 @@ import re
 import secrets
 
 import db
+import estimates
 import tools
 from test_cases import TEST_CASES, build_documents_from_profile
 
@@ -53,6 +54,7 @@ def build_submission(case_id: str, profile: dict, customer_message: str, documen
         identity["age"] = profile["age"]
     identity["employer"] = docs["payslip"].get("employer")
     application = {col: profile.get(key) for key, col in APPLICATION_COLUMNS.items()}
+    application |= estimates.for_submission(application)  # time to a decision + chance of approval
     case = {**docs, "profile": profile}
     return {"case_id": case_id, "application": application, "customer_token": new_token(), "identity": identity,
             "customer_message": customer_message,

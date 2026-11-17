@@ -97,20 +97,21 @@ def test_seven_correct_then_three_majors_gives_p1():
     assert lic["level"] == "P1" and lic["trust_score"] == 94
 
 
-def test_critical_suspends_and_promotion_is_never_automatic():
+def test_critical_sends_back_to_l_plates_and_promotion_is_never_automatic():
     import scoring
+    assert "SUSPENDED" not in scoring.LEVELS and scoring.normalise_level("SUSPENDED") == "L"
     lic = scoring.new_licence("decision_agent")
     scoring.apply_mistake(lic, {"agent_name": "decision_agent", "case_id": "C", "mistake_type": "CRITICAL",
                                 "details": {"title": "t"}, "rule": "r"}, "now")
-    assert lic["level"] == "SUSPENDED"
-    for i in range(100):  # lots of clean cases: still suspended
+    assert lic["level"] == "L"  # straight from Full licence to L-plates
+    assert scoring.promotion_check(lic, 0)[0] is False  # L needs 30 cases first
+    for i in range(100):  # lots of clean cases: still on L-plates until a person promotes
         scoring.record_case(lic, f"X{i}")
         scoring.demote_by_rate(lic, 0.0, "now")
-    assert lic["level"] == "SUSPENDED"
+    assert lic["level"] == "L"
     assert scoring.promotion_check(lic, criticals_since_change=0) == (True, "ok")
     scoring.promote(lic, "Sam", "now")
-    assert lic["level"] == "L"
-    assert scoring.promotion_check(lic, 0)[0] is False  # L needs 30 cases first
+    assert lic["level"] == "P1"
 
 
 # --- the demo script, end to end on the real pipeline ------------------------------
@@ -122,19 +123,17 @@ def test_demo_script(lens):
 
     lens.run_batch(23)
     held = {a["case_id"] for a in db.list_applications("held")}
-    assert held == {"LOAN-0023", "LOAN-0029", "LOAN-0035", "LOAN-0015", "LOAN-0031", "LOAN-0042",
-                    "LOAN-0039", "LOAN-0047"}
+    assert held == {"LOAN-0023", "LOAN-0029", "LOAN-0035", "LOAN-0015", "LOAN-0031", "LOAN-0042", "LOAN-0039"}
     lic = store.licences()
     # 1. verification: 7 correct, 3 doubled incomes -> P1 (and stays P1), suggestion #1
     assert lic["verification_agent"]["level"] == "P1"
     [s1] = store.suggestions()
     assert s1["pattern_key"] == "misreads_field:pay_frequency" and s1["case_ids"] == ["LOAN-0023", "LOAN-0029", "LOAN-0035"]
     assert "pay_frequency" in s1["suggested_fix"]
-    # 4. decision approved despite a failed credit check -> CRITICAL -> SUSPENDED
-    assert lic["decision_agent"]["level"] == "SUSPENDED"
+    # after the batch: decision is on a P plate, intake on a full licence
+    assert lic["decision_agent"]["level"] == "P2"
     assert lic["intake_agent"]["level"] == "FULL"
-    ranked = [r["agent_name"] for r in monitor.rank()]
-    assert ranked[0] == "decision_agent"
+    assert [r["agent_name"] for r in monitor.rank()][0] == "verification_agent"
 
     # 2. apply #1, verify -> 2 of 3 pass, the self-employed one doesn't -> iteration 2
     monitor.apply_suggestion(s1["id"], "Sam", s1["suggested_fix"])
@@ -157,9 +156,15 @@ def test_demo_script(lens):
     lens.run_cases(lens.extra_clean_cases(10))
     monitor.promote_agent("verification_agent", "Sam")
     assert lic["verification_agent"]["level"] == "P1"
-    # the suspended decision agent can't be promoted without a name
+    # promotion can't happen without a name
     with pytest.raises(ValueError, match="named person"):
         monitor.promote_agent("decision_agent", " ")
+
+    # 4. the critical incident, on demand: approved despite a failed credit check -> back to L-plates
+    out = lens.run_incident()
+    assert out["status"] == "held"
+    assert lic["decision_agent"]["level"] == "L"
+    assert any(m["case_id"] == "LOAN-0047" and m["mistake_type"] == "CRITICAL" for m in store.mistakes())
 
 
 def test_privacy_and_access_demos_are_caught(lens):
@@ -175,7 +180,7 @@ def test_privacy_and_access_demos_are_caught(lens):
         monitor.process(cid)
     rules = {(m["case_id"], m["rule"]) for m in store.mistakes()}
     assert ("LOAN-0026", "DP3") in rules and ("LOAN-0027", "DP4") in rules
-    assert store.licences()["verification_agent"]["level"] == "SUSPENDED"
+    assert store.licences()["verification_agent"]["level"] == "L"
     assert {a["case_id"] for a in db.list_applications("held")} == {"LOAN-0026", "LOAN-0027"}
     assert main.db.get_tracker("LOAN-0026")["message"] is None  # held before the customer was told anything
 
@@ -185,12 +190,61 @@ def test_reviewer_actions(lens):
     import monitor
 
     lens.run_batch(23)
-    monitor.review_case("LOAN-0047", "decline", "Sam")
-    assert db.get_application("LOAN-0047")["status"] == "declined"
+    held = db.get_application("LOAN-0031")
+    assert held["estimated_timeframe"].startswith("Within 1 business day")
+    monitor.review_case("LOAN-0031", "decline", "Sam")
+    a = db.get_application("LOAN-0031")
+    assert a["status"] == "declined" and a["reviewed_by"] == "Sam" and a["approval_probability"] == 0.0
     out = monitor.review_case("LOAN-0015", "recalculate", "Sam")  # fault fixed, re-run with all debts
     assert out["status"] == "declined"  # true DTI is over 50% once the debts are counted
+    assert db.get_application("LOAN-0015")["reviewed_by"] == "Sam"
     with pytest.raises(ValueError, match="not held"):
         monitor.review_case("LOAN-0001", "approve", "Sam")
+
+
+def test_estimates_are_stored_and_updated(lens):
+    import db
+    import estimates
+    lens.run_batch(22)
+    apps = {a["case_id"]: a for a in db.list_applications()}
+    assert apps["LOAN-0024"]["approval_probability"] == 0.0 and apps["LOAN-0024"]["estimated_timeframe"] == "Decided"
+    approved = [a for a in apps.values() if a["status"] == "approved"]
+    assert approved and all(a["approval_probability"] == 1.0 for a in approved)
+    # John's held case: estimated from his own form (DTI 52%), not the agent's doubled income
+    assert apps["LOAN-0023"]["approval_probability"] == estimates.probability(estimates.dti_from_form(apps["LOAN-0023"]))
+    assert apps["LOAN-0023"]["approval_probability"] <= 0.2
+    assert estimates.probability(0.25) > estimates.probability(0.45) > estimates.probability(0.6)
+    assert estimates.probability(0.25, defaults=1) == 0.05
+
+
+def test_reviewer_sees_form_and_documents_masked_unless_revealed(lens):
+    import db
+    import main
+    lens.run_batch(22)
+    f = main.application_form("LOAN-0023")
+    about = dict(f["sections"][0]["fields"])
+    assert about["Full name"] == "J••• D•••••" and "Davies" not in str(f)
+    assert "[NAME]" in f["message"]
+    docs = main.application_documents("LOAN-0023")["documents"]
+    assert set(docs) == {"payslip", "bank_statement", "credit_report"}
+    assert "John" not in docs["payslip"]["text"] and "Fortnightly" in docs["payslip"]["text"]
+    assert [e for e in db.get_events("LOAN-0023") if e["step_name"] == "vault.view_identity"] == []
+    shown = main.application_form("LOAN-0023", reveal=True, viewer="Sam")
+    assert dict(shown["sections"][0]["fields"])["Full name"] == "John Davies"
+    assert "John Davies" in main.application_documents("LOAN-0023", reveal=True, viewer="Sam")["documents"]["payslip"]["text"]
+    views = [e for e in db.get_events("LOAN-0023") if e["step_name"] == "vault.view_identity"]
+    assert len(views) == 2 and views[0]["input_data"]["viewer"] == "Sam"
+
+
+def test_timeline_is_plain_english(lens):
+    import agentlens
+    lens.run_batch(22)
+    d = agentlens.case_detail("LOAN-0023")
+    titles = [t["title"] for t in d["timeline"]]
+    assert "Checked the income" in titles and "AgentLens held the case for a person" in titles
+    income = next(t for t in d["timeline"] if t["step"] == "verify_income")
+    assert dict(income["facts"])["Income used (a year)"] == "$144,000"
+    assert d["primary"]["details"]["title"] == "Income doubled"
 
 
 def test_agentlens_never_reads_the_vault():

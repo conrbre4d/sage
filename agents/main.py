@@ -869,6 +869,93 @@ def applications(status: str | None = None):
     return db.list_applications(status)
 
 
+def _mask(value) -> str | None:
+    """'John Davies' -> 'J••• D•••••' (first letter of each word)."""
+    if value in (None, ""):
+        return value
+    return " ".join(w[0] + "•" * (len(w) - 1) if len(w) > 1 else w for w in str(value).split())
+
+
+def _log_reveal(case_id: str, viewer: str, what: str) -> None:
+    """A person looked at personal details: that goes in the audit trail."""
+    db.insert_event(case_id, "human_reviewer", "vault.view_identity", now_iso(), {"viewer": viewer, "viewed": what},
+                    {"fields": what}, "pass", f"{viewer} viewed the customer's {what}")
+    db.flush_events()
+
+
+@app.get("/applications/{case_id}/form")
+def application_form(case_id: str, reveal: bool = False, viewer: str = "Credit reviewer"):
+    """The web form as the customer submitted it (for a person reviewing the case).
+
+    Personal details are masked unless reveal=true, and every reveal is logged.
+    Plain code on the bank's side: no AI and no AgentLens code calls this.
+    """
+    a = db.get_application(case_id)
+    if a is None:
+        raise HTTPException(status_code=404, detail=f"no application {case_id}")
+    ident = db.get_identity(a["customer_token"])
+    message = db.get_customer_message(case_id)
+    if reveal:
+        _log_reveal(case_id, viewer, "personal details")
+    show = (lambda v: v) if reveal else _mask
+    return {
+        "case_id": case_id, "customer_token": a["customer_token"], "submitted_at": a.get("submitted_at"),
+        "revealed": reveal,
+        "status": a["status"], "approval_probability": a.get("approval_probability"),
+        "estimated_timeframe": a.get("estimated_timeframe"), "estimated_decision_by": a.get("estimated_decision_by"),
+        "sections": [
+            {"title": "About you", "private": True, "fields": [
+                ["Full name", show(ident.get("name"))],
+                ["Date of birth", show(ident.get("date_of_birth")) if ident.get("date_of_birth") else None],
+                ["Address", show(ident.get("address"))],
+                ["BSB / account", show(ident.get("account_number"))]]},
+            {"title": "Work and income", "fields": [
+                ["Employer", show(ident.get("employer"))],
+                ["Employment", a.get("employment")],
+                ["Annual gross income", f"${float(a['stated_annual_income']):,.0f}"]]},
+            {"title": "The loan", "fields": [
+                ["Amount", f"${float(a['requested_amount']):,.0f}"],
+                ["Term", f"{a['term_years']} years" if a.get("term_years") else "left blank (the assistant asked)"],
+                ["Purpose", a.get("purpose")]]},
+            {"title": "Your finances", "fields": [
+                ["Monthly living expenses", f"${float(a.get('monthly_expenses') or 0):,.0f}"],
+                ["Credit card limits", f"${float(a.get('credit_card_limit') or 0):,.0f}"],
+                ["HECS-HELP debt", "Yes" if a.get("has_hecs") else "No"],
+                ["Household", f"{a.get('household')}, {a.get('dependants') or 0} dependant(s)"],
+                ["Existing customer", "Yes" if a.get("existing_customer") else "No"],
+                ["Residency", a.get("residency")]]},
+        ],
+        "message": message if reveal else tools.redact_mask(message, a["customer_token"])["text"],
+    }
+
+
+@app.get("/applications/{case_id}/documents")
+def application_documents(case_id: str, reveal: bool = False, viewer: str = "Credit reviewer"):
+    """The documents attached to the application: payslip, bank statement, credit report.
+    Personal details are masked unless reveal=true (logged)."""
+    a = db.get_application(case_id)
+    if a is None:
+        raise HTTPException(status_code=404, detail=f"no application {case_id}")
+    if reveal:
+        _log_reveal(case_id, viewer, "documents")
+    docs = {}
+    for doc_type, title in (("payslip", "Payslip"), ("bank_statement", "Bank statement")):
+        text = db.get_document_text(case_id, doc_type)
+        docs[doc_type] = {"title": title, "kind": "text",
+                          "text": text if reveal else tools.redact_mask(text, a["customer_token"])["text"]}
+    if "SELF-EMPLOYED" in docs["payslip"]["text"].upper():
+        docs["payslip"]["title"] = "Income statement (self-employed)"
+    cr = db.get_mock_external(case_id)["credit_report"]
+    docs["credit_report"] = {"title": "Credit report", "kind": "table", "source": "Credit bureau (Equifax mock)",
+                             "rows": [["Credit score", cr.get("credit_score") or "n/a"], ["Defaults", cr.get("defaults")],
+                                      ["Enquiries (last 12 months)", cr.get("enquiries")]] +
+                                     [[f"{x.get('type', '').replace('_', ' ').title()} · {x.get('lender')}",
+                                       f"limit ${x.get('limit') or 0:,.0f}" + (f" · balance ${x['balance']:,.0f}"
+                                                                              if x.get("balance") else "")]
+                                      for x in cr.get("accounts", [])]}
+    return {"case_id": case_id, "revealed": reveal, "documents": docs}
+
+
 @app.post("/process/{case_id}")
 def process(case_id: str):
     try:

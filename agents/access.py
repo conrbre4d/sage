@@ -10,7 +10,7 @@ Four layers of restriction:
      'held' case can only be changed by a human reviewer.
 
 Anything outside that is refused, raised as AccessViolation, and logged to the
-event log as step 'access.violation' (AgentLens rule DP4: critical -> suspend the
+event log as step 'access.violation' (AgentLens rule DP4: critical -> back to L-plates for the
 agent and hold the case).
 
 Production version: an access role per agent, row-level security in the database,
@@ -24,6 +24,7 @@ from dataclasses import dataclass
 from datetime import datetime, timedelta, timezone
 
 import db
+import estimates
 
 # Case status flow: submitted -> verifying -> deciding -> approved / declined / referred
 FINAL_STATUSES = {"approved", "declined", "referred"}
@@ -157,15 +158,22 @@ def set_status(ticket: Ticket, new_status: str) -> dict:
         problem = f"tried to set status '{new_status}' (allowed: {sorted(PERMISSIONS[ticket.agent]['next_status'])})"
         _violation(ticket, "status", "write", problem, None)
         raise AccessViolation(f"DP4: {ticket.agent} {problem}")
-    db.update_application(ticket.case_id, {"status": new_status})
+    db.update_application(ticket.case_id, status_fields(ticket.case_id, new_status))
     step, status = TRACKER_LABEL[new_status]
     db.upsert_tracker(ticket.case_id, step, status, now_iso())
     return {"status": new_status}
 
 
+def status_fields(case_id: str, status: str) -> dict:
+    """The new status plus the updated time estimate and approval probability (stored on the application)."""
+    app = db.get_application(case_id) or {}
+    verification = db.read_handoff(case_id, "verification") if status == "deciding" else None
+    return {"status": status, **estimates.for_status(status, app, verification)}
+
+
 def place_hold(case_id: str, reason: str, by: str = "agentlens") -> None:
     """AgentLens (or a person) holds a case. Agents can't touch it until a human reviewer releases it."""
-    db.update_application(case_id, {"status": "held"})
+    db.update_application(case_id, status_fields(case_id, "held"))
     step, status = TRACKER_LABEL["held"]
     db.upsert_tracker(case_id, step, status, now_iso())
     db.insert_event(case_id, by, "case.hold", now_iso(), {"reason": reason}, {"status": "held"},
@@ -177,7 +185,10 @@ def human_review(case_id: str, reviewer: str, new_status: str, note: str = "") -
     """Only a human reviewer can change a held case."""
     if new_status not in STATUSES:
         raise ValueError(f"unknown status {new_status}")
-    db.update_application(case_id, {"status": new_status})
+    fields = status_fields(case_id, new_status)
+    if reviewer != "AgentLens replay":  # a real person
+        fields |= {"reviewed_by": reviewer, "reviewed_at": now_iso()}
+    db.update_application(case_id, fields)
     if new_status in TRACKER_LABEL:
         step, status = TRACKER_LABEL[new_status]
         db.upsert_tracker(case_id, step, status, now_iso())
@@ -191,5 +202,5 @@ def reset_for_rerun(case_id: str) -> None:
     app = db.get_application(case_id)
     if app["status"] == "held":
         raise AccessViolation(f"{case_id} is held; only a human reviewer can release it")
-    db.update_application(case_id, {"status": "submitted", "decision": None,
+    db.update_application(case_id, {**status_fields(case_id, "submitted"), "decision": None,
                                     "decision_confidence": None, "decided_at": None})

@@ -44,6 +44,15 @@ create table if not exists public.applications (
     decided_at            timestamptz
 );
 
+-- Added later: kept up to date at every status change (projects made before them get them here)
+alter table public.applications
+    add column if not exists approval_probability   numeric,      -- 0..1, rough chance of approval
+    add column if not exists estimated_timeframe    text,         -- e.g. "Within 1 business day · a credit officer is reviewing"
+    add column if not exists estimated_decision_by  timestamptz,
+    add column if not exists status_updated_at      timestamptz,
+    add column if not exists reviewed_by            text,         -- the person who reviewed a held case
+    add column if not exists reviewed_at            timestamptz;
+
 create table if not exists public.customer_identity (
     customer_token              text primary key,
     case_id                     text not null references public.applications (case_id) on delete cascade,
@@ -117,13 +126,20 @@ create table if not exists public.agent_licence (
     agent_name         text primary key,
     trust_score        integer not null default 100,
     level              text not null default 'FULL'
-                       check (level in ('SUSPENDED', 'L', 'P1', 'P2', 'FULL')),
+                       check (level in ('L', 'P1', 'P2', 'FULL')),
     cases_at_level     integer not null default 0,
     last_level_change  timestamptz,
     risk_owner         text not null default 'unassigned',
     fast_track         boolean not null default false,   -- after a verified fix: 10 cases to promote
     recent_cases       jsonb not null default '[]'        -- last 50 case_ids handled (mistake_rate window)
 );
+
+-- Upgrade older projects: the Suspended level no longer exists (a CRITICAL mistake
+-- now sends the agent back to L-plates). Move old rows, then tighten the check.
+update public.agent_licence set level = 'L' where level not in ('L', 'P1', 'P2', 'FULL');
+alter table public.agent_licence drop constraint if exists agent_licence_level_check;
+alter table public.agent_licence add constraint agent_licence_level_check
+    check (level in ('L', 'P1', 'P2', 'FULL'));
 
 create table if not exists public.mistake_log (
     id                         bigint generated always as identity primary key,

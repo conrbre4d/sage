@@ -53,7 +53,8 @@ def _req(method: str, path: str, params: dict | None = None, json=None, prefer: 
         hint = ""
         if r.status_code in (401, 403):
             hint = " (check SUPABASE_SECRET_KEY: it must be the secret/service_role key, not the publishable/anon key)"
-        elif r.status_code == 404 or "does not exist" in r.text or "schema cache" in r.text or "PGRST202" in r.text:
+        elif (r.status_code == 404 or "does not exist" in r.text or "schema cache" in r.text
+              or "PGRST202" in r.text or "PGRST204" in r.text):
             hint = " (run supabase/schema.sql again in the Supabase SQL editor)"
         raise SupabaseError(f"{method} {path} -> {r.status_code}: {r.text[:300]}{hint}")
     return r.json() if r.content else None
@@ -82,6 +83,11 @@ def check() -> list[str]:
             problems.append(str(e))
             if "could not reach" in str(e) or "SUPABASE_" in str(e):
                 return problems
+    try:
+        _req("GET", "applications", params={"select": "approval_probability,estimated_timeframe,reviewed_by",
+                                            "limit": 1})
+    except SupabaseError as e:
+        problems.append(f"applications is missing the new columns: {e}")
     try:
         reserve_event_ids(1)
     except SupabaseError as e:
